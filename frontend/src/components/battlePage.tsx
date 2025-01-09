@@ -18,7 +18,9 @@ export const BattlePgage = ()=>{
 </svg>
                         <div className="font-semibold text-green-600">Back</div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2" onClick={()=>{
+                           navigate('/rules')
+                    }}>
                     <div className="text-gray-400 font-semibold">Rules</div>
                     <img src="../../info.png" alt="" className="size-5 mt-1" />
                     </div>

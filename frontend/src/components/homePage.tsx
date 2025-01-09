@@ -7,8 +7,8 @@ export const HomePage = ()=>{
     const [setClicked , setSetClicked ] = useState(false);
     return (
         <div className="max-w-sm bg-white">
-            <div className="flex flex-col pt-12 ">
-                <div className="bg-gray-300">
+            <div className="flex flex-col pt-12">
+                <div className="bg-gray-300 pb-16">
                 <div className="font-serif text-center pt-4">CREATE A BATTLE!</div>
                 <div className=" flex gap-2 ml-12 pl-2 mx-4 py-2">
                 <input type="text" placeholder="Amount" className="p-2 rounded-md"/>
@@ -29,7 +29,9 @@ export const HomePage = ()=>{
                         <img src="../../battleIcon.png" alt="" className="size-6 m-2"/>
                         <div className="m-2 font-semibold-">Open Battle</div>
                      </div>
-                     <div className="flex">
+                     <div className="flex" onClick={()=>{
+                        navigate('/rules');
+                     }}>
                         <div className="my-2 font-semibold-">Rules</div>
                         <img src="../../info.png" alt="" className="size-6 m-2"/>
                      </div>
