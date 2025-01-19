@@ -16,6 +16,14 @@ export const sendOtp : RequestHandler = expressAsyncHandler(async (req: Request,
             { otp, otpExpires: new Date(Date.now() + 10 * 60 * 1000) },
             { upsert: true, new: true }
         );
+
+        if(!user){
+            await User.create(
+                { phone },
+                { otp, otpExpires: new Date(Date.now() + 10 * 60 * 1000) },
+            { upsert: true, new: true }
+            );
+        }
  
         if (!phone) 
             return console.log('Phone number is required  1.' );
@@ -50,7 +58,8 @@ export const verifyOtp : RequestHandler = (async (req: Request, res: Response, n
         res.status(200).json({ 
             success: true,
             message: 'OTP verified successfully',
-             token: 'JWT_TOKEN' });
+             token: 'JWT_TOKEN',
+            userId : user._id });
     } catch (error) {
         console.error('Error verifying OTP:', error);
         next(error)

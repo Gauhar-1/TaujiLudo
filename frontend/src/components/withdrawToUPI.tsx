@@ -1,6 +1,28 @@
+import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 
-export const  WithdrawToUPI = ()=>{
+export const  WithdrawToUPI = (props : any)=>{
+
+    const [amount, setAmount] = useState(0);
+    const [upiId, setUpiId] = useState("");
+
+    const handleWithdraw = async () => {
+
+        try {
+           await axios.post('http://localhost:3000/api/auth/withdraw', {
+                userId: props.userId,
+                amount,
+                paymentMethod: 'upi',
+                destinationDetails : upiId
+            });
+            props.setAmount((prevCount: number) => prevCount - amount)
+            console.log('Withdrawal request submitted.');
+        } catch (err : any) {
+            console.log('Error in withdrawal: ' + err.response?.data?.message || err);
+        }
+    };
+  
     const navigate = useNavigate();
     return (
         <div className="bg-gray-200 min-h-screen max-w-sm ">
@@ -9,14 +31,19 @@ export const  WithdrawToUPI = ()=>{
                 <div className="p-4 w-80 text-center font-serif text-2xl">Withdrawal To UPI</div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Your Linked UPI ID</div>
-                    <input type="text" className="rounded-md border border-gray-950 p-1"/>
+                    <input type="text" className="rounded-md border border-gray-950 p-1" onChange={(e)=>{
+                        setUpiId(e.target.value);
+                    }}/>
                  </div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Amount to Withdraw:</div>
-                    <input type="text" className="rounded-md border border-gray-950 p-1"/>
+                    <input type="text" className="rounded-md border border-gray-950 p-1"  onChange={(e)=>{
+                        const newValue = parseInt(e.target.value);
+                        setAmount(newValue);
+                    }}/>
                  </div>
                  <div className="p-2 flex justify-center">
-                 <div className=" bg-green-500 h-10 w-64 rounded-md text-center pt-2 mb-2">Withdraw</div>
+                 <div className=" bg-green-500 h-10 w-64 rounded-md text-center pt-2 mb-2" onClick={handleWithdraw}>Withdraw</div>
                  </div>
                  <div className="flex justify-center">
                  <div className="bg-green-700 w-28 text-center rounded-md p-1 mb-8" onClick={()=>{

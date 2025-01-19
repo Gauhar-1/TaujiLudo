@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { SideBar } from "./sideBar";
 
-export const Header = (props: { login: boolean })=>{
+export const Header = (props: any)=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
   const navigate = useNavigate();
    return (
@@ -20,7 +20,7 @@ export const Header = (props: { login: boolean })=>{
        <div className="m-3 flex gap-2">
          <div className="bg-green-900 flex flex-row  rounded-md h-8 w-20">
          <img src="../../money.png" alt=""  className="h-5 m-1"/>
-         <div className="text-xs text-white">cash  10</div>
+         <div className="text-xs text-white">cash  {props.amount}</div>
          <div className="bg-black" onClick={()=>{
           navigate('wallet');
          }}>
@@ -38,7 +38,7 @@ export const Header = (props: { login: boolean })=>{
        </div>}
         
     </div>
-    {sidebarClicked && <SideBar setSidebarClicked={setSidebarClicked} />}
+    {sidebarClicked && <SideBar setSidebarClicked={setSidebarClicked} setAdminClicked={props.setAdminClicked}/>}
     </div>
    )
 }

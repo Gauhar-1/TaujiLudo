@@ -21,6 +21,9 @@ exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awa
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     try {
         const user = yield User_js_1.default.findOneAndUpdate({ phone }, { otp, otpExpires: new Date(Date.now() + 10 * 60 * 1000) }, { upsert: true, new: true });
+        if (!user) {
+            yield User_js_1.default.create({ phone }, { otp, otpExpires: new Date(Date.now() + 10 * 60 * 1000) }, { upsert: true, new: true });
+        }
         if (!phone)
             return console.log('Phone number is required  1.');
         yield (0, otpService_1.sendOTP)(phone, otp);
@@ -51,7 +54,8 @@ exports.verifyOtp = ((req, res, next) => __awaiter(void 0, void 0, void 0, funct
         res.status(200).json({
             success: true,
             message: 'OTP verified successfully',
-            token: 'JWT_TOKEN'
+            token: 'JWT_TOKEN',
+            userId: user._id
         });
     }
     catch (error) {

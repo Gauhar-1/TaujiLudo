@@ -1,11 +1,109 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const ProfilePage = (props : any)=>{
+
+    const [ state , setState ] = useState({
+            phoneNumber : 0,
+            userName : "",
+            email : "",
+            editClicked : false
+    });
+
+   
+
+   
+ 
+
     const [editClicked , setEditClicked] = useState(false);
-    const [userName ,setUserName] =useState("Noobie");
+    const [userName ,setUserName] =useState("");
     const [email ,setEmail] =useState("");
     const navigate = useNavigate();
+    const [phoneNumber, setPhoneNumber] = useState<number>(props.phoneNumber) 
+
+    useEffect(()=>{
+        const getState = async()=>{
+            
+            try{
+                console.log("State field : "+phoneNumber +" " + userName +" " + email +" " + editClicked);
+    
+                const state = await axios.post('http://localhost:3000/api/auth/createState' , {  phoneNumber, userName, email, editClicked });
+    
+                if(!state){
+                    console.log("State not found");
+                }
+                if(state)
+    
+                setState(state.data);
+                setUserName(state.data.userName);
+                setPhoneNumber(state.data.phoneNumber);
+                setEditClicked(state.data.editClicked);
+                setEmail(state.data.email);
+            }
+            catch(err){
+                console.log("Error: "+ err);
+            }
+    
+        }
+        getState();
+    
+    },[phoneNumber, userName, email, editClicked]);
+
+    useEffect(()=>{
+        const getProfile = async()=>{
+                if (phoneNumber) {
+                  console.log("Phone number "+ phoneNumber);
+                }
+                
+
+            try{const response = await axios
+            .get("http://localhost:3000/api/auth/new-profile",  { params: { phoneNumber }})
+            if(response.data.success){
+                console.log("profile created 1");
+            }
+            else{
+                console.log("failed to create profile")
+            }
+            
+            props.setPhoneNumber(response.data.phoneNumber);
+            console.log("PhoneNumber :" + props.phoneNumber);
+            setPhoneNumber(response.data.phoneNumber);
+            setUserName(response.data.name);
+            setEmail(response.data.email);
+
+          
+        }
+            catch(err){
+                console.log("Error: "+ err);
+            }
+           
+        }
+
+       
+
+        getProfile();
+       
+    },[phoneNumber]);
+
+    
+
+    const updateProfile = async()=>{
+
+        if (!userName || !phoneNumber || !email) {
+            return console.log( 'All fields are required.' + name + " " + phoneNumber + " " + email);
+          }
+            const response = await axios
+            .post("http://localhost:3000/api/auth/update-Profile",  { phoneNumber,name :userName, email });
+            
+            if(response.data.success){
+                console.log("updated profile Successfully");
+            }
+            else{
+                console.log("failed to update profile");
+                console.log(response.data);
+            }
+    }
     return ( 
     <div className=" ">
         <div className="flex flex-col left-0 inset-y-0 pt-12">
@@ -21,15 +119,19 @@ export const ProfilePage = (props : any)=>{
                 </div>
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-xs">Enter the email:</div>
-            <input type="text" className="rounded-md p-1"  onChange={(e)=>{setEmail(e.target.value)}}/>
+            <input type="text" className="rounded-md p-1" value={email}  onChange={(e)=>{setEmail(e.target.value)}}/>
                 </div>
-                <button className="bg-green-500 text-center p-1 mt-3 rounded-md text-white" onClick={()=>{setEditClicked(false)}}>Save</button>
+                <button className="bg-green-500 text-center p-1 mt-3 rounded-md text-white" 
+                onClick={()=>{
+                    setEditClicked(false)
+                    updateProfile();
+                }}>Save</button>
             </div>
             </div>}
             <div className="m-5 bg-gray-600 rounded-xl flex flex-col hover:bg-gray-700 ">
                 <div className="flex">
                 <img src="../../profile.png" alt=""  className="h-32  p-3"/>
-                <div className="text-white text-3xl font-serif mx-6 my-10">{userName}</div>
+                <div className="text-white text-3xl font-serif mx-6 my-10" >{userName}</div>
                 <div onClick={()=>{
                    setEditClicked(true);
                 }}>
@@ -40,11 +142,11 @@ export const ProfilePage = (props : any)=>{
 
                 </div>
                 <div className="grid grid-cols-10 p-1 m-1">
-                    <div className="col-start-2 flex gap-2">
+                    <div className="col-start-2 flex gap-1">
                     <img src="../../call-icon.png" alt="" className="h-5 pt-1 "/>
-                    <div className="text-white font-semibold ">{props.phoneNumber}</div>
+                    <div className="text-white font-semibold text-sm">{phoneNumber}</div>
                     </div>
-                    <div className="text-white font-semibold col-start-6 ">{email}</div>
+                    <div className="text-white font-semibold col-start-6 text-sm  ">{email}</div>
                 </div>
             </div>
             <div className="flex justify-around m-4">

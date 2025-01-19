@@ -1,5 +1,5 @@
 import axios from "axios";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -12,39 +12,43 @@ export const LoginPage =(props : any)=>{
 
 
     const handleSendOtp = async()=>{
-        
         await axios
         .post("http://localhost:3000/api/auth/send-otp", { phoneNumber})
         .then(response =>{
-            console.log(response.data.success + "  this was response success")
             if(response.data.success){
                 toast.success("OTP sent successfully");
+                setSendOtp(true);
             }
             else {
                 toast.error("Invalid Phone Number");
             }
+           
         })
         .catch(error =>{
             console.error(error);
             toast.error("Failed to send OTP");
         });
     };
-    const handleVerifyOtp = ()=>{
-        axios
-        .post("http://localhost:3000/api/auth/verify-otp", { phoneNumber, otp})
-        .then(response =>{
-            if(response.data.success){
-                toast.success("OTP verified successfully");
-                navigate('/');
-            }
-            else {
-                toast.error("Invalid OTP")
-            }
-        })
-        .catch(error =>{
-            console.error(error);
-            toast.error("Error verifying OTP");
-        })
+    const handleVerifyOtp = async()=>{
+                await axios
+                .post("http://localhost:3000/api/auth/verify-otp", { phoneNumber, otp})
+                .then(response =>{
+                    console.log("login response"+ response.data.userId)
+                    props.setUserId(response.data.userId);
+                    if(response.data.success){
+                        toast.success("OTP verified successfully");
+                    }
+                    else {
+                        toast.error("Invalid OTP")
+                    }
+                    props.setLogin(true);
+                    navigate('/');
+                })
+                .catch(error =>{
+                    console.error(error);
+                    toast.error("Error verifying OTP");
+                })
+
     };
 
     return (
@@ -73,11 +77,9 @@ export const LoginPage =(props : any)=>{
                         <Link to='/login'>
                         <button className="bg-green-700 rounded-md w-56 text-center p-1" onClick={()=>{
                            if(!sendOtp){
-                               setSendOtp(true);
                                handleSendOtp();
                            }
                            else{
-                               props.setLogin(true);
                                handleVerifyOtp();
                            }
                         }} >{sendOtp ? "Verify OTP" : "Send OTP"}</button>

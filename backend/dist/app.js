@@ -8,11 +8,14 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const db_1 = __importDefault(require("./config/db"));
 const auth_1 = __importDefault(require("./routes/auth"));
+const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 (0, db_1.default)();
 app.use(body_parser_1.default.json());
 app.use((0, cors_1.default)());
 app.use('/api/auth', auth_1.default);
+const uploadDir = path_1.default.join(__dirname, 'uploads');
+app.use('/uploads', express_1.default.static(uploadDir));
 app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message });
 });

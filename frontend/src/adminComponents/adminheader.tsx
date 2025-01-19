@@ -1,0 +1,30 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom"
+import { AdminSideBar } from "./adminSideBar";
+// import { SideBar } from "./sideBar";
+
+export const AdminHeader = (props: any)=>{
+  const [sidebarClicked , setSidebarClicked] = useState(false);
+   return (
+    <div className="z-80">
+
+    <div className="fixed left-0 top-0  w-96 shadow-xl max-w-sm bg-white">
+       <div className=" flex flex-row justify-between ">
+       <div className="flex flex-row p-2 gap-6">
+         <div className="ml-2 pt-2" onClick={()=>{
+              setSidebarClicked(true);
+         }}> ☰</div>
+           
+       </div>
+
+       <div className="p-3">
+        <img src="/profile.png" alt="" className="size-9" />
+       </div>
+      
+   </div>
+        
+    </div>
+    {sidebarClicked && <AdminSideBar setSidebarClicked={setSidebarClicked} />}
+    </div>
+   )
+}
