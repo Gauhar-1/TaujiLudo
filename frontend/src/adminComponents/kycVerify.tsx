@@ -24,7 +24,6 @@ export const KycVerification = ()=>{
     const [ reason, setReason ] = useState("");
 
     const { userId } = useUserContext();
-    const navigate = useLocation();
     
     useEffect(()=>{
         const handle = async()=>{
