@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { HistoryCard } from "./historyCard"
 import axios from "axios"
+import { API_URL } from "../utils/url";
 
 export const HistoryPage = (props : any)=>{
   const userId = props.userId;
@@ -34,7 +35,7 @@ export const HistoryPage = (props : any)=>{
 
       const loadNotificatons = async()=>{
        try{ const response = await axios
-        .get("http://localhost:3000/api/auth/notifications", {params: { userId: "677bb4306857a1cde8045c44" }})
+        .get(`${API_URL}/api/auth/notifications`, {params: { userId: "677bb4306857a1cde8045c44" }})
 
             if(response.data.success){
                 console.log("Notification received successfully");
@@ -54,7 +55,7 @@ export const HistoryPage = (props : any)=>{
   },[userId, setNotifications])
   
     return (
-        <div className="bg-gray-300 mt-12 min-h-screen max-w-sm flex flex-col pb-16">
+        <div className="bg-gray-300 pt-12 min-h-screen max-w-sm flex flex-col pb-16">
           {notifications.map((notification) => (
     <HistoryCard key={notification._id} notification={notification} />
   ))}

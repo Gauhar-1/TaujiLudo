@@ -1,19 +1,22 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"
+import { useUserContext } from "../hooks/UserContext";
 
-export const  WithdrawToBank = (props : any)=>{
-   const [amount, setAmount] = useState(props.amount);
+export const  WithdrawToBank = ()=>{
+   const [token, setToken] = useState(0);
    const [name ,setName] = useState("");
    const [IFSC ,setIFSCcode] = useState("");
    const [accountNumber , setAccountNumber] = useState("");
+   const { userId,amount, setAmount } = useUserContext();
 
 
    const handleWithdraw = async () => {
       try {
          await axios.post('http://localhost:3000/api/auth/withdraw', {
-              userId: props.userId,
-              amount,
+              userId,
+              amount : token,
+              wallet : amount - token,
               paymentMethod: 'bank',
               destinationDetails : {
                  name,
@@ -22,7 +25,8 @@ export const  WithdrawToBank = (props : any)=>{
               }
           });
           console.log('Withdrawal request submitted.');
-          props.setAmount((prevCount: number) => prevCount - amount);
+          setAmount(amount - token);
+          navigate('/wallet');
       } catch (err : any) {
           console.log('Error in withdrawal: ' + err.response?.data?.message || err.message);
       }
@@ -55,7 +59,8 @@ export const  WithdrawToBank = (props : any)=>{
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Amount to Withdraw:</div>
                     <input type="text" className="rounded-md border border-gray-950 p-1" onChange={(e)=>{
-                     setAmount(e.target.value);
+                     const newValue = parseInt(e.target.value);
+                     setToken(newValue);
                     }}/>
                  </div>
                  <div className="p-2 flex justify-center">

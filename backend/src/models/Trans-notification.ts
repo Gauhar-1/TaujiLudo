@@ -6,6 +6,7 @@ interface INotification extends Document {
   message: string;
   amount: number;
   status: 'success' | 'failed' | 'pending' ;
+  reason: ""
   createdAt: Date;
   paymentReference: string; 
 }
@@ -18,6 +19,7 @@ const notificationSchema = new Schema({
   status: { type: String, enum: ['success', 'failed' ,"pending"] },
   createdAt: { type: Date, default: Date.now },
   paymentReference: { type: String, required: true }, 
+  reason: { type: String, default: null }, 
 });
 
 export const Notification = mongoose.model<INotification>('Notification', notificationSchema);

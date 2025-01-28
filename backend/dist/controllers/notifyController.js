@@ -37,7 +37,6 @@ const getNotifications = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
     try {
         const notifications = yield Trans_notification_1.Notification.find({ userId }).sort({ createdAt: -1 });
-        console.log(notifications);
         res.status(200).json(notifications);
     }
     catch (error) {

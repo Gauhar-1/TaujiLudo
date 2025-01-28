@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react"
 import { StickyTable } from "../utils/dashBoardTable"
-import axios from "axios"
 
 export const DashBoard = ()=>{
 
@@ -12,26 +10,7 @@ export const DashBoard = ()=>{
                 <div className="bg-gray-100 rounded-t-md">
                     <div className=" font-semibold my-4 py-3 px-4 text-blue-700 border-b-2">Running Batlle</div>
                 </div>
-                {/* <div className="">
-                    <div className="flex mx-3  ">
-                        <div className="py-2 px-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">#</div>
-                        <div className="py-2 px-1 border-y-2 border-gray-200  text-xs font-semibold text-gray-600">Battle ID</div>
-                        <div className="py-2 px-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">Player1</div>
-                        <div className="py-2 px-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">Player2</div>
-                        <div className="py-2 px-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">Amount</div>
-                        <div className="py-2 px-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">Status</div>
-                        <div className="py-2 px-4  border-y-2 border-gray-200 text-xs font-semibold text-gray-600">Date</div>
-                    </div>
-                    <div className="flex mx-3">
-                        <div className="py-2 pl-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">1</div>
-                        <div className="py-2 px-3 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">677b...</div>
-                        <div className="py-2 px-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">gohar</div>
-                        <div className="py-2 px-2 border-y-2 border-gray-200 text-xs font-semibold text-gray-600 ">manish</div>
-                        <div className="py-2 px-1 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">10000</div>
-                        <div className="py-2 px-1 text-center border-y-2 border-gray-200 text-xs font-semibold text-gray-600">on-progress</div>
-                        <div className="p-2 border-y-2 border-gray-200 text-xs font-semibold text-gray-600">1/14/2025, 4:20:47 PM</div>
-                    </div>
-                </div> */}
+
 
                 <StickyTable></StickyTable>
 

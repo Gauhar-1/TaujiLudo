@@ -1,7 +1,6 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { Header } from "../components/header";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { Footer } from "../components/footer";
 import { HomePage } from "../components/homePage";
 import { ProfilePage } from "../components/profilePage";
@@ -13,80 +12,87 @@ import { WithdrawPage } from "../components/withdrawPage";
 import { WithdrawToBank } from "../components/withdrawToBank";
 import { WithdrawToUPI } from "../components/withdrawToUPI";
 import { SupportPage } from "../components/supportPage";
-import { BattlePgage } from "../components/battlePage";
+import { BattlePage } from "../components/battlePage";
 import { RulesPgage } from "../components/rulesPage";
 import { GameHistory } from "../components/GameHistory";
 import { AdminPage } from "./adminPage";
 import { DashBoard } from "../adminComponents/dashBoard";
-import { AdminHeader } from "../adminComponents/adminheader";
 import { AllPlayers } from "../adminComponents/allPlayers";
+import { WinCashPage } from "../components/winCashPage";
+import { useUserContext } from "../hooks/UserContext";
+import { TransactionHistory } from "../adminComponents/transaction";
+import { BlockedPlayer } from "../adminComponents/blockedPlayers";
+import { PendingBattle } from "../adminComponents/pendingBattle";
+import { RunningBattle } from "../adminComponents/runningBattle";
+import { CompleteBattle } from "../adminComponents/completeBattle";
+import { DisputeBattle } from "../adminComponents/disputeBattle";
+import { BattleResult } from "../adminComponents/viewResult";
+import { DisputeResult } from "../adminComponents/dispute";
+import { AllPayments } from "../adminComponents/allPayments";
+import { ReqPayments } from "../adminComponents/reqPayments";
+import { PaymentRequest } from "../adminComponents/paymentReq";
+import { RechargeUser } from "../adminComponents/rechargeUser";
+import { MoneyRecharge } from "../adminComponents/moneyRecharge";
+import { PendingKyc } from "../adminComponents/pendingKyc";
+import { KycVerification } from "../adminComponents/kycVerify";
+import { VerifiedKyc } from "../adminComponents/verifiedKyc";
 
 
 export const UserPage = ()=>{
 
-    const [login , setLogin] = useState(true);
-      const [phoneNumber , setPhoneNumber] = useState(0);
-      const [ name , setName] =useState("");
-      const [amount , setAmount] = useState(5);
-      const [userId, setUserId] = useState<string>('');
-      const [battleId, setBattleId] = useState("");
-      const [ adminclicked , setAdminClicked ] = useState(false);
+      const { login  } = useUserContext();
+      const [ name , ] =useState("");
+      const navigate = useNavigate();
 
-    useEffect(()=>{
-        if ( !phoneNumber || !amount) {
-          return console.log( 'All fields are required.' + " " + phoneNumber + " " + amount);
+      const { adminClicked } = useUserContext();
+
+      useEffect(()=>{
+        if(login === true){
+          navigate('/winCash')
         }
-        const updateAmount = async()=>{
-          try{
-            const  response = await axios.post("http://localhost:3000/api/auth/update-Amount",  { phoneNumber,amount });
-            if(response && response.data && response.data.success){
-              console.log("Amount updated")
-            }
-            else{
-              console.log("Failed to update Amount")
-              console.log(response.data);
-            }
-    
-            const profile = response.data;
-            setAmount(profile.amount);
-            setUserId(profile.userId);
-            console.log("Userid: "+ userId);
-            setName(profile.name);8
-          }
-          catch(err){
-             console.log("Error" + err);
-          }
-    
-          }
-    
-        if (amount > 0) { 
-          updateAmount();
-        }
-      },[]);
+      },[login])
+
   
     return (
         <div>
-            { !adminclicked && <Header login={login} amount={amount} setAdminClicked={setAdminClicked}></Header>}
+            { !adminClicked && <Header ></Header>}
        <Routes>
-            <Route path="/home" element={<HomePage name={name} setBattleId={setBattleId} />}></Route>
-           <Route path="/" element={<ProfilePage setLogin={setLogin} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber}/>}></Route>
+            <Route path="/home" element={<HomePage name={name}/>}></Route>
+           <Route path="/profile" element={<ProfilePage  />}></Route>
            <Route path="/wallet" element={<WalletPage/>}></Route>
            <Route path="/history" element={<HistoryPage/>}></Route>
-           <Route path="/login" element={<LoginPage setLogin={setLogin}  setPhoneNumber={setPhoneNumber} setUserId={setUserId} />}></Route>
-           <Route path="/deposit" element={<DepositPage amount={amount} setAmount={setAmount} userId={userId}  />}></Route>
+           <Route path="/" element={<LoginPage />}></Route>
+           <Route path="/deposit" element={<DepositPage    />}></Route>
            <Route path="/withdraw" element={<WithdrawPage />}></Route>
-           <Route path="/withdrawToBank" element={<WithdrawToBank amount={amount} setAmount={setAmount} userId={userId} />}></Route>
-           <Route path="/withdrawToUPI" element={<WithdrawToUPI amount={amount} setAmount={setAmount} userId={userId} />}></Route>
+           <Route path="/withdrawToBank" element={<WithdrawToBank  />}></Route>
+           <Route path="/withdrawToUPI" element={<WithdrawToUPI  />}></Route>
            <Route path="/support" element={<SupportPage/>}></Route>
-           <Route path="/battle" element={<BattlePgage battleId={battleId} />}></Route>
+           <Route path="/battle" element={<BattlePage  />}></Route>
            <Route path="/rules" element={<RulesPgage/>}></Route>
-           <Route path="/gameHistory" element={<GameHistory userId={userId}/>}></Route>
+           <Route path="/gameHistory" element={<GameHistory />}></Route>
+           <Route path="/winCash" element={<WinCashPage/>}></Route>
            <Route path="/admin" element={<AdminPage />}>
                   <Route index element={<DashBoard />}></Route>
                   <Route path="allPlayers" element={<AllPlayers />}></Route>
+                  <Route path="allPlayers/transaction" element={<TransactionHistory />}></Route>
+                  <Route path="blocked" element={<BlockedPlayer />}></Route>
+                  <Route path="pendingBattle" element={<PendingBattle />}></Route>
+                  <Route path="runningBattle" element={<RunningBattle />}></Route>
+                  <Route path="completeBattle" element={<CompleteBattle />}></Route>
+                  <Route path="disputeBattle" element={<DisputeBattle />}></Route>
+                  <Route path="viewResult" element={<BattleResult />}></Route>
+                  <Route path="disputeResult" element={<DisputeResult />}></Route>
+                  <Route path="allPayments" element={<AllPayments />}></Route>
+                  <Route path="reqPayments" element={<ReqPayments />}></Route>
+                  <Route path="paymentReq" element={<PaymentRequest />}></Route>
+                  <Route path="rechargeUser" element={<RechargeUser />}></Route>
+                  <Route path="addMoney" element={<MoneyRecharge />}></Route>
+                  <Route path="pendingKyc" element={<PendingKyc />}></Route>
+                  <Route path="verifiedKyc" element={<VerifiedKyc />}></Route>
+                  <Route path="pendingKyc/kycView" element={<KycVerification />}></Route>
            </Route>
        </Routes>
-     { !adminclicked && <Footer login={login}></Footer> }
+     { !adminClicked && <Footer></Footer> }
         </div>
     )
 }

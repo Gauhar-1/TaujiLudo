@@ -1,25 +1,29 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"
+import { useUserContext } from "../hooks/UserContext";
 
-export const  WithdrawToUPI = (props : any)=>{
+export const  WithdrawToUPI = ()=>{
 
-    const [amount, setAmount] = useState(0);
+    const [token, setToken] = useState(0);
     const [upiId, setUpiId] = useState("");
+    const { userId, setAmount , amount } = useUserContext();
 
     const handleWithdraw = async () => {
 
         try {
            await axios.post('http://localhost:3000/api/auth/withdraw', {
-                userId: props.userId,
-                amount,
+                userId,
+                amount : token,
+                wallet : amount - token,
                 paymentMethod: 'upi',
                 destinationDetails : upiId
             });
-            props.setAmount((prevCount: number) => prevCount - amount)
+            setAmount((amount - token));
             console.log('Withdrawal request submitted.');
+            navigate('/wallet');
         } catch (err : any) {
-            console.log('Error in withdrawal: ' + err.response?.data?.message || err);
+            console.log('Error in withdrawal: ' +  err);
         }
     };
   
@@ -39,7 +43,7 @@ export const  WithdrawToUPI = (props : any)=>{
                     <div className="text-sm font-semibold text-slate-500">Amount to Withdraw:</div>
                     <input type="text" className="rounded-md border border-gray-950 p-1"  onChange={(e)=>{
                         const newValue = parseInt(e.target.value);
-                        setAmount(newValue);
+                        setToken(newValue);
                     }}/>
                  </div>
                  <div className="p-2 flex justify-center">

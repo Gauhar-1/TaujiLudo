@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"
 import { AdminSideBar } from "./adminSideBar";
 // import { SideBar } from "./sideBar";
 
-export const AdminHeader = (props: any)=>{
+export const AdminHeader = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
    return (
     <div className="z-80">

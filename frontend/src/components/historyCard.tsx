@@ -7,9 +7,9 @@ export const HistoryCard = (props : any)=>{
                 <div className=" mt-6 mr-4 border border-white h-20 w-64  font-bold  ">
                     <div className="flex justify-between pr-4">
                         <div className="flex flex-col gap-1  px-4">
-                            <div className="text-sm">New User Bonus</div>
+                            <div className="text-sm">{props.notification.type}</div>
                             <div className="text-xs text-gray-500">OrderID: {props.notification.paymentReference}</div>
-                            <div className={`text-xs  font-bold text-green-500 ${props.notification.status === "success" ? "text-green-500": "text-red-500"}`}>Status:{props.notification.status}</div>
+                            <div className={`text-xs  font-bold text-green-500 ${props.notification.status === "success" ? "text-green-500": props.notification.status === "failed" ? "text-red-500": "text-orange-500" }  `}>Status:{props.notification.status}</div>
                         </div>
                         <div className="flex">
                             <div className={`text-gray-600 ${props.notification.type === "deposit" ? "text-green-500": "text-red-500"}`}>{props.notification.type === "deposit" ? "(+)": "(-)"}</div>

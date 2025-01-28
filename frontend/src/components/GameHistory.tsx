@@ -1,7 +1,9 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { useUserContext } from "../hooks/UserContext";
+import { API_URL } from "../utils/url";
 
-export const GameHistory =( props : any)=>{
+export const GameHistory =()=>{
 
     const [ battles, setBattles ] = useState([{
         "_id": "",
@@ -19,11 +21,12 @@ export const GameHistory =( props : any)=>{
         "__v": 0
     }]);
 
-    const userId = props.userId;
+    const { userId } = useUserContext() ;
+   
 
     useEffect(()=>{
         const handleBattleHistory = async()=>{
-           try{ const response = await axios.get("http://localhost:3000/api/auth/battles/battleHistory",{ params : { userId }});
+           try{ const response = await axios.get(`${API_URL}/api/auth/battles/battleHistory`,{ params : { userId }});
 
             if(!response){
                 console.log("response not found");

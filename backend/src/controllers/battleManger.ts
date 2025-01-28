@@ -1,3 +1,4 @@
+import { io } from "../app";
 import Battle from "../models/Battle";
 
 const date =  Date.now()
@@ -13,6 +14,7 @@ export const createBattle = async(req: any, res: any, next: any)=>{
          status: "pending" 
         });
     await battle.save();
+    io.emit("battleCreated", battle);
     if(!battle){
         console.log("battle not created");
     }
@@ -37,6 +39,39 @@ export const pendingBattle = async(req: any , res: any, next: any)=>{
     catch(err){
         console.log("Error Found: " + err);
     }
+}
+
+export const showBattles = async(req: any, res: any, next: any)=>{
+    try{
+
+        const { status }  = req.query;
+
+        if(status === "canceled"){
+
+            const battle = await Battle.find({status ,  winner: { $exists: true, $ne: null } }).sort({ createdAt : -1});
+    
+            if(!battle){
+                console.log("No  Battle found");
+            }
+        
+         
+            res.status(200).json(battle);
+        }
+        else{
+            const battle = await Battle.find({status}).sort({ createdAt : -1});
+    
+            if(!battle){
+                console.log("No  Battle found");
+            }
+        
+         
+            res.status(200).json(battle);
+        }
+       
+        }
+        catch(err){
+            console.log("Error Found: " + err);
+        }
 }
 
 export const battleHistory = async( req : any, res: any, next: any )=>{
@@ -91,18 +126,33 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
 
 }
 
-export const inProgressBattle = async( req: any, res: any, next: any)=>{
-
-    const { battleId } = req.query;
-
-    const battle = await Battle.findById(battleId);
-
-    if(!battle){
-        console.log("Battle not found");
+export const inProgressBattle = async (req: any, res: any, next: any) => {
+    try {
+      const { battleId } = req.query;
+  
+      // Check if battleId is provided
+      if (!battleId) {
+        return res.status(400).json({ message: "battleId is required" });
+      }
+  
+      // Find the battle using the battleId
+      const battle = await Battle.findById(battleId);
+  
+      // Check if battle is found
+      if (!battle) {
+        return res.status(404).json({ message: "Battle not found" });
+      }
+  
+      // Send the battle details as a response
+      res.status(200).json(battle);
+  
+    } catch (err) {
+      // Send a generic error message if an unexpected error occurs
+      console.error("Error fetching battle:", err);
+      res.status(500).json({ message: "Internal Server Error" });
     }
-
-    res.status(200).json(battle);
-}
+  };
+  
 
 export const uploadScreenShot = async(req: any, res: any, next: any)=>{
 
@@ -181,6 +231,15 @@ export const runningBattle = async(req: any, res: any)=>{
     if(!battle){
         console.log("Battle not found");
     }
+
+    res.status(200).json(battle);
+}
+
+export const deleteBattle = async(req: any, res: any, next: any)=>{
+
+    const { battleId } = req.body;
+
+    const battle = await Battle.findByIdAndDelete(battleId);
 
     res.status(200).json(battle);
 }

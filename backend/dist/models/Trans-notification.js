@@ -33,5 +33,6 @@ const notificationSchema = new mongoose_1.Schema({
     status: { type: String, enum: ['success', 'failed', "pending"] },
     createdAt: { type: Date, default: Date.now },
     paymentReference: { type: String, required: true },
+    reason: { type: String, default: null },
 });
 exports.Notification = mongoose_1.default.model('Notification', notificationSchema);

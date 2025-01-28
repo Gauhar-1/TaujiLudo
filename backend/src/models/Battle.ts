@@ -29,7 +29,7 @@ const BattleSchema: Schema = new Schema({
   filename: { type: String, default: null},
   path: { type: String, default: null},
   status: { type: String, enum: ["pending", "in-progress", "canceled", "completed"], default: "pending" },
-  ludoCode: { type:String, required: true },
+  ludoCode: { type:String, default: null },
   winner: { type: String, default: null },
   reason: { type: String, default: null },
   createdAt: { type: Date, default: Date.now },

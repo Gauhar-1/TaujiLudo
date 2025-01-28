@@ -1,14 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../hooks/UserContext";
 
 export const SideBar = (props : any)=>{
     const navigate = useNavigate();
+    const { setAdminClicked } = useUserContext();
     return (
-        <div className="bg-gray-300 absolute min-h-screen min-w-56  z-50 flex gap-4">
+        <div className="bg-gray-300 fixed min-h-screen min-w-56  z-50 flex gap-4">
           <div className="py-5 pl-5 flex flex-col  gap-6">
             <div className="text-2xl font-serif text-white bg-gray-500 text-center rounded-md py-4 w-48">Tauji Ludo</div>
             <div className="">
               <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/');
+                navigate('/profile');
                 props.setSidebarClicked(false);
               }}>
                 <img src="../../user.png" alt=""  className="size-6"/>
@@ -91,7 +93,7 @@ export const SideBar = (props : any)=>{
               <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
                 navigate('/admin');
                 props.setSidebarClicked(false);
-                props.setAdminClicked(true)
+                setAdminClicked(true)
               }}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
   <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />

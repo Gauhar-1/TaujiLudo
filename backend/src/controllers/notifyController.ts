@@ -29,7 +29,6 @@ export const getNotifications = async (req: any, res: any) => {
   
   try {
     const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
-    console.log(notifications)
     res.status(200).json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);

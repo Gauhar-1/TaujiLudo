@@ -12,12 +12,12 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "no", label: "#" },
-  { id: "battleId", label: "Battle ID", minWidth: 190 },
+  { id: "battleId", label: "Battle ID", minWidth: 220 },
   { id: "player1Name", label: "Player1", minWidth: 170 },
   { id: "player2Name", label: "Player2", minWidth: 170 },
-  { id: "amount", label: "Amount", minWidth: 170, align: "right" },
-  { id: "status", label: "Status", minWidth: 170, align: "right" },
-  { id: "joinedAt", label: "Joined At", minWidth: 170, align: "right" },
+  { id: "amount", label: "Amount", minWidth: 120,  },
+  { id: "status", label: "Status", minWidth: 170 },
+  { id: "joinedAt", label: "Joined At", minWidth: 170 },
 ];
 
 interface Data {
@@ -60,10 +60,10 @@ export const StickyTable: React.FC = () => {
           return createData(
             index + 1,
             battle._id,
-            battle.player1Name || "Unknown",
-            battle.player2Name || "Unknown",
+            battle.player1Name || "",
+            battle.player2Name || "",
             battle.amount || 0,
-            battle.status || "Unknown",
+            battle.status || "",
             date
           );
         });
@@ -123,7 +123,7 @@ export const StickyTable: React.FC = () => {
 
   const filteredRows = rows.filter(filterEachRow);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -152,57 +152,51 @@ export const StickyTable: React.FC = () => {
         </button>
       </div>
 
-      <div className="overflow-y-auto max-w-screen shadow-md relative  max-h-[440px]">
-        <div className="flex  shadow-md bg-gray-100 p-2 text-center border-b ">
-          {columns.map((column) => (
-            <div
-              key={column.id}
-              className="text-sm font-semibold p-2"
-              style={{ minWidth: column.minWidth }}
-            >
-              {column.label}
-            </div>
-          ))}
-        </div>
-
-        {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-          <div
-            key={row.battleId}
-            className="flex flex-row  px-2   border-b "
-          >
-            {columns.map((column) => {
-              const value = row[column.id as keyof Data];
-              const statusClasses =
-                column.id === "status"
-                  ? value === "pending"
-                    ? "text-red-500 ml-12 pl-4 mr-20 font-bold"
-                    : value === "in-progress"
-                    ? "text-yellow-500 mx-6 font-bold"
-                    : ""
-                  : "";
-                  const no = column.id === "no" ? "pt-4 px-2 " : "";
-                  const battleId = column.id === "battleId" ? "h-5 pt-4 px-5 w-80" : "";
-                  const player1 = column.id === "player1Name" ? "px-8 mx-2 mr-1 pt-4" : "";
-                  const player2 = column.id === "player2Name" ? "px-4 pt-4  mx-20 w-190" : "";
-                  const amount = column.id === "amount" ? "px-5 pt-4 mx-6 w-190" : "";
-                  const status = column.id === "status" ? "px-16 mx-20  pt-2 text-center " : "";
-                  const joinedAt = column.id === "joinedAt" ? "px-12 mx-2  " : "";
-              return (
-                <div
-                  key={column.id}
-                  className={`px-2 mt-1 text-center text-sm ${statusClasses} ${no} ${battleId} ${player1} ${player2} ${amount}
-                  ${status} ${joinedAt}`}
-              
-                >
-                  {column.format && typeof value === "number" ? column.format(value) : value}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+      <div className="overflow-y-auto shadow-md relative max-h-[440px]">
+  <div className="flex bg-gray-200 text-center  shadow-md  border-b">
+    {columns.map((column) => (
+      <div
+        key={column.id}
+        className={`text-sm font-semibold p-2 flex-1`}
+        style={{
+          minWidth: column.minWidth || 100,
+          textAlign: column.align || "left",
+        }}
+      >
+        {column.label}
       </div>
+    ))}
+  </div>
 
-      <div className="mt-4">
+  {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+    <div key={row.battleId} className="flex border-b text-center">
+      {columns.map((column) => {
+        const value = row[column.id as keyof Data];
+        const isStatus = column.id === "status";
+        const statusClass =
+          isStatus && value === "pending"
+            ? "text-red-500 font-bold"
+            : isStatus && value === "in-progress"
+            ? "text-yellow-500 font-bold"
+            : "";
+
+        return (
+          <div
+            key={column.id}
+            className={`text-sm p-2 flex-1 ${statusClass}`}
+            style={{
+              minWidth: column.minWidth || 100,
+              textAlign: column.align || "left",
+            }}
+          >
+            {column.format && typeof value === "number" ? column.format(value) : value}
+          </div>
+        );
+      })}
+    </div>
+  ))}
+</div>
+<div className="mt-4">
         <div className="flex justify-between items-center">
           <div className="text-sm">
             {filteredRows.length} rows

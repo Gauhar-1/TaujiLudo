@@ -28,11 +28,14 @@ const TransactionSchema = new mongoose_1.Schema({
     userId: { type: mongoose_1.default.Schema.Types.ObjectId, required: true, ref: 'User' },
     type: { type: String, enum: ['deposit', 'withdraw'], required: true },
     amount: { type: Number, required: true },
+    wallet: { type: Number },
     paymentMethod: { type: String, enum: ['upi', 'bank'], required: true },
     details: {
         type: mongoose_1.default.Schema.Types.Mixed, // Allows storing any data type, including objects
         required: true
     },
+    filename: { type: String, default: null },
+    path: { type: String, default: null },
     status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
     date: { type: Date, default: Date.now },
     paymentReference: { type: String, required: true },

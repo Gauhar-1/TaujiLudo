@@ -1,16 +1,28 @@
 import axios from "axios";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../hooks/UserContext";
+import { API_URL } from "../utils/url";
+import { socket } from "./homePage";
 
 export const BettingCard = (props : any)=>{
     const navigate = useNavigate();
+    const { setOpponentFound, opponentFound, userId } = useUserContext();
+
+    const { setBattleId, name } = useUserContext();
 
     const joinBattle = async()=>{
+        
+        if(userId === props.battle.player1){
+            if(!opponentFound){
+                return console.log("Opponent not found!");
+            }
+            return console.log("batlle created joined");
+        }
         try{
 
-           const respose = await axios.post('http://localhost:3000/api/auth/battles/join', {
-                name : props.name,
-                userId : "677bb4306857a1cde8045c44",
+           const respose = await axios.post(`${API_URL}/api/auth/battles/join`, {
+                name ,
+                userId ,
                 battleId : props.battle._id
             });
 
@@ -21,6 +33,10 @@ export const BettingCard = (props : any)=>{
             console.log("Error :" + err);
         }
     }
+    const deleteBattle = () => {
+        socket.emit("deleteBattle", props.battle._id);
+        console.log("Battleid: "+ props.battle._id);
+      };
 
     return ( 
         <div>
@@ -44,10 +60,22 @@ export const BettingCard = (props : any)=>{
             </div>
         </div>
        </div>
-       <button className="text-center font-mono bg-purple-700 text-white py-2 px-4 text-xs rounded-md" onClick={()=>{
-        joinBattle();
-        props.setBattleId(props.battle._id);
-       }}>Play</button>
+       <div className="flex gap-3">
+       
+       {userId === props.battle.player1 ?
+       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${!opponentFound ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+                            joinBattle();
+                            setBattleId(props.battle._id);
+                            setOpponentFound(true);
+                        } }>{!opponentFound ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                            deleteBattle();
+                            setBattleId(props.battle._id);
+                        } }>Delete</button></> : <button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md bg-purple-700`} onClick={() => {
+                            joinBattle();
+                            setBattleId(props.battle._id);
+                            setOpponentFound(true);
+                        } }>play</button>}
+       </div>
     </div>
         </div>
     )

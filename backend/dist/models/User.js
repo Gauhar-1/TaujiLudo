@@ -7,6 +7,9 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const userSchema = new mongoose_1.default.Schema({
     phone: { type: String, required: true, unique: true },
     otp: { type: String, required: false },
+    status: { type: String,
+        enum: ["active", "blocked"], // Define allowed string values
+        required: true, },
     otpExpires: { type: Date, required: false },
 });
 const User = mongoose_1.default.model('User', userSchema);

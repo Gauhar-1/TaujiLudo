@@ -1,109 +1,108 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../utils/url";
+import { useUserContext } from "../hooks/UserContext";
 
-export const ProfilePage = (props : any)=>{
+export const ProfilePage = ()=>{
 
-    const [ state , setState ] = useState({
-            phoneNumber : 0,
-            userName : "",
-            email : "",
-            editClicked : false
-    });
-
-   
-
-   
- 
-
-    const [editClicked , setEditClicked] = useState(false);
-    const [userName ,setUserName] =useState("");
-    const [email ,setEmail] =useState("");
+    const [editClicked, setEditClicked] = useState(false);
+    const [ kycClicked, setKycClicked ] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [email, setEmail] = useState( () => localStorage.getItem("email") ||  "@gmail.com");
     const navigate = useNavigate();
-    const [phoneNumber, setPhoneNumber] = useState<number>(props.phoneNumber) 
+    const { name, setName, phoneNumber, userId, setPhoneNumber , setUserId, setLogin } = useUserContext();
+    const [ Name , setname ] = useState("")
+    const [ DOB , setDOB ] = useState("")
+    const [ state , setState ] = useState("")
+    const [ documentName , setDocumentName ] = useState("")
+    const [ documentNumber , setDocumentNumber ] = useState("")
 
-    useEffect(()=>{
-        const getState = async()=>{
-            
-            try{
-                console.log("State field : "+phoneNumber +" " + userName +" " + email +" " + editClicked);
+  
+    // Get phoneNumber from location state or fallback
     
-                const state = await axios.post('http://localhost:3000/api/auth/createState' , {  phoneNumber, userName, email, editClicked });
-    
-                if(!state){
-                    console.log("State not found");
-                }
-                if(state)
-    
-                setState(state.data);
-                setUserName(state.data.userName);
-                setPhoneNumber(state.data.phoneNumber);
-                setEditClicked(state.data.editClicked);
-                setEmail(state.data.email);
-            }
-            catch(err){
-                console.log("Error: "+ err);
-            }
-    
+        
+  
+    useEffect(() => {
+      const fetchProfile = async () => {
+        if (!phoneNumber) {
+          console.log("Phone number (Profile): "+ phoneNumber);
+          return;
         }
-        getState();
-    
-    },[phoneNumber, userName, email, editClicked]);
-
-    useEffect(()=>{
-        const getProfile = async()=>{
-                if (phoneNumber) {
-                  console.log("Phone number "+ phoneNumber);
-                }
-                
-
-            try{const response = await axios
-            .get("http://localhost:3000/api/auth/new-profile",  { params: { phoneNumber }})
-            if(response.data.success){
-                console.log("profile created 1");
-            }
-            else{
-                console.log("failed to create profile")
-            }
-            
-            props.setPhoneNumber(response.data.phoneNumber);
-            console.log("PhoneNumber :" + props.phoneNumber);
-            setPhoneNumber(response.data.phoneNumber);
-            setUserName(response.data.name);
-            setEmail(response.data.email);
-
-          
-        }
-            catch(err){
-                console.log("Error: "+ err);
-            }
-           
-        }
-
-       
-
-        getProfile();
-       
-    },[phoneNumber]);
-
-    
-
-    const updateProfile = async()=>{
-
-        if (!userName || !phoneNumber || !email) {
-            return console.log( 'All fields are required.' + name + " " + phoneNumber + " " + email);
+  
+        try {
+          const response = await axios.post(
+            `${API_URL}/api/auth/new-Profile`,
+             { phoneNumber} 
+          );
+  
+          if (response.data) {
+            const {phoneNumber, name, email, userId } = response.data;
+            setName(name );
+            setEmail(email );
+            setPhoneNumber(phoneNumber);
+            setName(name);
+            setUserId(userId);
+            console.log("Profile fetched successfully.");
+          } else {
+            console.warn("Failed to fetch profile.");
           }
-            const response = await axios
-            .post("http://localhost:3000/api/auth/update-Profile",  { phoneNumber,name :userName, email });
-            
-            if(response.data.success){
-                console.log("updated profile Successfully");
-            }
-            else{
-                console.log("failed to update profile");
-                console.log(response.data);
-            }
-    }
+        } catch (err) {
+          console.error("Error fetching profile:", err);
+        }
+      };
+  
+      fetchProfile();
+    }, [phoneNumber]);
+  
+    const updateProfile = async () => {
+      if (!name || !phoneNumber || !email) {
+        console.error("All fields are required:", { name, phoneNumber, email });
+        return;
+      }
+  
+      try {
+        const response = await axios.post(
+          `${API_URL}/api/auth/update-Profile`,
+          { phoneNumber , name, email }
+        );
+  
+        if (response.data.success) {
+          console.log("Profile updated successfully.");
+        } else {
+          console.warn("Failed to update profile.");
+        }
+      } catch (err) {
+        console.error("Error updating profile:", err);
+      }
+    };
+
+    const uploadScreenshot = async () => {
+      if (!selectedFile || !userId) {
+        alert("Please select a file to upload.");
+        return;
+      }
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      formData.append("userId", userId);
+      formData.append("Name", Name);
+      formData.append("DOB", DOB);
+      formData.append("state", state);
+      formData.append("documentName", documentName);
+      formData.append("documentNumber", documentNumber);
+
+      console.log("Form data:", selectedFile, userId);
+  
+      try {
+          await axios.post(`${API_URL}/api/auth/kyc`, formData);
+
+      } catch (err) {
+        console.error("Error uploading screenshot:", err);
+      }
+    };
+
+    
+
     return ( 
     <div className=" ">
         <div className="flex flex-col left-0 inset-y-0 pt-12">
@@ -115,7 +114,7 @@ export const ProfilePage = (props : any)=>{
             <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-xs">Enter the username:</div>
-            <input type="text" className="rounded-md p-1" value={userName} onChange={(e)=>{setUserName(e.target.value)}}/>
+            <input type="text" className="rounded-md p-1" value={name} onChange={(e)=>{setName(e.target.value)}}/>
                 </div>
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-xs">Enter the email:</div>
@@ -128,13 +127,51 @@ export const ProfilePage = (props : any)=>{
                 }}>Save</button>
             </div>
             </div>}
+             {/*********** *Kyc upload **************/}
+             { kycClicked && <div className="absolute z-30 top-32 left-12 bg-gray-400 p-8 rounded-lg">
+                <input  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
+                    if(e.target.files)
+                    setSelectedFile(e.target.files[0])
+                }} />
+                <div className="flex flex-col gap-3 pt-2">
+                <div className="flex flex-col gap-2">
+                    <div className="font-bold text-xs">Enter the Name:</div>
+            <input type="text" className="rounded-md p-1"  onChange={(e)=>{setname(e.target.value)}}/>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <div className="font-bold text-xs"> Date of Birth:</div>
+            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDOB(e.target.value)}}/>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <div className="font-bold text-xs"> State:</div>
+            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setState(e.target.value)}}/>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <div className="font-bold text-xs"> Document Name:</div>
+            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDocumentName(e.target.value)}}/>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <div className="font-bold text-xs"> Document Number:</div>
+            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDocumentNumber(e.target.value)}}/>
+                </div>
+                </div>
+               
+                <div className="bg-green-400 text-white text-center mt-6 mx-8 p-2 rounded-lg " onClick={()=>{
+                  uploadScreenshot();
+                  setKycClicked(false);
+                }}>Done</div>
+                <div className="bg-gray-500 text-white text-center mt-2 mx-16 p-2 rounded-lg " onClick={()=>{
+                  setKycClicked(false);
+                }}>back</div>
+                </div>}
             <div className="m-5 bg-gray-600 rounded-xl flex flex-col hover:bg-gray-700 ">
                 <div className="flex">
                 <img src="../../profile.png" alt=""  className="h-32  p-3"/>
-                <div className="text-white text-3xl font-serif mx-6 my-10" >{userName}</div>
+                <div className="text-white text-3xl font-serif mx-6 my-10" >{name}</div>
                 <div onClick={()=>{
                    setEditClicked(true);
                 }}>
+                  
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" className="size-6 mt-11 ">
   <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
 </svg>
@@ -150,14 +187,20 @@ export const ProfilePage = (props : any)=>{
                 </div>
             </div>
             <div className="flex justify-around m-4">
-                <div className="bg-gray-100 h-16 w-40 rounded-md relative z-30 hover:bg-gray-700  font-bold">
+                <div className="bg-gray-100 h-16 w-40 rounded-md relative z-3 hover:bg-gray-700  font-bold" onClick={()=>{
+                  navigate('/wallet')
+                }}>
                     <img src="../../wallet.png" alt="" className="size-7 absolute top-0 left-16 mt-2   " />
                     <div className="absolute top-8 left-10 mt-1">My Wallet</div>
                 </div>
-                <div className="bg-gray-100  rounded-md h-16 w-40 relative hover:bg-gray-700 ">
+                <div className="bg-gray-100  rounded-md h-16 w-40 relative hover:bg-gray-700 " onClick={()=>{
+                      setKycClicked(true);
+                    }}>
                     <img src="../../kyc.png" alt=""  className="size-7 absolute top-0 left-16 mt-2 " />
-                    <div className="absolute top-8 left-6 mt-1 font-bold">Kyc completed</div>
+                    <div className="absolute top-8 left-6 mt-1 font-bold" >Kyc completed</div>
                 </div>
+
+               
             </div>
                 <div className="flex justify-around m-8">
                     <div className="">
@@ -184,8 +227,9 @@ export const ProfilePage = (props : any)=>{
                 </div>
                 <div className="mt-16 ">
                 <div className="absolute w-80 bg-gray-300 text-black rounded-xl p-2 m-8 border border-black text-center hover:cursor-pointer hover:bg-green-500 hover:text-white" onClick={()=>{
-                    navigate('/login');
-                    props.setLogin(false);
+                    navigate('/');
+                    setLogin(false);
+                    localStorage.clear();
                 }}>Log out</div>
                 </div>
         </div>

@@ -12,7 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runningBattle = exports.completeBattle = exports.canceledBattle = exports.uploadScreenShot = exports.inProgressBattle = exports.joinBattle = exports.battleHistory = exports.pendingBattle = exports.createBattle = void 0;
+exports.deleteBattle = exports.runningBattle = exports.completeBattle = exports.canceledBattle = exports.uploadScreenShot = exports.inProgressBattle = exports.joinBattle = exports.battleHistory = exports.showBattles = exports.pendingBattle = exports.createBattle = void 0;
+const app_1 = require("../app");
 const Battle_1 = __importDefault(require("../models/Battle"));
 const date = Date.now();
 const createBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -26,6 +27,7 @@ const createBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         status: "pending"
     });
     yield battle.save();
+    app_1.io.emit("battleCreated", battle);
     if (!battle) {
         console.log("battle not created");
     }
@@ -46,6 +48,29 @@ const pendingBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.pendingBattle = pendingBattle;
+const showBattles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { status } = req.query;
+        if (status === "canceled") {
+            const battle = yield Battle_1.default.find({ status, winner: { $exists: true, $ne: null } }).sort({ createdAt: -1 });
+            if (!battle) {
+                console.log("No  Battle found");
+            }
+            res.status(200).json(battle);
+        }
+        else {
+            const battle = yield Battle_1.default.find({ status }).sort({ createdAt: -1 });
+            if (!battle) {
+                console.log("No  Battle found");
+            }
+            res.status(200).json(battle);
+        }
+    }
+    catch (err) {
+        console.log("Error Found: " + err);
+    }
+});
+exports.showBattles = showBattles;
 const battleHistory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.query;
@@ -84,12 +109,26 @@ const joinBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.joinBattle = joinBattle;
 const inProgressBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { battleId } = req.query;
-    const battle = yield Battle_1.default.findById(battleId);
-    if (!battle) {
-        console.log("Battle not found");
+    try {
+        const { battleId } = req.query;
+        // Check if battleId is provided
+        if (!battleId) {
+            return res.status(400).json({ message: "battleId is required" });
+        }
+        // Find the battle using the battleId
+        const battle = yield Battle_1.default.findById(battleId);
+        // Check if battle is found
+        if (!battle) {
+            return res.status(404).json({ message: "Battle not found" });
+        }
+        // Send the battle details as a response
+        res.status(200).json(battle);
     }
-    res.status(200).json(battle);
+    catch (err) {
+        // Send a generic error message if an unexpected error occurs
+        console.error("Error fetching battle:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 });
 exports.inProgressBattle = inProgressBattle;
 const uploadScreenShot = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -163,3 +202,9 @@ const runningBattle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     res.status(200).json(battle);
 });
 exports.runningBattle = runningBattle;
+const deleteBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { battleId } = req.body;
+    const battle = yield Battle_1.default.findByIdAndDelete(battleId);
+    res.status(200).json(battle);
+});
+exports.deleteBattle = deleteBattle;

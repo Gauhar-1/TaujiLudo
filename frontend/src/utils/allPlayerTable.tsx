@@ -1,9 +1,10 @@
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import axios from "axios";
+import { Accept, Blockplayer, Transaction } from "./action";
 
 interface Column {
-  id: "no" | "userId" | "mobile" | "wallet" | "referal" | "gameWon" | "gameLost" | "joinedAt" | "action";
+  id: "no" | "userId" | "player1Name" | "mobile" | "wallet" | "referal" | "gameWon" | "gameLost" | "joinedAt" | "action" ;
   label: string;
   minWidth?: number;
   align?: "right";
@@ -12,40 +13,54 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "no", label: "#" },
-  { id: "userId", label: "User ID", minWidth: 190 },
-  { id: "mobile", label: "mobile", minWidth: 170 },
-  { id: "wallet", label: "Wallet", minWidth: 170 },
-  { id: "referal", label: "Referal Code", minWidth: 170, align: "right" },
-  { id: "gameWon", label: "Game Won", minWidth: 170, align: "right" },
-  { id: "gameLost", label: "Game Lost", minWidth: 170, align: "right" },
-  { id: "joinedAt", label: "Joined At", minWidth: 170, align: "right" },
-  { id: "action", label: "Action", minWidth: 170, align: "right" },
+  { id: "userId", label: "User ID", minWidth: 220 },
+  { id: "player1Name", label: "Player1", minWidth: 170 },
+  { id: "mobile", label: "mobile No.", minWidth: 170 },
+  { id: "wallet", label: "Wallet", minWidth: 120,  },
+  { id: "referal", label: "Referal Code", minWidth: 170 },
+  { id: "gameWon", label: "Game Won", minWidth: 170 },
+  { id: "gameLost", label: "Game Lost", minWidth: 170 },
+  { id: "joinedAt", label: "Joined At", minWidth: 170 },
+  { id: "action", label: "Action", minWidth: 170 },
 ];
 
 interface Data {
   no: number;
   userId: string;
+  player1Name: string;
   mobile: string;
   wallet: number;
   referal: string;
   gameWon: string;
   gameLost: string;
   joinedAt: string;
-  action: HTMLBodyElement | null;
+  action: ReactElement;
 }
 
 function createData(
   no: number,
   userId: string,
+  player1Name: string,
   mobile: string,
   wallet: number,
   referal: string,
   gameWon: string,
   gameLost: string,
   joinedAt: string,
-  action: HTMLBodyElement | null,
+  action: ReactElement,
 ): Data {
-  return { no, userId, mobile, wallet, referal, gameWon, gameLost, joinedAt , action};
+  return {
+    no,
+    userId,
+    player1Name,
+    mobile,
+    wallet,
+    referal,
+    gameWon,
+    gameLost,
+    joinedAt,
+    action,
+  };
 }
 
 export const StickyTable: React.FC = () => {
@@ -61,19 +76,26 @@ export const StickyTable: React.FC = () => {
     const runningBattle = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/auth/getProfiles");
-        const fetchedProfile = response.data.map((profile: any, index: number) => {
+        const fetchedBattles = response.data.map((profile: any, index: number) => {
           const date = new Date(profile.createdAt).toLocaleString();
           return createData(
             index + 1,
             profile.userId,
-            profile.phoneNumber ,
+            profile.name || "",
+            profile.phoneNumber || "",
             profile.amount || 0,
             profile.Referal ,
-            profile.status || "Unknown",
+            profile.gameWon,
+            profile.gameLost ,
             date,
+            <div className="flex gap-2">
+              <Transaction userId={profile.userId}></Transaction>
+              <Accept></Accept>
+              <Blockplayer userId={profile.userId}></Blockplayer>
+              </div>
           );
         });
-        setRows(fetchedProfile);
+        setRows(fetchedBattles);
       } catch (err) {
         console.error("Error:", err);
       }
@@ -118,18 +140,20 @@ export const StickyTable: React.FC = () => {
   const filterEachRow = (row: Data) => {
     const query = searchQuery.toLowerCase();
     return (
-      row.battleId.toLowerCase().includes(query) ||
+      row.userId.toLowerCase().includes(query) ||
       row.player1Name.toLowerCase().includes(query) ||
-      row.player2Name.toLowerCase().includes(query) ||
-      row.amount.toString().toLowerCase().includes(query) ||
-      row.status.toLowerCase().includes(query) ||
+      row.mobile.toLowerCase().includes(query) ||
+      row.wallet.toString().toLowerCase().includes(query) ||
+      row.gameWon.toString().toLowerCase().includes(query) ||
+      row.referal.toString().toLowerCase().includes(query) ||
+      row.gameLost.toString().toLowerCase().includes(query) ||
       row.joinedAt.toLowerCase().includes(query)
     );
   };
 
   const filteredRows = rows.filter(filterEachRow);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -158,57 +182,44 @@ export const StickyTable: React.FC = () => {
         </button>
       </div>
 
-      <div className="overflow-y-auto max-w-screen shadow-md relative  max-h-[440px]">
-        <div className="flex  shadow-md bg-gray-100 p-2 text-center border-b ">
-          {columns.map((column) => (
-            <div
-              key={column.id}
-              className="text-sm font-semibold p-2"
-              style={{ minWidth: column.minWidth }}
-            >
-              {column.label}
-            </div>
-          ))}
-        </div>
-
-        {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-          <div
-            key={row.battleId}
-            className="flex flex-row  px-2   border-b "
-          >
-            {columns.map((column) => {
-              const value = row[column.id as keyof Data];
-              const statusClasses =
-                column.id === "status"
-                  ? value === "pending"
-                    ? "text-red-500 ml-12 pl-4 mr-20 font-bold"
-                    : value === "in-progress"
-                    ? "text-yellow-500 mx-6 font-bold"
-                    : ""
-                  : "";
-                  const no = column.id === "no" ? "pt-4 px-2 " : "";
-                  const battleId = column.id === "battleId" ? "h-5 pt-4 px-5 w-80" : "";
-                  const player1 = column.id === "player1Name" ? "px-8 mx-2 mr-1 pt-4" : "";
-                  const player2 = column.id === "player2Name" ? "px-4 pt-4  mx-20 w-190" : "";
-                  const amount = column.id === "amount" ? "px-5 pt-4 mx-6 w-190" : "";
-                  const status = column.id === "status" ? "px-16 mx-20  pt-2 text-center " : "";
-                  const joinedAt = column.id === "joinedAt" ? "px-12 mx-2  " : "";
-              return (
-                <div
-                  key={column.id}
-                  className={`px-2 mt-1 text-center text-sm ${statusClasses} ${no} ${battleId} ${player1} ${player2} ${amount}
-                  ${status} ${joinedAt}`}
-              
-                >
-                  {column.format && typeof value === "number" ? column.format(value) : value}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+      <div className="overflow-y-auto shadow-md relative max-h-[440px]">
+  <div className="flex bg-gray-200 text-center border-b">
+    {columns.map((column) => (
+      <div
+        key={column.id}
+        className={`text-sm font-semibold p-2 flex-1`}
+        style={{
+          minWidth: column.minWidth || 100,
+          textAlign: column.align || "left",
+        }}
+      >
+        {column.label}
       </div>
+    ))}
+  </div>
 
-      <div className="mt-4">
+  {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+    <div key={row.userId} className="flex border-b text-center">
+      {columns.map((column) => {
+        const value = row[column.id as keyof Data];
+        
+        return (
+          <div
+            key={column.id}
+            className={`text-sm p-2 flex-1`}
+            style={{
+              minWidth: column.minWidth || 100,
+              textAlign: column.align || "left",
+            }}
+          >
+            {column.format && typeof value === "number" ? column.format(value) : value}
+          </div>
+        );
+      })}
+    </div>
+  ))}
+</div>
+<div className="mt-4">
         <div className="flex justify-between items-center">
           <div className="text-sm">
             {filteredRows.length} rows
@@ -240,6 +251,7 @@ export const StickyTable: React.FC = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };

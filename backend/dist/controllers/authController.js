@@ -14,19 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOtp = exports.sendOtp = void 0;
 const User_js_1 = __importDefault(require("../models/User.js"));
-const otpService_1 = require("../utils/otpService");
+const dotenv_1 = __importDefault(require("dotenv"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
+const axios_1 = __importDefault(require("axios"));
+dotenv_1.default.config();
 exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const phone = req.body.phoneNumber;
+    if (!phone)
+        return console.log('Phone number is required  0.');
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     try {
-        const user = yield User_js_1.default.findOneAndUpdate({ phone }, { otp, otpExpires: new Date(Date.now() + 10 * 60 * 1000) }, { upsert: true, new: true });
+        const user = yield User_js_1.default.findOneAndUpdate({ phone }, { otp, status: "active", otpExpires: new Date(Date.now() + 10 * 60 * 1000) }, { upsert: true, new: true });
         if (!user) {
-            yield User_js_1.default.create({ phone }, { otp, otpExpires: new Date(Date.now() + 10 * 60 * 1000) }, { upsert: true, new: true });
+            yield User_js_1.default.create({ phone }, { otp, status: "active", otpExpires: new Date(Date.now() + 10 * 60 * 1000) }, { upsert: true, new: true });
         }
         if (!phone)
             return console.log('Phone number is required  1.');
-        yield (0, otpService_1.sendOTP)(phone, otp);
+        const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
+        const response = yield axios_1.default.get(URL);
         res.status(200).json({
             success: true,
             message: 'OTP sent successfully'
@@ -38,6 +43,32 @@ exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awa
         res.status(500).json({ error: 'Error sending OTP' });
     }
 }));
+//     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//     try {
+//         const user = await User.findOneAndUpdate(
+//             { phone },
+//             { otp, status: "active",  otpExpires: new Date(Date.now() + 10 * 60 * 1000) },
+//             { upsert: true, new: true }
+//         );
+//         if(!user){
+//             await User.create(
+//                 { phone },
+//                 { otp,status: "active", otpExpires: new Date(Date.now() + 10 * 60 * 1000) },
+//             { upsert: true, new: true }
+//             );
+//         }
+//         if (!phone) 
+//             return console.log('Phone number is required  1.' );
+//         await sendOTP(phone, otp);
+//         res.status(200).json({ 
+//             success: true,
+//             message: 'OTP sent successfully' });
+//     } catch (error) {
+//         console.error('Error sending OTP:', error);
+//         next(error);
+//         res.status(500).json({ error: 'Error sending OTP' });
+//     }
+// });
 exports.verifyOtp = ((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const phone = req.body.phoneNumber;
     const otp = req.body.otp;
