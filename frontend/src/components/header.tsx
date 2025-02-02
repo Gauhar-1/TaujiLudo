@@ -5,7 +5,7 @@ import { useUserContext } from "../hooks/UserContext";
 import axios from "axios";
 import { API_URL } from "../utils/url";
 
-export const Header = (props : any)=>{
+export const Header = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
   const navigate = useNavigate();
   const { login, amount, phoneNumber  } = useUserContext();

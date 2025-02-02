@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
-import { dividerClasses } from "@mui/material";
 
 interface Battle {
     _id: string;
