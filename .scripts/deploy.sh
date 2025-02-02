@@ -7,15 +7,20 @@ echo "Deployment started..."
 git pull origin main
 echo "New changes copied to server !"
 
+cd .\frontend\
+
 echo "Installing Dependencies..."
-npm install --yes
+pnpm install --yes
 
 echo "Creating Production Build..."
-npm run build
+pnpm run build
+
+sudo systemctl restart nginx
+
+cd ..\backend\
 
 echo "PM2 Reload"
 pm2 reload 0
 
-sudo systemctl restart nginx
 
 echo "Deployment Finished!"
