@@ -41,7 +41,7 @@ const getInitialValue = <T extends string | number | boolean  | object>(
   key: string,
   defaultValue: T
 ): T => {
-  const storedValue = localStorage.getItem(key);
+  const storedValue = sessionStorage.getItem(key);
   if (storedValue !== null) {
     try {
       const parsedValue = JSON.parse(storedValue);
@@ -99,9 +99,9 @@ const [profile, setProfile] = useState<object>(() => getInitialValue("profile",{
   // Update localStorage when state changes
   useEffect(() => {
     const updateLocalStorage = (key: string , value: string | boolean | number) => {
-      const existingValue = safeParse(localStorage.getItem(key));
+      const existingValue = safeParse(sessionStorage.getItem(key));
       if (existingValue !== value) {
-        localStorage.setItem(key, JSON.stringify(value));
+        sessionStorage.setItem(key, JSON.stringify(value));
       }
     };
 

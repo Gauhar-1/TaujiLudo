@@ -3,6 +3,9 @@ import axios from "axios"
 import { useUserContext } from "../hooks/UserContext"
 import { API_URL } from "../utils/url"
 
+// import { useLocation } from "react-router-dom"
+
+
 export const KycVerification = ()=>{
     const [ username, setUserName ] = useState("");
     const [ phoneNumber, setPhoneNumber ] = useState("");
@@ -23,6 +26,9 @@ export const KycVerification = ()=>{
     const [ reason, setReason ] = useState("");
 
     const { userId } = useUserContext();
+
+
+    // const navigate = useLocation();
     
     useEffect(()=>{
         const handle = async()=>{
