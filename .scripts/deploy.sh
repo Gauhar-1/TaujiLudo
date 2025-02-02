@@ -16,4 +16,6 @@ npm run build
 echo "PM2 Reload"
 pm2 reload 0
 
+sudo systemctl restart nginx
+
 echo "Deployment Finished!"
