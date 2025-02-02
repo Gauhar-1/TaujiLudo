@@ -65,7 +65,7 @@ export const Header = ()=>{
          </div>
        </div>
    </div>}
-       {!login && <div className="flex justify-center">
+       {!login && <div className="flex justify-end">
         <img src="../../logo.png" alt=""  className="h-10 m-3  "/>
        </div>}
         
