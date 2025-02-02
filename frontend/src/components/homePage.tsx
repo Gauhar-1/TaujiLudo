@@ -8,7 +8,10 @@ import { io } from "socket.io-client";
 
 
 
- export const socket = io("http://localhost:5000");
+export const socket = io("https://api.taujiludo.in",{
+  path: '/socket.io/',
+
+});
 
 export const HomePage = (props: any) => {
     const navigate = useNavigate();

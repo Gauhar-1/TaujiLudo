@@ -10,23 +10,23 @@ export const WinCashPage = ()=>{
                     <div className="flex">
                         <div className="px-4 flex flex-col gap-1">
                             <div> ◉ LIVE</div>
-                          <img src="/ludoCard.png" alt="" className="h-52 " onClick={()=>{
+                          <img src="/ludoCard.jpg" alt="" className="h-52 " onClick={()=>{
                             navigate('/home')
                           }} />
                         </div>
                         <div className="px-4 flex flex-col gap-1">
                             <div> ◉ LIVE</div>
-                          <img src="/ludo2.png" alt="" className="h-52 " />
+                          <img src="/ludo2.jpg" alt="" className="h-52 " />
                         </div>
                     </div>
                     <div className="flex">
-                        <div className="px-4 flex flex-col gap-1">
+                        {/* <div className="px-4 flex flex-col gap-1">
                             <div> ◉ comming soon</div>
                           <img src="/ludo3.png" alt="" className="h-52 " />
-                        </div>
+                        </div> */}
                         <div className="px-4 flex flex-col gap-1">
                             <div> ◉ Support</div>
-                          <img src="/ludo6.png" alt="" className="h-52 " onClick={()=>{
+                          <img src="/ludo6.jpg" alt="" className="h-52 " onClick={()=>{
                             navigate('/support')
                           }}/>
                         </div>
