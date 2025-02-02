@@ -79,9 +79,6 @@ export const LoginPage = () => {
       <div className="relative w-full max-w-sm p-6">
         <div className="bg-white shadow-md rounded-lg p-6">
           <h1 className="text-3xl font-serif text-center mb-2">Login Here!</h1>
-          <p className="text-sm text-gray-600 text-center mb-6">
-            Fill in your information to complete your account.
-          </p>
 
           {/* Phone Number Input */}
           <div className="mb-4">
