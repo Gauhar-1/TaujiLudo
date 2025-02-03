@@ -37,7 +37,8 @@ echo "Installing Backend Dependencies..."
 pnpm install || { echo "Error installing backend dependencies"; exit 1; }
 
 echo "Building TypeScript files..."
-pnpm exec tsc -b || { echo "Error building backend TypeScript files"; exit 1; }
+npm install tsc
+ tsc -b || { echo "Error building backend TypeScript files"; exit 1; }
 
 echo "PM2 Reload"
 pm2 reload 0 || { echo "Error reloading PM2"; exit 1; }
