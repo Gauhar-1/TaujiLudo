@@ -19,6 +19,8 @@ echo "New changes copied to server!"
 # Frontend setup
 cd ./frontend/
 
+rm -rf node_modules package-lock.json pnpm-lock.yaml yarn.lock
+
 echo "Installing Dependencies..."
 pnpm install || { echo "Error installing frontend dependencies"; exit 1; }
 
