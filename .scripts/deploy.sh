@@ -3,6 +3,9 @@ set -e
 
 echo "Deployment started..."
 
+# Clean untracked files and symbolic links
+git clean -fdx
+
 # Stash local changes if there are any
 git stash -u
 
