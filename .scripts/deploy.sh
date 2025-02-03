@@ -26,6 +26,8 @@ sudo systemctl restart nginx
 
 cd ../backend/
 
+pnpm install 
+
 echo "PM2 Reload"
 pm2 reload 0
 
