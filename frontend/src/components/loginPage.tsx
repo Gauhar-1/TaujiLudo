@@ -78,7 +78,7 @@ export const LoginPage = () => {
     <div className="bg-gray-200 flex justify-center items-center max-w-sm min-h-screen">
       <div className="relative w-full max-w-sm p-6">
         <div className="bg-white shadow-md rounded-lg p-6">
-          <h1 className="text-3xl font-serif text-center mb-2">Login Here!</h1>
+          {/* <h1 className="text-3xl font-serif text-center mb-2">Login Here!</h1> */}
 
           {/* Phone Number Input */}
           <div className="mb-4">
