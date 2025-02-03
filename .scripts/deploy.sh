@@ -8,9 +8,9 @@ git stash -u
 
 # Pull the latest version of the app
 git pull origin main
-echo "New changes copied to server !"
+echo "New changes copied to server!"
 
-cd .\frontend\
+cd ./frontend/
 
 echo "Installing Dependencies..."
 pnpm install --yes
@@ -20,7 +20,7 @@ pnpm run build
 
 sudo systemctl restart nginx
 
-cd ..\backend\
+cd ../backend/
 
 echo "PM2 Reload"
 pm2 reload 0
