@@ -4,34 +4,44 @@ set -e
 echo "Deployment started..."
 
 # Clean untracked files and symbolic links
-git clean -fdx
+echo "Cleaning untracked files..."
+git clean -fdx || { echo "Error cleaning untracked files"; exit 1; }
 
 # Stash local changes if there are any
-git stash -u
-echo "git stash!"
+echo "Stashing local changes..."
+git stash -u || echo "No local changes to stash"
 
 # Pull the latest version of the app
-git pull origin main
+echo "Pulling the latest version of the app..."
+git pull origin main || { echo "Error pulling the latest version"; exit 1; }
 echo "New changes copied to server!"
 
+# Frontend setup
 cd ./frontend/
 
 echo "Installing Dependencies..."
-pnpm install 
+pnpm install || { echo "Error installing frontend dependencies"; exit 1; }
 
 echo "Creating Production Build..."
-pnpm run build
+pnpm run build || { echo "Error creating production build"; exit 1; }
 
-sudo systemctl restart nginx
+echo "Restarting nginx..."
+sudo systemctl restart nginx || { echo "Error restarting nginx"; exit 1; }
 
+# Backend setup
 cd ../backend/
 
-pnpm install 
+echo "Installing Backend Dependencies..."
+pnpm install || { echo "Error installing backend dependencies"; exit 1; }
+
+tsc -b
+pnpm run build
 
 echo "PM2 Reload"
-pm2 reload 0
+pm2 reload 0 || { echo "Error reloading PM2"; exit 1; }
 
-# Reapply any stashed changes
-git stash pop
+# Reapply any stashed changes if they exist
+echo "Reapplying stashed changes..."
+git stash pop || echo "No stashed changes to apply"
 
 echo "Deployment Finished!"
