@@ -3,6 +3,9 @@ set -e
 
 echo "Deployment started..."
 
+# Stash local changes if there are any
+git stash -u
+
 # Pull the latest version of the app
 git pull origin main
 echo "New changes copied to server !"
@@ -22,5 +25,7 @@ cd ..\backend\
 echo "PM2 Reload"
 pm2 reload 0
 
+# Reapply any stashed changes
+git stash pop
 
 echo "Deployment Finished!"
