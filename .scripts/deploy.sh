@@ -8,6 +8,7 @@ git clean -fdx
 
 # Stash local changes if there are any
 git stash -u
+echo "git stash!"
 
 # Pull the latest version of the app
 git pull origin main
