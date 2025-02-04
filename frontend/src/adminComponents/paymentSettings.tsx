@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export const PaymentSettings = ()=>{
-     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+     const [, setSelectedFile] = useState<File | null>(null);
     return (
         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
                            <div className="text-3xl font-serif">Payment Settings</div>
