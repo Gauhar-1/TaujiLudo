@@ -1,6 +1,7 @@
 import { useUserContext } from "../hooks/UserContext";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { API_URL } from "../utils/url";
 
 
  export const MoneyRecharge = ()=>{
@@ -10,7 +11,7 @@ import axios from "axios";
 
     const handleDeposit = async () => {
         try {
-             await axios.post('http://localhost:3000/api/auth/deposit', {
+             await axios.post(`${API_URL}/api/auth/deposit`, {
                 userId : profile.userId, // Replace with the logged-in user's ID
                 amount,
                 wallet : (profile.amount + amount),
