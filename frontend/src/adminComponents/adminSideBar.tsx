@@ -8,12 +8,21 @@ export const AdminSideBar = ( props : any)=>{
     const [ battleButton , setBattleButton ] = useState(false);
     const [ kycButton , setKycButton ] = useState(false);
     const [ paymentsButton , setPaymentsButton ] = useState(false);
-    const { setLogin } = useUserContext()
+    const { setAdminClicked } = useUserContext()
 
     return (
-        <div className="bg-blue-500 fixed min-h-screen min-w-56  z-50 flex gap-4">
-          <div className="py-5 pl-5 flex flex-col  gap-6">
-            <div className="text-2xl font-serif text-blue-500 bg-gray-300 text-center rounded-md py-4 w-48">Tauji Ludo</div>
+        <div className="bg-gray-200  shadow-lg fixed min-h-screen min-w-64  z-50 flex flex-col ">
+          <div className="flex justify-between">
+            <div className="pt-2">
+            <img src="/logo.png" alt="" className="h-12"/>
+            </div>
+            <div className="p-4 font-bold text-lg" onClick={()=>{
+            props.setSidebarClicked(false);
+          }}>
+            X
+          </div>
+            </div>
+          <div className=" pl-2 flex flex-col ">
             <div className="">
               <div className="flex gap-4 p-3   rounded-lg hover:bg-gray-400" onClick={()=>{
                 navigate('/admin');
@@ -104,7 +113,10 @@ export const AdminSideBar = ( props : any)=>{
                   props.setSidebarClicked(false);
                   navigate("rechargeUser");
                  }}>Recharge to User</div>
-                 <div className="text-sm">Payment Settings</div>
+                 <div className="text-sm"  onClick={()=>{
+                  props.setSidebarClicked(false);
+                  navigate("paymentSettings");
+                 }}>Payment Settings</div>
                 </div>}
               <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
                 props.setSidebarClicked(false);
@@ -126,16 +138,7 @@ export const AdminSideBar = ( props : any)=>{
 
                 <div className="font-mono">Admin Settings</div>
               </div>
-              <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/support');
-                props.setSidebarClicked(false);
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46" />
-</svg>
-
-                <div className="font-mono">Games</div>
-              </div>
+            
               <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
                 navigate('/policies');
                 props.setSidebarClicked(false);
@@ -147,42 +150,9 @@ export const AdminSideBar = ( props : any)=>{
                 <div className="font-mono">Notifications</div>
               </div>
               <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/admin');
-                props.setSidebarClicked(false);
-                props.setAdminClicked(true)
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-</svg>
-
-                <div className="font-mono">Marquee Notification</div>
-              </div>
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/admin');
-                props.setSidebarClicked(false);
-                props.setAdminClicked(true)
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-</svg>
-
-                <div className="font-mono">Support</div>
-              </div>
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/admin');
-                props.setSidebarClicked(false);
-                props.setAdminClicked(true)
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-</svg>
-
-                <div className="font-mono">Policies</div>
-              </div>
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
                 navigate('/home');
                 props.setSidebarClicked(false);
-                setLogin(false);
+                setAdminClicked(false);
               }}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
   <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
@@ -192,11 +162,7 @@ export const AdminSideBar = ( props : any)=>{
               </div>
             </div>
           </div>
-          <div className="pt-1 pr-2 font-bold text-lg" onClick={()=>{
-            props.setSidebarClicked(false);
-          }}>
-            X
-          </div>
+          
 
           </div>
     )

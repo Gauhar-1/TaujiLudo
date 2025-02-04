@@ -82,7 +82,7 @@ const [phoneNumber, setPhoneNumber] = useState<string>(() => getInitialValue("ph
 const [name, setName] = useState<string>(() => getInitialValue("name", "") as string);
 const [battleId, setBattleId] = useState<string>(() => getInitialValue("battleId", "") as string);
 const [login, setLogin] = useState<boolean>(() => getInitialValue("login", false) as boolean);
-const [adminClicked, setAdminClicked] = useState<boolean>(() => getInitialValue("login", false) as boolean);
+const [adminClicked, setAdminClicked] = useState<boolean>(() => getInitialValue("adminClicked", false) as boolean);
 const [opponentFound, setOpponentFound] = useState<boolean>(() => getInitialValue("opponentFound", false) as boolean);
 const [amount, setAmount] = useState<number>(() => getInitialValue("amount", 5) as number);
 const [profile, setProfile] = useState<object>(() => getInitialValue("profile",{}) as object);

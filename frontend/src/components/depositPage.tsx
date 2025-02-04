@@ -45,27 +45,7 @@ export const DepositPage = ()=>{
             console.log('Error initiating deposit: ' + err.response?.data?.message || err.message);
         }
     };
-    // const uploadScreenshot = async () => {
-    //     if (!selectedFile || !userId) {
-    //       alert("Please select a file to upload.");
-    //       return;
-    //     }
-    //     const formData = new FormData();
-    //     formData.append("image", selectedFile);
-    //     formData.append("userId", userId);
-
-    //     console.log("Form data:", selectedFile, userId);
-    
-    //     navigate("/wallet");
-    //     try {
-    //         await axios.post(`${API_URL}/api/auth/depositProof`, formData);
-
-    //     //   navigate("/wallet");
-    //     } catch (err) {
-    //       console.error("Error uploading screenshot:", err);
-    //     }
-    //   };
-
+   
     
     return (
         <div className="bg-gray-200 min-h-screen max-w-sm flex flex-col justify-between">

@@ -36,6 +36,8 @@ import { MoneyRecharge } from "../adminComponents/moneyRecharge";
 import { PendingKyc } from "../adminComponents/pendingKyc";
 import { KycVerification } from "../adminComponents/kycVerify";
 import { VerifiedKyc } from "../adminComponents/verifiedKyc";
+import { ReferPage } from "../components/referPage";
+import { PaymentSettings } from "../adminComponents/paymentSettings";
 
 
 export const UserPage = ()=>{
@@ -69,6 +71,7 @@ export const UserPage = ()=>{
            <Route path="/support" element={<SupportPage/>}></Route>
            <Route path="/battle" element={<BattlePage  />}></Route>
            <Route path="/rules" element={<RulesPgage/>}></Route>
+           <Route path="/refer" element={<ReferPage/>}></Route>
            <Route path="/gameHistory" element={<GameHistory />}></Route>
            <Route path="/winCash" element={<WinCashPage/>}></Route>
            <Route path="/admin" element={<AdminPage />}>
@@ -90,6 +93,7 @@ export const UserPage = ()=>{
                   <Route path="pendingKyc" element={<PendingKyc />}></Route>
                   <Route path="verifiedKyc" element={<VerifiedKyc />}></Route>
                   <Route path="pendingKyc/kycView" element={<KycVerification />}></Route>
+                  <Route path="paymentSettings" element={<PaymentSettings />}></Route>
            </Route>
        </Routes>
      { !adminClicked && <Footer></Footer> }
