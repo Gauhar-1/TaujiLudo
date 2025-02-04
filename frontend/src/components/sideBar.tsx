@@ -5,9 +5,18 @@ export const SideBar = (props : any)=>{
     const navigate = useNavigate();
     const { setAdminClicked } = useUserContext();
     return (
-        <div className="bg-gray-300 fixed min-h-screen min-w-56  z-50 flex gap-4">
-          <div className="py-5 pl-5 flex flex-col  gap-6">
-            <div className="text-2xl font-serif text-white bg-gray-500 text-center rounded-md py-4 w-48">Tauji Ludo</div>
+        <div className="bg-gray-300 fixed min-h-screen min-w-64  z-50 flex flex-col">
+          <div className="flex justify-between">
+            <div className="pt-2">
+            <img src="/logo.png" alt="" className="h-12"/>
+            </div>
+            <div className="p-4 font-bold text-lg" onClick={()=>{
+            props.setSidebarClicked(false);
+          }}>
+            X
+          </div>
+            </div>
+          <div className="pl-1 flex flex-col  gap-6">
             <div className="">
               <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
                 navigate('/profile');
@@ -103,12 +112,6 @@ export const SideBar = (props : any)=>{
               </div>
             </div>
           </div>
-          <div className="pt-1 pr-2 font-bold text-lg" onClick={()=>{
-            props.setSidebarClicked(false);
-          }}>
-            X
-          </div>
-
           </div>
     )
 }
