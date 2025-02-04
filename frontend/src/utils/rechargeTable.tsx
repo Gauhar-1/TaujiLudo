@@ -3,6 +3,7 @@ import React, { ReactElement, useEffect, useState } from "react";
 import axios from "axios";
 import {  AddMoney,  Transaction } from "./action";
 import { useUserContext } from "../hooks/UserContext";
+import { API_URL } from "./url";
 
 interface Column {
   id: "no" | "userId" | "player1Name" | "mobile" | "wallet" | "referal" | "gameWon" | "gameLost" | "joinedAt" | "action" ;
@@ -78,7 +79,7 @@ export const StickyTable: React.FC = () => {
   useEffect(() => {
     const runningBattle = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auth/findProfile", { params : { userId }});
+        const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { userId }});
         const fetchedBattles = response.data.map((profile: any, index: number) => {
           const date = new Date(profile.createdAt).toLocaleString();
           setProfile(profile);

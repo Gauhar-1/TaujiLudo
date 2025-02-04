@@ -1,6 +1,7 @@
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL } from "./url";
 
 interface Column {
   id: "no" | "battleId" | "player1Name" | "player2Name" | "amount" | "status" | "joinedAt";
@@ -54,7 +55,7 @@ export const StickyTable: React.FC = () => {
   useEffect(() => {
     const runningBattle = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auth/battles/runningBattle");
+        const response = await axios.get(`${API_URL}/api/auth/battles/runningBattle`);
         const fetchedBattles = response.data.map((battle: any, index: number) => {
           const date = new Date(battle.createdAt).toLocaleString();
           return createData(

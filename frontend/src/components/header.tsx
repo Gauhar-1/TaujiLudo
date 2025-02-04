@@ -47,7 +47,7 @@ export const Header = ()=>{
               setSidebarClicked(true);
          }}> ☰</div>
            
-           <img src="../../logo.png" alt=""  className="h-10 pt-1"/>
+           <img src="../../logo.png" alt=""  className="h-10 pt-"/>
        </div>
        <div className="m-3 flex gap-2">
          <div className="bg-green-900 flex flex-row  rounded-md h-8 w-20">
@@ -65,8 +65,8 @@ export const Header = ()=>{
          </div>
        </div>
    </div>}
-       {!login && <div className="flex justify-end">
-        <img src="../../logo.png" alt=""  className="h-10 m-3  "/>
+       {!login && <div className="flex justify-center">
+        <img src="../../logo.png" alt=""  className="h-14  "/>
        </div>}
         
     </div>

@@ -2,6 +2,7 @@ import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import React, { ReactElement, useEffect, useState } from "react";
 import axios from "axios";
 import { Accept, Blockplayer, Transaction } from "./action";
+import { API_URL } from "./url";
 
 interface Column {
   id: "no" | "userId" | "player1Name" | "mobile" | "wallet" | "referal" | "gameWon" | "gameLost" | "joinedAt" | "action" ;
@@ -75,7 +76,7 @@ export const StickyTable: React.FC = () => {
   useEffect(() => {
     const runningBattle = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auth/getProfiles");
+        const response = await axios.get(`${API_URL}/api/auth/getProfiles`);
         const fetchedBattles = response.data.map((profile: any, index: number) => {
           const date = new Date(profile.createdAt).toLocaleString();
           return createData(

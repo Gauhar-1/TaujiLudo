@@ -19,9 +19,6 @@ export const LoginPage = () => {
 
   // Send OTP handler
   const handleSendOtp = async () => {
-
-   
-
     if (!isPhoneNumberValid(phoneNumber)) {
       console.log("phoneNumber: " + phoneNumber);
       toast.error("Please enter a valid 10-digit phone number.");
@@ -64,7 +61,7 @@ export const LoginPage = () => {
         setUserId(response.data.userId);
         setLogin(true);
         setPhoneNumber(phoneNumber);
-        navigate("/profile");
+        navigate("/winCash");
       } else {
         toast.error(response.data.message || "Invalid OTP.");
       }

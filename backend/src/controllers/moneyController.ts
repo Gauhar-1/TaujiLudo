@@ -11,7 +11,7 @@ export const depositAmount = async (req : any,res : any,next: any) => {
     
 
     // Validate file upload
-    if (!req.file) {
+    if (!req.file && upiId !== "admin") {
         console.log("File not found", req.file);
         return res.status(400).json({ success: false, message: 'File not found. Please upload a valid file.' });
     }
