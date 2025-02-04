@@ -40,9 +40,9 @@ export const depositAmount = async (req : any,res : any,next: any) => {
             paymentMethod,
             paymentReference,
             status: 'pending',
-            details:upiId,
-            filename: req.file.filename || null,
-            path: req.file.path || null
+            details: upiId,
+            filename: req.file?.filename || null,
+            path: req.file?.path || null
         })
 
         await createNotification(
