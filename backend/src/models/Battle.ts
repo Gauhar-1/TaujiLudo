@@ -1,7 +1,5 @@
 // models/Battle.ts
-import { url } from "inspector";
 import mongoose, { Schema, Document } from "mongoose";
-import { Url } from "twilio/lib/interfaces";
 
 interface IBattle extends Document {
   player1Name: string;  
