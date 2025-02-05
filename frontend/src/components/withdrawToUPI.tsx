@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { useUserContext } from "../hooks/UserContext";
+import { API_URL } from "../utils/url";
 
 export const  WithdrawToUPI = ()=>{
 
@@ -12,7 +13,7 @@ export const  WithdrawToUPI = ()=>{
     const handleWithdraw = async () => {
 
         try {
-           await axios.post('http://localhost:3000/api/auth/withdraw', {
+           await axios.post(`${API_URL}/api/auth/withdraw`, {
                 userId,
                 amount : token,
                 wallet : amount - token,
