@@ -51,7 +51,7 @@ export const depositAmount = async (req : any,res : any,next: any) => {
             `Your deposit of ${amount} tokens was successful.`,
              paymentReference,
              'pending',
-             amount
+             amount,
         );
 
          // Simulate UPI link (replace with QR code generation in production)

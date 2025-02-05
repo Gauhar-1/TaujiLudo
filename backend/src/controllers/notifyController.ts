@@ -10,7 +10,8 @@ export const createNotification = async (userId: string, type: string, message: 
           message,
           paymentReference,
            status,
-           amount
+           amount,
+           markAsRead : false,
         });
 
         console.log("Notification created 1")
@@ -21,7 +22,6 @@ export const createNotification = async (userId: string, type: string, message: 
 
 // Endpoint to fetch notifications
 export const getNotifications = async (req: any, res: any) => {
-  console.log(req.query);
   const userId  = req.query.userId;
   if (!userId ) {
     return  console.log('Invalid or missing userId' );
@@ -36,12 +36,22 @@ export const getNotifications = async (req: any, res: any) => {
   }
 };
 
+export const allNotifications = async (req: any, res: any)=>{
+  try {
+    const notifications = await Notification.find().sort({ createdAt: -1 });
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+}
+
 // Endpoint to mark a notification as read
 export const markAsRead = async (req: any, res: any) => {
   const { notificationId } = req.body;
   try {
-    await Notification.findByIdAndUpdate(notificationId, { status: 'read' });
-    res.status(200).json({ success: true });
+    await Notification.findByIdAndUpdate(notificationId, { markAsRead: 'read' });
+    res.status(200).json({ markAsRead: true });
   } catch (error) {
     console.error('Error marking notification as read:', error);
     res.status(500).json({ error: 'Failed to update notification' });

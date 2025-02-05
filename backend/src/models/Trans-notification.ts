@@ -9,6 +9,7 @@ interface INotification extends Document {
   reason: ""
   createdAt: Date;
   paymentReference: string; 
+  markAsRead : boolean;
 }
 
 const notificationSchema = new Schema({
@@ -20,6 +21,7 @@ const notificationSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   paymentReference: { type: String, required: true }, 
   reason: { type: String, default: null }, 
+  markAsRead: { type: Boolean, default: null }, 
 });
 
 export const Notification = mongoose.model<INotification>('Notification', notificationSchema);

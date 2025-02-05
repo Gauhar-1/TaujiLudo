@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
-import { HistoryCard } from "./historyCard"
 import axios from "axios"
 import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
+import { NotifyCard } from "../utils/adminNotifyCard";
 
-export const HistoryPage = ()=>{
-  const { userId } = useUserContext() ;
-  const[notifications, setNotifications] = useState<[{
+export const AdminNotification = ()=>{
+    const { userId } = useUserContext() ;
+  const[, setNotifications] = useState<[{
       _id: string;
       userId: string;
       type: string;
@@ -56,11 +56,11 @@ export const HistoryPage = ()=>{
   },[userId, setNotifications])
   
     return (
-        <div className="bg-gray-300 pt-12 min-h-screen max-w-sm flex flex-col pb-16">
-          {notifications.map((notification) => (
-    <HistoryCard key={notification._id} notification={notification} />
-  ))}
-          
+        <div className="bg-gray-200 pt-16 min-h-screen max-w-sm flex flex-col pb-16">
+          {/* {notifications.map((notification) => (
+    <NotifyCard key={notification._id} notification={notification} />
+  ))} */}
+     <NotifyCard></NotifyCard>     
         </div>
     )
 }

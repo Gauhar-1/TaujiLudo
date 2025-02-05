@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { sendOtp, verifyOtp } from '../controllers/authController';
 import { AllTransaction, depositAmount, findTransaction, getTransaction, paymentProof, rejectPayment, ReqTransaction, verifyPayment, withdrawAmount } from '../controllers/moneyController';
-import { getNotifications } from '../controllers/notifyController';
+import { allNotifications, getNotifications } from '../controllers/notifyController';
 import { blockedPlayer, completeKYC, createProfile, findProfile, getBlockedOnes, getProfile, rejectKyc, unBlockPlayer, updateAmount, updateProfile, verifyKyc } from '../controllers/ProfileManager';
 import { battleHistory, canceledBattle, completeBattle, createBattle, deleteBattle, inProgressBattle, joinBattle, pendingBattle, runningBattle, showBattles, uploadScreenShot } from '../controllers/battleManger';
 import {io} from '../app';
@@ -48,6 +48,7 @@ router.get('/transaction', getTransaction);
 router.get('/allTransaction', AllTransaction);
 router.get('/reqTransaction', ReqTransaction);
 router.get('/findTransaction', findTransaction);
+router.get('/allNotifications', allNotifications);
 router.post('/depositProof', upload.single("image"), paymentProof);
 
  

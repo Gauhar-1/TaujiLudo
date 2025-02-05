@@ -38,6 +38,8 @@ import { KycVerification } from "../adminComponents/kycVerify";
 import { VerifiedKyc } from "../adminComponents/verifiedKyc";
 import { ReferPage } from "../components/referPage";
 import { PaymentSettings } from "../adminComponents/paymentSettings";
+import { AdminSettings } from "../adminComponents/adminSettings";
+import { AdminNotification } from "../adminComponents/adminNotification";
 
 
 export const UserPage = ()=>{
@@ -94,6 +96,8 @@ export const UserPage = ()=>{
                   <Route path="verifiedKyc" element={<VerifiedKyc />}></Route>
                   <Route path="pendingKyc/kycView" element={<KycVerification />}></Route>
                   <Route path="paymentSettings" element={<PaymentSettings />}></Route>
+                  <Route path="adminSettings" element={<AdminSettings />}></Route>
+                  <Route path="adminNotification" element={<AdminNotification />}></Route>
            </Route>
        </Routes>
      { !adminClicked && <Footer></Footer> }
