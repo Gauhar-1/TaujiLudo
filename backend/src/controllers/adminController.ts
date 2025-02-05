@@ -77,4 +77,6 @@ export const createAdminDetails = async (req: any, res: any) => {
     await Admin.create(adminDetails);
 
     console.log("Admin details created successfully.");
+
+    res.status(200).json("Admin details created successfully.");
 };
