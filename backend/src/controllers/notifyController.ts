@@ -50,7 +50,7 @@ export const allNotifications = async (req: any, res: any)=>{
 export const markAsRead = async (req: any, res: any) => {
   const { notificationId } = req.body;
   try {
-    await Notification.findByIdAndUpdate(notificationId, { markAsRead: 'read' });
+    await Notification.findByIdAndUpdate(notificationId, { markAsRead: true });
     res.status(200).json({ markAsRead: true });
   } catch (error) {
     console.error('Error marking notification as read:', error);
