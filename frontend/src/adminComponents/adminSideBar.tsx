@@ -129,7 +129,7 @@ export const AdminSideBar = ( props : any)=>{
                 <div className="font-mono ">Payment Request</div>
               </div>
               <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/notification');
+                navigate("adminSettings");
                 props.setSidebarClicked(false);
               }}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" >
@@ -140,7 +140,7 @@ export const AdminSideBar = ( props : any)=>{
               </div>
             
               <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/policies');
+                navigate('adminNotification');
                 props.setSidebarClicked(false);
               }}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
