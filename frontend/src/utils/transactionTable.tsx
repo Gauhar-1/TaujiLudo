@@ -2,6 +2,7 @@ import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import React, {  useEffect, useState } from "react";
 import axios from "axios";
 import { useUserContext } from "../hooks/UserContext";
+import { API_URL } from "./url";
 
 interface Column {
   id: "no" | "orderId"  | "mobile" | "wallet" | "wallet" | "type" | "paymentMethod" |  "status" | "joinedAt" | "amount" ;
@@ -68,7 +69,7 @@ export const StickyTable: React.FC = () => {
   useEffect(() => {
     const runningBattle = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auth/transaction", { params : { userId : id}});
+        const response = await axios.get(`${API_URL}/api/auth/transaction`, { params : { userId : id}});
         const fetchedBattles = response.data.map((profile: any, index: number) => {
           const date = new Date(profile.date).toLocaleString();
           return createData(

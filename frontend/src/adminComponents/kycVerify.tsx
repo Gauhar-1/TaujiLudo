@@ -62,8 +62,6 @@ export const KycVerification = ()=>{
                 console.log("Battle Id", userId);
             }
 
-    
-
             const response = await axios.post(`${API_URL}/api/auth/verify-kyc`,{userId})
 
             if(response.data){

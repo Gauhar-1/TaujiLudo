@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { StickyTable } from "../utils/transactionTable"
 import axios from "axios"
 import { useUserContext } from "../hooks/UserContext"
+import { API_URL } from "../utils/url"
 
 export const TransactionHistory = ()=>{
     const [ username, setUserName ] = useState("");
@@ -15,7 +16,7 @@ export const TransactionHistory = ()=>{
             if(userId){
                 console.log("UserId: " + userId);
             }
-            try{const response = await axios.get('http://localhost:3000/api/auth/findProfile', { params : { userId }});
+            try{const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { userId }});
 
             if(!response.data){
                  return console.log("response not found" , response.data);

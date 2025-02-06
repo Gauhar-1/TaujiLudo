@@ -91,7 +91,7 @@ export const BattleResult = ()=>{
                             </div>}
                         </div>
                         { viewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`http://localhost:3000/api/auth/battles/inBattle/uploads/${battle.filename}`} alt="" className="rounded-lg" />
+                            <img src={`${API_URL}/uploads/${battle.filename}`} alt="" className="rounded-lg" />
                         </div> }
                     </div>
                     {rejectClicked && <div className="bg-gray-400 p-10 absolute w-80 m-6">

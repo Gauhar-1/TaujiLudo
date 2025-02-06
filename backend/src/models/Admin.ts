@@ -19,7 +19,11 @@ interface IAdmin extends Document {
   paymentSetting : {
     QR: string;
     UPI: string;
-  }
+  };
+  adminSetting : {
+    phoneNumber : string;
+    content : string;
+  };
   createdAt: Date;
 }
 
@@ -39,6 +43,10 @@ const AdminSchema: Schema = new Schema({
     paymentSetting : {
         QR:  { type: String, default: null },
         UPI: { type:String, default: null },
+      },
+      adminSetting : {
+        phoneNumber : { type: String, default: null },
+        content : { type:String, default: null },
       },
     createdAt: { type: Date, default: Date.now },
 });
