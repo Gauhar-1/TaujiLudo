@@ -177,4 +177,20 @@ export const UPIsettings = async (req: any, res: any) => {
         console.error("Error updating QR settings:", error);
         return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
-};
+}
+
+export const getAdmin = async(req: any, res: any)=>{
+
+    try{
+        const admin = await Admin.find();
+        if(!admin){
+            return res.status(404).json({ success: false, message: "Admin not found" });
+        }
+
+        return res.status(200).json({ success: true, message: "UPI settings updated successfully", admin });
+    }
+    catch(error : any){
+        console.error("Error updating QR settings:", error);
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+    }
+}
