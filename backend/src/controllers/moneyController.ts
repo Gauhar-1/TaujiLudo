@@ -126,7 +126,7 @@ export const depositAmount = async (req : any,res : any,next: any) => {
     }
 }
 
-export const  verifyPayment = async (req: any ,res : any) => {
+export const verifyPayment = async (req: any, res: any) => {
     const { transactionId } = req.body;
 
     if (!transactionId) {
@@ -134,48 +134,57 @@ export const  verifyPayment = async (req: any ,res : any) => {
     }
 
     try {
-
-        const sanitizedTransactionId = transactionId.toString().replace(/:/g, "");
-
+        const sanitizedTransactionId = typeof transactionId === "string" ? transactionId.replace(/:/g, "") : transactionId.toString();
         console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
 
         // Find the transaction by payment reference
-        const transaction = await Transaction.findById(sanitizedTransactionId);
+        const transaction = await Transaction.findById(sanitizedTransactionId).lean(); // Use `.lean()` to return a plain object
 
         if (!transaction) {
-            console.log('Transaction not found');
-            return res.status(404).json({ success: false, message: 'Transaction not found' });
+            console.log("Transaction not found");
+            return res.status(404).json({ success: false, message: "Transaction not found" });
         }
 
-        // Update the transaction as completed
-        transaction.status = 'completed';
-        await transaction.save();
+        // Ensure userId is a string
+        const userId = transaction.userId as string;
+        if (!userId) {
+            console.log("userId not found");
+            return res.status(400).json({ success: false, message: "User ID not found in transaction" });
+        }
 
-        const userId = transaction.userId;
         const profile = await Profile.findById(userId);
-        
         if (!profile) {
-            console.log('Profile not found');
-            return res.status(404).json({ success: false, message: 'Profile not found' });
+            console.log("Profile not found");
+            return res.status(404).json({ success: false, message: "Profile not found" });
         }
 
-          profile.amount = parseInt((transaction.wallet)as string);
-          await profile.save();
+        // Ensure `transaction.wallet` is a valid number before assigning
+        if (typeof transaction.wallet !== "number") {
+            console.log("Invalid wallet amount:", transaction.wallet);
+            return res.status(400).json({ success: false, message: "Invalid wallet amount" });
+        }
 
-    
-        // Add tokens to the user's wallet (mocked here)
-        // Replace with your wallet update logic
+        profile.amount = transaction.wallet; // Assuming `amount` is a number
+        await profile.save();
+
         console.log(`Tokens added to user ${transaction.userId}: ${transaction.amount}`);
 
-        // Update notification as transaction completed
-        await Notification.updateOne({paymentReference : transaction.paymentReference, status:'success'})
+        // Update transaction status
+        await Transaction.findByIdAndUpdate(sanitizedTransactionId, { $set: { status: "completed" } });
 
-        res.status(200).json({ success: true, message: 'Payment verified and tokens added' });
-    } catch (err : any) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Payment verification failed', error: err.message });
+        // Update notification as transaction completed
+        await Notification.updateOne(
+            { paymentReference: transaction.paymentReference },
+            { $set: { status: "success" } }
+        );
+
+        res.status(200).json({ success: true, message: "Payment verified and tokens added" });
+    } catch (err: any) {
+        console.error("Error verifying payment:", err);
+        res.status(500).json({ success: false, message: "Payment verification failed", error: err.message });
     }
-}
+};
+
 
 export const  rejectPayment = async (req: any ,res : any) => {
     const { transactionId , reason } = req.body;
