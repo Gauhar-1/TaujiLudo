@@ -81,41 +81,50 @@ export const createAdminDetails = async (req: any, res: any) => {
     res.status(200).json("Admin details created successfully.");
 };
 
-export const supportSettings = async(req: any, res: any)=>{
-     const { phoneNumber } = req.body;
+export const supportSettings = async (req: any, res: any) => {
+    try {
+        const { phoneNumber } = req.body;
 
-     if(!phoneNumber){
-        return res.status(500).json("PhoneNumber missing");
-     }
-
-     const admin = await Admin.findOneAndUpdate({
-        adminSetting: {
-            phoneNumber,
+        if (!phoneNumber) {
+            return res.status(400).json({ error: "PhoneNumber missing" });
         }
-     });
 
-     if(!admin){
-        res.status(400).json("Admin not found");
-     }
+        const admin = await Admin.findOneAndUpdate(
+            {}, 
+            { $set: { "adminSetting.phoneNumber": phoneNumber } }, 
+            { new: true } // Returns the updated document
+        );
 
-     res.status(200).json("Support setting chanded successfully");
-}
-export const infoSettings = async(req: any, res: any)=>{
-     const { content } = req.body;
-
-     if(!content ){
-        return res.status(500).json("PhoneNumber missing");
-     }
-
-     const admin = await Admin.findOneAndUpdate({
-        adminSetting: {
-            content ,
+        if (!admin) {
+            return res.status(404).json({ error: "Admin not found" });
         }
-     });
 
-     if(!admin){
-        res.status(400).json("Admin not found");
-     }
+        res.status(200).json({ message: "Support setting changed successfully" });
+    } catch (error : any) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
-     res.status(200).json("Support setting chanded successfully");
-}
+export const infoSettings = async (req: any, res: any) => {
+    try {
+        const { content } = req.body;
+
+        if (!content) {
+            return res.status(400).json({ error: "Content missing" });
+        }
+
+        const admin = await Admin.findOneAndUpdate(
+            {}, 
+            { $set: { "adminSetting.content": content } }, 
+            { new: true }
+        );
+
+        if (!admin) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+
+        res.status(200).json({ message: "Info setting changed successfully" });
+    } catch (error : any) {
+        res.status(500).json({ error: error.message });
+    }
+};
