@@ -47,7 +47,9 @@ export const Header = ()=>{
               setSidebarClicked(true);
          }}> ☰</div>
            
-           <img src="../../logo.png" alt=""  className="h-10 pt-"/>
+           <img src="../../logo.png" alt=""  className="h-10 pt-" onClick={()=>{
+            navigate('/winCash');
+           }}/>
        </div>
        <div className="m-3 flex gap-2">
          <div className="bg-green-900 flex flex-row  rounded-md h-8 w-20">

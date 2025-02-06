@@ -2,6 +2,9 @@ import { useState } from "react";
 
 export const AdminSettings = ()=>{
     const [ , setInfo ] = useState("");
+
+    
+
     return (
         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
         <div className="text-3xl font-serif">Admin Settings</div>
