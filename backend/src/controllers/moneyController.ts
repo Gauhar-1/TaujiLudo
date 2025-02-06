@@ -5,6 +5,7 @@ import { randomBytes } from "crypto";
 import { createNotification } from "./notifyController";
 import mongoose from "mongoose";
 import { json } from "body-parser";
+import Admin from "../models/Admin";
 
 export const depositAmount = async (req : any,res : any,next: any) => {
     const { userId,image,wallet, amount, paymentMethod, upiId } = req.body;
@@ -314,3 +315,4 @@ export const findTransaction = async(req: any, res: any, next:any)=>{
         console.log("Error: "+ err);
     }
 }
+
