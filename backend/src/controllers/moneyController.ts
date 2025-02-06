@@ -146,13 +146,13 @@ export const verifyPayment = async (req: any, res: any) => {
         }
 
         // Ensure userId is a string
-        const userId = transaction.userId
+        const userId = transaction.userId 
         if (!userId) {
             console.log("userId not found");
             return res.status(400).json({ success: false, message: "User ID not found in transaction" });
         }
 
-        const profile = await Profile.findById(userId);
+        const profile = await Profile.findOne({userId});
         if (!profile) {
             console.log("Profile not found");
             return res.status(404).json({ success: false, message: "Profile not found" });
