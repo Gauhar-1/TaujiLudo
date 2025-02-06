@@ -59,6 +59,7 @@ export const KycVerification = ()=>{
         }
         handle();
     },[userId]);
+    
 
     const handleVerify = async()=>{
         try{
