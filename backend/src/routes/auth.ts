@@ -54,7 +54,7 @@ router.post('/markRead', markAsRead);
 router.post('/createAdminDetails', createAdminDetails);
 router.post('/supportSettings', supportSettings);
 router.post('/infoSettings', infoSettings);
-router.post('/QRSettings', QRsettings);
+router.post('/QRSettings',upload.single('image'), QRsettings);
 router.post('/UPISettings', UPIsettings);
 router.post('/depositProof', upload.single("image"), paymentProof);
 
