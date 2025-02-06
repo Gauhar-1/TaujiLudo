@@ -172,7 +172,7 @@ export const UPIsettings = async (req: any, res: any) => {
             return res.status(404).json({ success: false, message: "Admin not found" });
         }
 
-        return res.status(200).json({ success: true, message: "UPI settings updated successfully", filename: req.file.filename });
+        return res.status(200).json({ success: true, message: "UPI settings updated successfully", UPI });
     } catch (error : any) {
         console.error("Error updating QR settings:", error);
         return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
