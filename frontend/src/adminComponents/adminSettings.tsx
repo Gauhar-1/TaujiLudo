@@ -1,9 +1,42 @@
+import axios from "axios";
 import { useState } from "react";
+import { API_URL } from "../utils/url";
 
 export const AdminSettings = ()=>{
-    const [ , setInfo ] = useState("");
+    const [ content, setContent ] = useState("");
+    const [ phoneNumber, setPhoneNumber ] = useState("");
 
-    
+    const handlePhoneNumber = async()=>{
+        if(!phoneNumber){
+            return console.log("Phone Number is missing");
+        }
+
+        try{
+            const response = await axios.post(`${API_URL}/api/auth/supportSettings`, { phoneNumber });
+            if(!response.data){
+                console.log("response not found");
+            }
+        }
+        catch(err){
+            console.log("Error: "+ err);
+        }
+    }
+
+    const handleContent = async()=>{
+        if(!content){
+            return console.log("Content is missing");
+        }
+
+        try{
+            const response = await axios.post(`${API_URL}/api/auth/infoSettings`, { content });
+            if(!response.data){
+                console.log("response not found");
+            }
+        }
+        catch(err){
+            console.log("Error: "+ err);
+        }
+    }
 
     return (
         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
@@ -15,8 +48,10 @@ export const AdminSettings = ()=>{
             </div>
             <div className="px-4 flex">
              <div className="border p-2 w-20 text-xs text-center font-semibold">Phone Number</div>
-             <input type="text" className="border p-2" />
-            <button className="border p-2 ml-2 bg-blue-700 rounded-lg text-white">Done</button>
+             <input type="text" className="border p-2" onChange={(e)=>{
+                setPhoneNumber(e.target.value);
+             }}/>
+            <button className="border p-2 ml-2 bg-blue-700 rounded-lg text-white" onClick={handlePhoneNumber}>Done</button>
             </div>
         </div>
 <div className="bg-white  rounded-md shadow-md pb-4">
@@ -29,10 +64,10 @@ export const AdminSettings = ()=>{
         className="w-full border border-gray-300 p-2 rounded resize-none break-words whitespace-normal"
         rows={4}
         placeholder="Type your text here..." onChange={(e)=>{
-            setInfo(e.target.value)
+            setContent(e.target.value)
         }}
       ></textarea>
-            <button className="border p-2  bg-blue-700 rounded-lg text-white ">Done</button>
+            <button className="border p-2  bg-blue-700 rounded-lg text-white " onClick={handleContent}>Done</button>
             </div>
         </div>
 </div>
