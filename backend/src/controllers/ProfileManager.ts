@@ -193,10 +193,10 @@ export const unBlockPlayer = async(req: any, res: any, next: any)=>{
 }
 
 export const updateAmount = async(req:any, res:any, next:any)=>{
-  const { phoneNumber, amount } = req.body;
+  const { phoneNumber } = req.body;
 
-  if(!phoneNumber || !amount){
-    console.log("missing fields" + phoneNumber + " " + amount );
+  if(!phoneNumber){
+    console.log("missing fields" + phoneNumber  );
   }
 
   try{
@@ -205,8 +205,6 @@ export const updateAmount = async(req:any, res:any, next:any)=>{
           if(!profile){
             return res.status(404).json({ success: false, message: 'profile not found' })
           }
-          profile.amount = amount;
-          await profile.save();
           res.status(200).json(profile)
   }
   catch(error){

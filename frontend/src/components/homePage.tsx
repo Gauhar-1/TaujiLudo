@@ -17,6 +17,7 @@ export const HomePage = (props: any) => {
     const navigate = useNavigate();
   const { userId, name } = useUserContext(); // Access userId from the context
   const [amount, setAmount] = useState<number>(0);
+  const [ info , setInfo ] = useState("");
 
   const getLocalStorageValue = (key: string, defaultValue: any) => {
     try {
@@ -67,6 +68,25 @@ export const HomePage = (props: any) => {
     }}
   }, [userName]);
 
+  // Info Bar
+  useEffect(()=>{
+    const handleInfoBar = async()=>{
+      try{
+        const response = await axios.get(`${API_URL}/api/auth/getAdmin`);
+        if(!response.data){
+          return console.log( "InfoBAr response not found ");
+        }
+        const { adminSetting } = response.data.admin[0];
+        setInfo(adminSetting.content);
+      }
+      catch(err){
+        console.log("Error: "+ err);
+      }
+    }
+
+    handleInfoBar();
+  },[])
+
   // Fetch ongoing battles
   useEffect(() => {
     const fetchOngoingBattles = async () => {
@@ -111,6 +131,7 @@ export const HomePage = (props: any) => {
         <div className="max-w-sm bg-gray-300 min-h-screen">
             <div className="flex flex-col pt-12">
                 <div className="bg-gray-300 pb-16">
+                  <div className="bg-yellow-500 px-4 pt-4 pb-1 shadow-md mx-6 text-sm font-mono text-white">{info}</div>
                         <div>
                             <div className="font-serif text-center pt-4">CREATE A BATTLE!</div>
                             <div className="flex gap-2 ml-12 pl-2 mx-4 py-2">

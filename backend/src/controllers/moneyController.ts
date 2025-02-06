@@ -6,6 +6,7 @@ import { createNotification } from "./notifyController";
 import mongoose from "mongoose";
 import { json } from "body-parser";
 import Admin from "../models/Admin";
+import Profile from "../models/Profile";
 
 export const depositAmount = async (req : any,res : any,next: any) => {
     const { userId,image,wallet, amount, paymentMethod, upiId } = req.body;
@@ -149,6 +150,17 @@ export const  verifyPayment = async (req: any ,res : any) => {
         // Update the transaction as completed
         transaction.status = 'completed';
         await transaction.save();
+
+        const userId = transaction.userId;
+        const profile = await Profile.findById(userId);
+        
+        if (!profile) {
+            console.log('Profile not found');
+            return res.status(404).json({ success: false, message: 'Profile not found' });
+        }
+
+          profile.amount = parseInt((transaction.wallet)as string);
+          await profile.save();
 
     
         // Add tokens to the user's wallet (mocked here)

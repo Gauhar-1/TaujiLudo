@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
@@ -9,10 +9,33 @@ export const DepositPage = ()=>{
     const[token , setToken] = useState<number>(0)
     const [upiId, setUpiId] = useState<string>('');
     const [, setUpiLink] = useState<string>('');
+    const [ QR , setQR ] = useState("");
+    const [ UPI , setUPI ] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const navigate = useNavigate();
 
     const { userId, amount, setAmount } = useUserContext();
+
+    useEffect(()=>{
+        const handleInfoBar = async()=>{
+          try{
+            const response = await axios.get(`${API_URL}/api/auth/getAdmin`);
+            if(!response.data){
+              return console.log( "InfoBAr response not found ");
+            }
+            const { paymentSetting } = response.data.admin[0];
+            console.log(paymentSetting);
+            console.log(response.data.admin[0]);
+            setQR(paymentSetting.QR);
+            setUPI(paymentSetting.UPI);
+          }
+          catch(err){
+            console.log("Error: "+ err);
+          }
+        }
+    
+        handleInfoBar();
+      },[])
 
     const handleDeposit = async () => {
 
@@ -40,7 +63,6 @@ export const DepositPage = ()=>{
             setUpiLink(response.data.upiLink);
             setAmount( amount + token);
             navigate("/wallet");
-            console.log('Deposit initiated. Complete the payment.');
         } catch (err : any) {
             console.log('Error initiating deposit: ' + err.response?.data?.message || err.message);
         }
@@ -58,7 +80,11 @@ export const DepositPage = ()=>{
                 <div className="p-4 w-80 text-center font-serif text-2xl">Deposit via QR</div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="bg-white p-4 w-48 rounded-lg mx-10 mb-2">
-                        <img src="/QR.jpeg" alt="" className="size-40" />
+                        <img src={`${API_URL}/uploads/${QR}`} alt="" className="size-40" />
+                    </div>
+                    <div className="flex gap-2">
+                        <div className=" text-slate-500 font-bold">UPI Id:</div>
+                        <div className="font-semibold">{UPI}</div>
                     </div>
                     <div className=" flex flex-col gap-2 ">
                         <div className="text-sm text-slate-500  font-semibold">Upload screenShot:</div>

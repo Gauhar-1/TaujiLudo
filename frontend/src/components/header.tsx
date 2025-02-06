@@ -8,16 +8,17 @@ import { API_URL } from "../utils/url";
 export const Header = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
   const navigate = useNavigate();
-  const { login, amount, phoneNumber  } = useUserContext();
+  const [amount , setAmount ] = useState(0);
+  const { login,  phoneNumber } = useUserContext();
 
   
       useEffect(()=>{
-          if ( !phoneNumber || !amount) {
-            return console.log( 'All fields are required.' + " " + phoneNumber + " " + amount);
+          if ( !phoneNumber) {
+            return console.log( 'All fields are required.' + " " + phoneNumber);
           }
           const updateAmount = async()=>{
             try{
-              const  response = await axios.post(`${API_URL}/api/auth/update-Amount`,  { phoneNumber,amount });
+              const  response = await axios.post(`${API_URL}/api/auth/update-Amount`,  { phoneNumber });
               if(response && response.data && response.data.success){
                 console.log("Amount updated")
               }
@@ -25,6 +26,7 @@ export const Header = ()=>{
                 console.log("Failed to update Amount")
                 console.log(response.data);
               }
+              setAmount(response.data.amount)
             }
             catch(err){
                console.log("Error" + err);
@@ -35,7 +37,7 @@ export const Header = ()=>{
           if (amount > 0) { 
             updateAmount();
           }
-        },[amount]);
+        },[]);
 
    return (
     <div>
