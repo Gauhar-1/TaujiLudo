@@ -10,7 +10,7 @@ import path from 'path';
 import { upload } from '../utils/multerService';
 import { createState } from '../controllers/stateManager';
 import { Socket } from 'socket.io';
-import { createAdminDetails, infoSettings, supportSettings } from '../controllers/adminController';
+import { createAdminDetails, infoSettings, QRsettings, supportSettings, UPIsettings } from '../controllers/adminController';
 
 const router = Router();
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -54,6 +54,8 @@ router.post('/markRead', markAsRead);
 router.post('/createAdminDetails', createAdminDetails);
 router.post('/supportSettings', supportSettings);
 router.post('/infoSettings', infoSettings);
+router.post('/QRSettings', QRsettings);
+router.post('/UPISettings', UPIsettings);
 router.post('/depositProof', upload.single("image"), paymentProof);
 
  

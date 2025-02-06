@@ -128,3 +128,53 @@ export const infoSettings = async (req: any, res: any) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const QRsettings = async (req: any, res: any) => {
+    try {
+        if (!req.file) {
+            console.log("File not found", req.file);
+            return res.status(400).json({ success: false, message: "File not found. Please upload a valid file." });
+        }
+
+        const admin = await Admin.findOneAndUpdate(
+            {}, 
+            { $set: { "paymentSetting.QR": req.file.filename } }, 
+            { new: true }
+        );
+
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "Admin not found" });
+        }
+
+        return res.status(200).json({ success: true, message: "QR settings updated successfully", filename: req.file.filename });
+    } catch (error : any) {
+        console.error("Error updating QR settings:", error);
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+    }
+};
+export const UPIsettings = async (req: any, res: any) => {
+    try {
+
+        const { UPI } = req.body;
+
+        if (!UPI) {
+            console.log("UPI not found", UPI);
+            return res.status(400).json({ success: false, message: "UPI not found." });
+        }
+
+        const admin = await Admin.findOneAndUpdate(
+            {}, 
+            { $set: { "paymentSetting.UPI": UPI } }, 
+            { new: true }
+        );
+
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "Admin not found" });
+        }
+
+        return res.status(200).json({ success: true, message: "UPI settings updated successfully", filename: req.file.filename });
+    } catch (error : any) {
+        console.error("Error updating QR settings:", error);
+        return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+    }
+};
