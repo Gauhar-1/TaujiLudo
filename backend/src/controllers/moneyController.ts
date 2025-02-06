@@ -146,7 +146,7 @@ export const verifyPayment = async (req: any, res: any) => {
         }
 
         // Ensure userId is a string
-        const userId = transaction.userId as string;
+        const userId = transaction.userId
         if (!userId) {
             console.log("userId not found");
             return res.status(400).json({ success: false, message: "User ID not found in transaction" });
