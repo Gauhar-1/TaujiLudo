@@ -326,3 +326,15 @@ export const  rejectKyc = async (req: any ,res : any) => {
       res.status(500).json({ success: false, message: 'Kyc rejection failed', error: err.message });
   }
 }
+
+export const getReferal = async(req: any, res:any)=>{
+  try {
+    const profile = await Profile.findOne(req.params.userId);
+    if (!profile) return res.status(404).json({ message: "User not found" });
+
+    const referralLink = `https://taujiludo.in/?ref=${profile.Referal}`;
+    res.json({ referralLink });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  } 
+}

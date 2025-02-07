@@ -1,4 +1,5 @@
 // import { formatDistanceToNowStrict } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
 import { API_URL } from "./url";
 import axios from "axios";
 
@@ -26,7 +27,7 @@ export const NotifyCard = (props : any)=>{
             <div>
                     <img src="/profile.png" alt="" className="h-10"/>
                 </div>
-                <div className="px-4 font-serif text-lg  ">
+                <div className="px-4 font-serif text-sm  ">
                     <div className="flex gap-2">
                     <div className="text-white">Manish</div>
                     {/* {props.notifications.type <div className="text-green-300 pt-1">has joined!!</div>} */}
@@ -39,7 +40,7 @@ export const NotifyCard = (props : any)=>{
                     </div>
                 </div>
             </div>
-                <div className="flex  flex-col gap-2">
+                <div className="flex  flex-col justify-between">
                     <div className="flex justify-center " onClick={()=>{
                         handleRead();
                     }}>
@@ -49,10 +50,11 @@ markAsRead ? "gray" : "yellow"}`} viewBox="0 0 24 24" strokeWidth="1.5" stroke="
 </svg>
 
                     </div>
-{/* <div className="">{formatDistanceToNowStrict(new Date(props.notification.createdAt), { addSuffix: true })}</div> */}
+                    <div className="flex justify-end">
+                    <div className="text-xs">{formatDistanceToNowStrict(new Date(props.notification.createdAt), { addSuffix: true })}</div>
+                    </div>
 
                 </div>
-
             </div>}
         </div>
     )
