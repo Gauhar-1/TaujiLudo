@@ -77,7 +77,7 @@ export const UserPage = ()=>{
            <Route path="/refer" element={<ReferPage/>}></Route>
            <Route path="/gameHistory" element={<GameHistory />}></Route>
            <Route path="/winCash" element={<WinCashPage/>}></Route>
-           <Route path="/notifications" element={<Notifications/>}></Route>
+           <Route path="/notification" element={<Notifications/>}></Route>
            <Route path="/admin" element={<AdminPage />}>
                   <Route index element={<DashBoard />}></Route>
                   <Route path="allPlayers" element={<AllPlayers />}></Route>
