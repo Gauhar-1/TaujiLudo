@@ -50,7 +50,7 @@ router.get('/allTransaction', AllTransaction);
 router.get('/reqTransaction', ReqTransaction);
 router.get('/findTransaction', findTransaction);
 router.get('/allNotifications', allNotifications);
-router.get('/getReferral/:userId', getReferal);
+router.get('/getReferral', getReferal);
 router.get('/getAdmin', getAdmin);
 router.post('/markRead', markAsRead);
 router.post('/createAdminDetails', createAdminDetails);

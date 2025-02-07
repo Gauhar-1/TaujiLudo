@@ -329,10 +329,10 @@ export const  rejectKyc = async (req: any ,res : any) => {
 
 export const getReferal = async(req: any, res:any)=>{
 
-  const userId = req.params.userId
+  const userId = req.query.userId
   try {
     const profile = await Profile.findOne({userId});
-    if (!profile) return res.status(404).json({ message: "User not found" });
+    if (!profile) return res.status(404).json({ message: "profile not found" });
 
     const referralLink = `https://taujiludo.in/?ref=${profile.Referal}`;
     res.json({ referralLink });
