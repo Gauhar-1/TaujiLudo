@@ -29,10 +29,6 @@ export const HistoryPage = ()=>{
 
   
      useEffect(()=>{
-      
-    //  if(!userId){
-    //   console.log("Userid not yet found");
-    //  }
 
       const loadNotificatons = async()=>{
        try{ const response = await axios
