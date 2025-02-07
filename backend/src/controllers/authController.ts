@@ -91,11 +91,11 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
         }
     }
         // JWT generation logic here
-        const token = jwt.sign(
-            { userId: user._id, phoneNumber: user.phone },
-            process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in env
-            { expiresIn: "7d" } // Token valid for 7 days
-        );
+        // const token = jwt.sign(
+        //     { userId: user._id, phoneNumber: user.phone },
+        //     process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in env
+        //     { expiresIn: "7d" } // Token valid for 7 days
+        // );
 
         res.status(200).json({ 
             success: true,
