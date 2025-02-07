@@ -2,11 +2,11 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
-// import { NotifyCard } from "../utils/notifyCard";
+import { NotifyCard } from "../utils/notifyCard";
 
 export const Notifications = ()=>{
   const { userId } = useUserContext() ;
-  const[, setNotifications] = useState<[{
+  const[notifications, setNotifications] = useState<[{
       reason: string;
       status: string;
       _id: string;
@@ -49,13 +49,13 @@ export const Notifications = ()=>{
   
     return (
         <div className="bg-gray-300 py-20 min-h-screen max-w-sm flex flex-col gap-2">
-           {/* {notifications
+           {notifications
     .filter((notification) => 
       notification.status === "failed" && notification.reason
     )
     .map((notification) => (
       <NotifyCard key={notification._id} notification={notification} />
-    ))} */}
+    ))}
           
         </div>
     )

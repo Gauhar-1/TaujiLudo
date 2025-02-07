@@ -48,9 +48,12 @@ export const allNotifications = async (req: any, res: any)=>{
 
 // Endpoint to mark a notification as read
 export const markAsRead = async (req: any, res: any) => {
-  const { notificationId } = req.body;
+  const { id } = req.body;
   try {
-    await Notification.findByIdAndUpdate(notificationId, { markAsRead: true });
+    const notification = await Notification.findByIdAndUpdate(id, { markAsRead: true });
+    if(!notification){
+      return res.status(400).json("Notification not found");
+    }
     res.status(200).json({ markAsRead: true });
   } catch (error) {
     console.error('Error marking notification as read:', error);

@@ -6,7 +6,7 @@ import { NotifyCard } from "../utils/adminNotifyCard";
 
 export const AdminNotification = ()=>{
     const { userId } = useUserContext() ;
-  const[, setNotifications] = useState<[{
+  const[notifications, setNotifications] = useState<[{
       _id: string;
       userId: string;
       type: string;
@@ -15,6 +15,7 @@ export const AdminNotification = ()=>{
       status: string;
       paymentReference: string;
       createdAt: string;
+      markAsRead: boolean;
     
   }]>([{
     _id: "",
@@ -24,7 +25,8 @@ export const AdminNotification = ()=>{
     message: "",
     status: "",
     paymentReference: "",
-    createdAt: ""
+    createdAt: "",
+    markAsRead: false
   }]);
 
   
@@ -57,10 +59,9 @@ export const AdminNotification = ()=>{
   
     return (
         <div className="bg-gray-200 pt-16 min-h-screen max-w-sm flex flex-col pb-16">
-          {/* {notifications.map((notification) => (
+          {notifications.map((notification) => (
     <NotifyCard key={notification._id} notification={notification} />
-  ))} */}
-     <NotifyCard></NotifyCard>     
+  ))}
         </div>
     )
 }
