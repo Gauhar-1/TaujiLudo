@@ -1,33 +1,22 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { API_URL } from "../utils/url";
-import { useUserContext } from "../hooks/UserContext";
 import { NotifyCard } from "../utils/adminNotifyCard";
 
+type NotificationType = {
+  _id: string;
+  userId: string;
+  type: string;
+  amount: number;
+  message: string;
+  status: string;
+  paymentReference: string;
+  createdAt: Date;
+  markAsRead: boolean;
+};
+
 export const AdminNotification = ()=>{
-    const { userId } = useUserContext() ;
-  const[notifications, setNotifications] = useState<[{
-      _id: string;
-      userId: string;
-      type: string;
-      amount: number;
-      message: string;
-      status: string;
-      paymentReference: string;
-      createdAt: string;
-      markAsRead: boolean;
-    
-  }]>([{
-    _id: "",
-    userId: "",
-    type: "",
-    amount:0,
-    message: "",
-    status: "",
-    paymentReference: "",
-    createdAt: "",
-    markAsRead: false
-  }]);
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
   
      useEffect(()=>{
@@ -38,7 +27,7 @@ export const AdminNotification = ()=>{
 
       const loadNotificatons = async()=>{
        try{ const response = await axios
-        .get(`${API_URL}/api/auth/notifications`, {params: { userId }})
+        .get(`${API_URL}/api/auth/allNotifications`)
 
             if(response.data.success){
                 console.log("Notification received successfully");
@@ -55,7 +44,7 @@ export const AdminNotification = ()=>{
           }
           
           loadNotificatons();
-  },[userId, setNotifications])
+  },[])
   
     return (
         <div className="bg-gray-200 pt-16 min-h-screen max-w-sm flex flex-col pb-16">

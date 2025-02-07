@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useState } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {  useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
@@ -9,6 +9,8 @@ export const LoginPage = () => {
   const [sendOtp, setSendOtp] = useState(false);
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   const { setUserId , phoneNumber, setPhoneNumber, setLogin } = useUserContext();
 
   // Validate phone number (basic validation)
@@ -16,6 +18,11 @@ export const LoginPage = () => {
 
   // Validate OTP (assuming 6-digit OTP)
   const isOtpValid = (otp: string) => /^\d{6}$/.test(otp);
+
+  useEffect(() => {
+    const refCode = searchParams.get("ref");
+    if (refCode) setReferralCode(refCode);
+  }, [searchParams]);
 
   // Send OTP handler
   const handleSendOtp = async () => {
@@ -54,6 +61,7 @@ export const LoginPage = () => {
       const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
         phoneNumber,
         otp,
+        ref: referralCode
       });
 
       if (response.data.success) {
