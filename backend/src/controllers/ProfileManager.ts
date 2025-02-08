@@ -1,6 +1,7 @@
 import Profile from "../models/Profile";
 import User from "../models/User";
 import crypto from 'crypto';
+import { faker } from "@faker-js/faker"; // Import faker
 
 export const createProfile = async (req: any, res: any, next: any) => {
   const { phoneNumber } = req.body;
@@ -26,10 +27,13 @@ export const createProfile = async (req: any, res: any, next: any) => {
 
     console.log("Referal: "+ Referal);
 
+    const randomName = faker.person.firstName(); // Generates a random first name
+const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`; // Generates a unique email
+
     const profile = await Profile.create({
       userId: user._id,
-      name: "Noobie",
-      email: "@gmail.com",
+      name: randomName,
+      email: randomEmail,
       phoneNumber,
       amount: 5,
       imgUrl: "image",
