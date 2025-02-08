@@ -9,7 +9,7 @@ export const BettingCard = (props : any)=>{
     // const navigate = useNavigate();
     const {  userId } = useUserContext();
 
-    const { setBattleId, name, event,setEvent, details, setDetails } = useUserContext();
+    const { setBattleId, name  } = useUserContext();
 
     const navigate = useNavigate();
 
@@ -38,7 +38,7 @@ export const BettingCard = (props : any)=>{
         console.log("Battleid: "+ props.battle._id);
       };
 
-      const manageRequest = async()=>{
+      const manageRequest = async(event: string, details: string)=>{
         try{
             const response = await axios.post(`${API_URL}/api/auth/battles/manageRequest`, {
                 event,
@@ -61,6 +61,10 @@ export const BettingCard = (props : any)=>{
     return history.some(entry => entry.event === event);
   }
   
+
+   // Store computed values for history events
+   const hasOpponentFound = iterateHistory(props.battle.history, "opponent_found");
+   const hasPlayerEntered = iterateHistory(props.battle.history, "player_entered");
   
     return ( 
         <div>
@@ -87,39 +91,30 @@ export const BettingCard = (props : any)=>{
        <div className="flex gap-3">
        
        {userId === props.battle.player1 ?
-       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${ iterateHistory(props.battle.history,"opponent_found" ) ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${ hasOpponentFound ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
                             setBattleId(props.battle._id);
-                            if(iterateHistory(props.battle.history,"opponent_found" )){
-                                setEvent("player_entered");
-                                setDetails(`${props.battle.player1Name} joined the battle`);
-                                manageRequest();
+                            if(hasOpponentFound){
+                                manageRequest("player_entered",`${props.battle.player1Name} joined the battle`);
                                 navigate('/battle');
                             }
-                        } }>{iterateHistory(props.battle.history,"opponent_found") ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                        } }>{hasOpponentFound ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                             setBattleId(props.battle._id);
                             deleteBattle();
                         } }>Delete</button></> : userId === props.battle.player2 ?
-                        <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${iterateHistory(props.battle.history,"player_entered") ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
-                                             if(iterateHistory(props.battle.history,"player_entered")){
-                                                setEvent("opponent_entered");
-                                                setDetails(`${props.battle.player2Name} joined the battle`);
-                                                 setBattleId(props.battle._id);
-                                                 console.log("Event: "+event)
-                                                 manageRequest();
+                        <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${hasPlayerEntered ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+                                             if(hasPlayerEntered){
+                                                setBattleId(props.battle._id);
+                                                 manageRequest("opponent_entered", `${props.battle.player2Name} joined the battle` );
                                                  console.log("Managing Request done")
                                                  navigate('/battle');
                                              }
-                                         } }>{iterateHistory(props.battle.history,"player_entered") ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                                         } }>{hasPlayerEntered ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                                              setBattleId(props.battle._id);
-                                             setEvent("opponent_canceled");
-                                             setDetails(`Opponent left the battle`);
-                                             manageRequest();
+                                             manageRequest("opponent_canceled", `Opponent left the battle`);
                                          } }>cancel</button></> : <button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md bg-purple-700`} onClick={() => {
-                                             setEvent("opponent_found");
-                                             setDetails(`Opponent matched successfully`);
                                              setBattleId(props.battle._id);
                                              joinBattle();
-                                             manageRequest();
+                                             manageRequest("opponent_found" , `Opponent matched successfully`);
                                          } }>play</button>}
        </div>
     </div>
