@@ -69,7 +69,7 @@ function iterateHistory(history: Record<string, { event: string }>, event: strin
                             setBattleId(props.battle._id);
                             if(iterateHistory(props.battle.history,"opponent_found" )){
                                 setEvent("player_entered");
-                                setDetails(`${props.battle.player2Name} joined the battle`);
+                                setDetails(`${props.battle.player1Name} joined the battle`);
                                 joinBattle();
                             }
                         } }>{iterateHistory(props.battle.history,"opponent_found") ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
@@ -78,13 +78,15 @@ function iterateHistory(history: Record<string, { event: string }>, event: strin
                         } }>Delete</button></> : userId === props.battle.player2 ?
                         <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${iterateHistory(props.battle.history,"player_entered") ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
                                              if(iterateHistory(props.battle.history,"player_entered")){
+                                                setEvent("opponent_entered");
+                                                setDetails(`${props.battle.player2Name} joined the battle`);
                                                  setBattleId(props.battle._id);
                                                  joinBattle();
                                              }
                                          } }>{iterateHistory(props.battle.history,"player_entered") ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                                              setBattleId(props.battle._id);
-                                             setEvent("opponent_entered");
-                                             setDetails(`${props.battle.player2Name} joined the battle`);
+                                             setEvent("opponent_canceled");
+                                             setDetails(`Opponent left the battle`);
                                              joinBattle();
                                          } }>cancel</button></> : <button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md bg-purple-700`} onClick={() => {
                                              setEvent("opponent_found");
