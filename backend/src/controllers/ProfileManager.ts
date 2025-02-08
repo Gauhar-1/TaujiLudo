@@ -43,6 +43,7 @@ const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 100
       Referal,
       gameWon: 0, // Corrected field name
       gameLost: 0, // Corrected field name
+      "kycDetails.status" : "pending",
     });
 
     if (!profile) {
