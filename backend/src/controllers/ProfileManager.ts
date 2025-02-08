@@ -87,7 +87,9 @@ export const getProfile = async(req: any, res: any, next: any)=>{
 
     const profile =await Profile.find({
       status : "active",
-      "kycDetails.status": "pending" 
+      $or: [
+        { "kycDetails.status": "pending" },
+        { "kycDetails.status": { $exists: false } }, ]
     }).sort({ createdAt : -1 });
 
     if(!profile){
