@@ -105,10 +105,46 @@ export const battleHistory = async( req : any, res: any, next: any )=>{
 
 export const joinBattle= async(req: any, res: any, next: any)=>{
 
-    const {battleId, userId,name, event, details } = req.body;
+    const {battleId, userId,name} = req.body;
 
-    if(!battleId || !name  || !userId || !event || !details){
-        console.log("feilds Missing: " + name + " " + battleId + " " + userId + " " + event + " " + details);
+    if(!battleId || !name  || !userId){
+        console.log("feilds Missing: " + name + " " + battleId + " " + userId );
+    }
+
+    // if(event === "opponent_canceled "){
+    //     const battle = await Battle.findByIdAndUpdate(battleId,
+    //         { $set: { history: {} } } // Set profile to an empty object
+    //     );
+
+    //     if(!battle){
+    //         console.log("battle not found");
+    //     }
+    
+    //     return res.status(200).json(battle);
+    // }
+    
+    const battle = await Battle.findByIdAndUpdate(battleId,
+        {
+            player2Name: name,
+            player2 : userId,
+            // status: "in-progress",
+            createdAt:  date,
+            // $push: { history: { event, timestamp: new Date(), details } },
+        });
+
+    if(!battle){
+        console.log("battle not found");
+    }
+
+    res.status(200).json(battle);
+
+}
+
+export const manageRequest = async(req: any, res: any)=>{
+    const { battleId,event, details } = req.body;
+
+    if(!event || !details){
+        console.log("feilds Missing: " + event + " " + details  );
     }
 
     if(event === "opponent_canceled "){
@@ -122,13 +158,9 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
     
         return res.status(200).json(battle);
     }
-    
+
     const battle = await Battle.findByIdAndUpdate(battleId,
         {
-            player2Name: name,
-            player2 : userId,
-            // status: "in-progress",
-            createdAt:  date,
             $push: { history: { event, timestamp: new Date(), details } },
         });
 
@@ -137,7 +169,6 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
     }
 
     res.status(200).json(battle);
-
 }
 
 export const inProgressBattle = async (req: any, res: any, next: any) => {
