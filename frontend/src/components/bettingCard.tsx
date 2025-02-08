@@ -54,15 +54,10 @@ export const BettingCard = (props : any)=>{
       }
 
    // Function to check if any object in `history` has the specified event
-   function iterateHistory(
-    history: Record<string, { event: string }> | { event: string }[],
-    event: string
-  ): boolean {
-    if (Array.isArray(history)) {
-      return history.some(entry => entry.event === event);
-    }
-    return Object.values(history).some(entry => entry.event === event);
+   function iterateHistory(history: { event: string }[], event: string): boolean {
+    return history.some(entry => entry.event === event);
   }
+  
   
     return ( 
         <div>
