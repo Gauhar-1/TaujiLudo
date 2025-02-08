@@ -8,7 +8,7 @@ export const BettingCard = (props : any)=>{
     const navigate = useNavigate();
     const { setOpponentFound, opponentFound, userId } = useUserContext();
 
-    const { setBattleId, name } = useUserContext();
+    const { setBattleId, name, event, details} = useUserContext();
 
     const joinBattle = async()=>{
         
@@ -23,7 +23,9 @@ export const BettingCard = (props : any)=>{
            const respose = await axios.post(`${API_URL}/api/auth/battles/join`, {
                 name ,
                 userId ,
-                battleId : props.battle._id
+                battleId : props.battle._id,
+                event,
+                details
             });
 
             console.log(respose.data);
@@ -63,11 +65,10 @@ export const BettingCard = (props : any)=>{
        <div className="flex gap-3">
        
        {userId === props.battle.player1 ?
-       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${!opponentFound ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${props.battle.history.event === "opponent_found" ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
                             joinBattle();
                             setBattleId(props.battle._id);
-                            setOpponentFound(true);
-                        } }>{!opponentFound ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                        } }>{props.battle.history.event === "opponent_found" ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                             deleteBattle();
                             setBattleId(props.battle._id);
                         } }>Delete</button></> : <button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md bg-purple-700`} onClick={() => {
@@ -75,6 +76,18 @@ export const BettingCard = (props : any)=>{
                             setBattleId(props.battle._id);
                             setOpponentFound(true);
                         } }>play</button>}
+       {userId === props.battle.player2 ?
+       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${props.battle.history.event === "opponent_found" ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+                            joinBattle();
+                            setBattleId(props.battle._id);
+                        } }>{props.battle.history.event === "opponent_found" ? "Requested" : "Enter"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                            setBattleId(props.battle._id);
+                        } }>cancel</button></> : props.battle.history.event === "player_entered" ? <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${props.battle.history.event === "opponent_found" ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+                            joinBattle();
+                            setBattleId(props.battle._id);
+                        } }>{props.battle.history.event === "opponent_found" ? "Requested" : "Enter"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                            setBattleId(props.battle._id);
+                        } }>cancel</button></> : ""}
        </div>
     </div>
         </div>
