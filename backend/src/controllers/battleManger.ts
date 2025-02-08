@@ -1,3 +1,4 @@
+import { de } from "@faker-js/faker/.";
 import { io } from "../app";
 import Battle from "../models/Battle";
 
@@ -104,10 +105,10 @@ export const battleHistory = async( req : any, res: any, next: any )=>{
 
 export const joinBattle= async(req: any, res: any, next: any)=>{
 
-    const {battleId, userId,name } = req.body;
+    const {battleId, userId,name, event, details } = req.body;
 
-    if(!battleId || !name  || !userId){
-        console.log("feilds Missing: " + name + " " + battleId + " " + userId);
+    if(!battleId || !name  || !userId || !event || !details){
+        console.log("feilds Missing: " + name + " " + battleId + " " + userId + " " + event + " " + details);
     }
     
     const battle = await Battle.findByIdAndUpdate(battleId,
@@ -115,7 +116,8 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
             player2Name: name,
             player2 : userId,
             status: "in-progress",
-            createdAt:  date
+            createdAt:  date,
+            $push: { history: { event, timestamp: new Date(), details } },
         });
 
     if(!battle){
