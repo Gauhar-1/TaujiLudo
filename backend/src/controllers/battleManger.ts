@@ -171,6 +171,24 @@ export const manageRequest = async(req: any, res: any)=>{
     res.status(200).json(battle);
 }
 
+export const handleLudoCode = async(req: any, res: any)=>{
+    const { battleId , ludoCode } = req.body;
+
+    if(!battleId || !ludoCode){
+        res.status(400).json("feilds Missing: " + battleId + " " + ludoCode);
+    }
+
+    const battle = await Battle.findByIdAndUpdate( battleId, {
+        ludoCode
+    });
+
+    if(!battle){
+        res.status(400).json("Battle not found");
+    }
+
+    res.status(200).json("Ludo code set successfully");
+}
+
 export const inProgressBattle = async (req: any, res: any, next: any) => {
     try {
       const { battleId } = req.query;

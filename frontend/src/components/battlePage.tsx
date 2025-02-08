@@ -22,10 +22,11 @@ interface Battle {
 
 export const BattlePage = ()=>{ 
     const navigate = useNavigate();
-    const { battleId, userId } = useUserContext();
+    const { battleId, userId} = useUserContext();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [reason, setReason] = useState<string>("");
+  const [ludoCode, setLudoCode] = useState<string>("");
   const [ woned , setWoned ] = useState(false);
   const [ losed , setLosed ] = useState(false);
   const [ canceled , setCanceled ] = useState(false);
@@ -108,6 +109,22 @@ useEffect(() => {
     }
   };
 
+  const handleLudoCode = async()=>{
+     
+    try{
+      const response = await axios.post(`${API_URL}/api/auth/battles/setLudoCode`, { 
+         battleId : battle?._id ,
+         ludoCode
+        });
+      if(!response.data){
+        console.log("response not found");
+      }
+    }
+    catch(err){
+      console.log("Error: "+ err);
+    }
+  }
+
 
     return (
         <div className="bg-white min-h-screen max-w-sm">
@@ -167,7 +184,14 @@ useEffect(() => {
   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
 </svg>
 
-                    </div>: <div></div>}
+                    </div>: <div className="flex flex-col gap-2 py-2 px-4">
+                      <input type="text" className="border p-1 rounded-lg border-black" onChange={(e)=>{
+                        setLudoCode(e.target.value);
+                      }}/>
+                      <div className="text-center bg-blue-600 rounded-lg p-1 text-white " onClick={()=>{
+                        handleLudoCode();
+                      }}>Set</div>
+                      </div>}
                 </div> 
                 </div>
                
