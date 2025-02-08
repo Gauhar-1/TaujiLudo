@@ -8,8 +8,7 @@ import { API_URL } from "../utils/url";
 export const Header = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
   const navigate = useNavigate();
-  const [amount , setAmount ] = useState(0);
-  const { login,  phoneNumber } = useUserContext();
+  const { login,  phoneNumber, amount, setAmount } = useUserContext();
 
   
       useEffect(()=>{
@@ -18,7 +17,7 @@ export const Header = ()=>{
           }
           const updateAmount = async()=>{
             try{
-              const  response = await axios.post(`${API_URL}/api/auth/update-Amount`,  { phoneNumber });
+              const  response = await axios.get(`${API_URL}/api/auth/update-Amount`, { params:{ phoneNumber } });
               if(response && response.data && response.data.success){
                 console.log("Amount updated")
               }
@@ -26,7 +25,7 @@ export const Header = ()=>{
                 console.log("Failed to update Amount")
                 console.log(response.data);
               }
-              setAmount(response.data.amount)
+              setAmount(response.data.amount);
             }
             catch(err){
                console.log("Error" + err);

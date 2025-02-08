@@ -26,7 +26,7 @@ router.post('/reject-kyc',  rejectKyc);
 router.get('/notifications', getNotifications);
 router.post('/new-Profile', createProfile);
 router.post('/update-Profile', updateProfile);
-router.post('/update-Amount', updateAmount);
+router.get('/update-Amount', updateAmount);
 router.post('/battles/create', createBattle);
 router.post('/battles/join', joinBattle);
 router.get('/battles/pending', pendingBattle);

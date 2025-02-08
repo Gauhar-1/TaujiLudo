@@ -200,7 +200,7 @@ export const unBlockPlayer = async(req: any, res: any, next: any)=>{
 }
 
 export const updateAmount = async(req:any, res:any, next:any)=>{
-  const { phoneNumber } = req.body;
+  const { phoneNumber } = req.query;
 
   if(!phoneNumber){
     console.log("missing fields" + phoneNumber  );
