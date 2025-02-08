@@ -3,14 +3,10 @@ import axios from "axios";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
 import { socket } from "./homePage";
-import { useState } from "react";
 
 export const BettingCard = (props : any)=>{
     // const navigate = useNavigate();
     const {  userId } = useUserContext();
-    const [ history , setHistory ] = useState([{
-        event : ""
-    }]);
 
     const { setBattleId, name, event,setEvent, details, setDetails } = useUserContext();
 
@@ -27,7 +23,6 @@ export const BettingCard = (props : any)=>{
             });
 
             console.log(respose.data);
-            setHistory(props.battle.history)
             // navigate('/battle');
         }
         catch(err){
@@ -39,15 +34,11 @@ export const BettingCard = (props : any)=>{
         console.log("Battleid: "+ props.battle._id);
       };
 
-      // Function to iterate over object properties
-       function iterateHistory(event : string){
-         Object.entries(history).forEach(([, value]) => {
-            if(value.event === event){
-                return true;
-            }
-    });
-    return false;
+   // Function to check if any object in `history` has the specified event
+function iterateHistory(history: Record<string, { event: string }>, event: string): boolean {
+    return Object.values(history).some(entry => entry.event === event);
   }
+  
 
     return ( 
         <div>
@@ -74,23 +65,23 @@ export const BettingCard = (props : any)=>{
        <div className="flex gap-3">
        
        {userId === props.battle.player1 ?
-       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${ iterateHistory("opponent_found" ) ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+       <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${ iterateHistory(props.battle.history,"opponent_found" ) ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
                             setBattleId(props.battle._id);
                             if(props.battle.history.event === "opponent_found"){
                                 setEvent("player_entered");
                                 setDetails(`${props.battle.player2Name} joined the battle`);
                                 joinBattle();
                             }
-                        } }>{iterateHistory("opponent_found") ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
-                            deleteBattle();
+                        } }>{iterateHistory(props.battle.history,"opponent_found") ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                             setBattleId(props.battle._id);
+                            deleteBattle();
                         } }>Delete</button></> : userId === props.battle.player2 ?
-                        <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${iterateHistory("opponent_found") ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
-                                             if(iterateHistory("player_entered")){
+                        <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${iterateHistory(props.battle.history,"player_entered") ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
+                                             if(iterateHistory(props.battle.history,"player_entered")){
                                                  setBattleId(props.battle._id);
                                                  joinBattle();
                                              }
-                                         } }>{iterateHistory("player_entered") ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                                         } }>{iterateHistory(props.battle.history,"player_entered") ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                                              setBattleId(props.battle._id);
                                              setEvent("opponent_entered");
                                              setDetails(`${props.battle.player2Name} joined the battle`);
