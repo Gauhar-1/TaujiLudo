@@ -67,7 +67,7 @@ function iterateHistory(history: Record<string, { event: string }>, event: strin
        {userId === props.battle.player1 ?
        <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${ iterateHistory(props.battle.history,"opponent_found" ) ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
                             setBattleId(props.battle._id);
-                            if(props.battle.history.event === "opponent_found"){
+                            if(iterateHistory(props.battle.history,"opponent_found" )){
                                 setEvent("player_entered");
                                 setDetails(`${props.battle.player2Name} joined the battle`);
                                 joinBattle();
