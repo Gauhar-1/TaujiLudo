@@ -104,7 +104,9 @@ export const BettingCard = (props : any)=>{
                                                 setEvent("opponent_entered");
                                                 setDetails(`${props.battle.player2Name} joined the battle`);
                                                  setBattleId(props.battle._id);
+                                                 console.log("Event: "+event)
                                                  manageRequest();
+                                                 console.log("Managing Request done")
                                                  navigate('/battle');
                                              }
                                          } }>{iterateHistory(props.battle.history,"player_entered") ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
