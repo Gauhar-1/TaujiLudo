@@ -13,7 +13,7 @@ export const socket = io("https://api.taujiludo.in",{
 
 });
 
-export const HomePage = (props: any) => {
+export const HomePage = () => {
     const navigate = useNavigate();
   const { userId, name } = useUserContext(); // Access userId from the context
   const [amount, setAmount] = useState<number>(0);
@@ -179,7 +179,7 @@ export const HomePage = (props: any) => {
                         </div>
                         <div className="flex flex-col gap-3">
                             {onGoingB && onGoingB.map((battle: any) => (
-                                <BettingCard key={battle._id} battle={battle}  />
+                                <BettingCard key={battle._id} battle={battle} />
                             ))}
                         </div>
                     </div>

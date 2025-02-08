@@ -1,12 +1,12 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
 import { socket } from "./homePage";
 import { useState } from "react";
 
 export const BettingCard = (props : any)=>{
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const {  userId } = useUserContext();
     const [ history , setHistory ] = useState([{
         event : ""
