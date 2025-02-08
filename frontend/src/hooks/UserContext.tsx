@@ -15,6 +15,8 @@ interface UserContextType {
   setProfile: (profile: Profile) => void;
   id: string;
   setId: (id: string) => void;
+  ludoSet: boolean;
+  setLudoSet: (id: boolean) => void;
   userId: string;
   setUserId: (id: string) => void;
   paymentId: string;
@@ -72,6 +74,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [userId, setUserId] = useState(() => getInitialValue("userId", ""));
   const [paymentId, setPaymentId] = useState(() => getInitialValue("paymentId", ""));
   const [id, setId] = useState(() => getInitialValue("id", ""));
+  const [ludoSet, setLudoSet] = useState(() => getInitialValue("ludoSet", false));
   const [event, setEvent] = useState(() => getInitialValue("event", ""));
   const [details, setDetails] = useState(() => getInitialValue("details", ""));
   const [phoneNumber, setPhoneNumber] = useState(() => getInitialValue("phoneNumber", ""));
@@ -102,6 +105,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     updateSessionStorage("details", details);
     updateSessionStorage("event", event);
     updateSessionStorage("profile", profile);
+    updateSessionStorage("ludoSet", ludoSet);
   }, [
     userId,
     phoneNumber,
@@ -115,7 +119,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     adminClicked,
     details,
     event,
-    profile
+    profile,
+    ludoSet
   ]);
 
   // Context value
@@ -145,7 +150,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     event,
     setEvent,
     details,
-    setDetails
+    setDetails,
+    ludoSet,
+    setLudoSet
   };
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
