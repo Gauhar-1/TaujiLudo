@@ -1,4 +1,3 @@
-import {  useState } from "react";
 import { Header } from "../components/header";
 import { Route, Routes} from "react-router-dom";
 import { Footer } from "../components/footer";
@@ -46,7 +45,6 @@ import { Notifications } from "../components/notification";
 export const UserPage = ()=>{
 
       // const { login  } = useUserContext();
-      const [ name , ] =useState("");
       // const navigate = useNavigate();
 
       const { adminClicked } = useUserContext();
@@ -62,7 +60,7 @@ export const UserPage = ()=>{
         <div>
             { !adminClicked && <Header ></Header>}
        <Routes>
-            <Route path="/home" element={<HomePage name={name}/>}></Route>
+            <Route path="/home" element={<HomePage />}></Route>
            <Route path="/profile" element={<ProfilePage  />}></Route>
            <Route path="/wallet" element={<WalletPage/>}></Route>
            <Route path="/history" element={<HistoryPage/>}></Route>
