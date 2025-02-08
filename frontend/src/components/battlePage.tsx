@@ -160,7 +160,7 @@ useEffect(() => {
                 <div className="flex justify-center">
                 <div className="bg-gray-300 rounded-xl w-48 p-2 ">
                     <div className=" font-bold p-1 text-xl text-center">Ludo Code</div>
-                   {userId === battle?.player1 ? <div className="flex gap-2 justify-between  bg-gray-400 rounded-lg m-2 p-3">
+                   {userId === battle?.player2 ? <div className="flex gap-2 justify-between  bg-gray-400 rounded-lg m-2 p-3">
                         <div className="font-mono text-lg">{battle?.ludoCode}</div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" 
                         >
