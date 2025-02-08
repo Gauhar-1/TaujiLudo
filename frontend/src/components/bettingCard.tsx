@@ -3,12 +3,15 @@ import axios from "axios";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
 import { socket } from "./homePage";
+import {  useNavigate } from "react-router-dom";
 
 export const BettingCard = (props : any)=>{
     // const navigate = useNavigate();
     const {  userId } = useUserContext();
 
     const { setBattleId, name, event,setEvent, details, setDetails } = useUserContext();
+
+    const navigate = useNavigate();
 
     const joinBattle = async()=>{
         
@@ -90,6 +93,7 @@ export const BettingCard = (props : any)=>{
                                 setEvent("player_entered");
                                 setDetails(`${props.battle.player1Name} joined the battle`);
                                 manageRequest();
+                                navigate('/battle');
                             }
                         } }>{iterateHistory(props.battle.history,"opponent_found") ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                             setBattleId(props.battle._id);
@@ -101,6 +105,7 @@ export const BettingCard = (props : any)=>{
                                                 setDetails(`${props.battle.player2Name} joined the battle`);
                                                  setBattleId(props.battle._id);
                                                  manageRequest();
+                                                 navigate('/battle');
                                              }
                                          } }>{iterateHistory(props.battle.history,"player_entered") ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                                              setBattleId(props.battle._id);
