@@ -4,21 +4,28 @@ import { useNavigate } from "react-router-dom"
 import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
 
+interface BattleHistoryEntry {
+  event: string;
+  [key: string]: any; // Allows additional properties if needed
+}
+
 interface Battle {
-    _id: string;
-    player1Name: string;
-    player2Name: string;
-    player1: string;
-    player2: string | null;
-    amount: number;
-    prize: number;
-    screenShot: string | null;
-    status: string;
-    ludoCode: string;
-    winner: string | null;
-    createdAt: string;
-    __v: number;
-  }
+  _id: string;
+  player1Name: string;
+  player2Name: string;
+  player1: string;
+  player2: string | null;
+  amount: number;
+  prize: number;
+  screenShot: string | null;
+  status: string;
+  ludoCode: string;
+  winner: string | null;
+  createdAt: string;
+  __v: number;
+  history: BattleHistoryEntry[]; // Updated type for history
+}
+
 
 export const BattlePage = ()=>{ 
     const navigate = useNavigate();
@@ -114,7 +121,9 @@ useEffect(() => {
     try{
       const response = await axios.post(`${API_URL}/api/auth/battles/setLudoCode`, { 
          battleId : battle?._id ,
-         ludoCode
+         ludoCode,
+         event : "ludoCode_set",
+         details : "ludo Code set"
         });
       if(!response.data){
         console.log("response not found");
@@ -124,6 +133,12 @@ useEffect(() => {
       console.log("Error: "+ err);
     }
   }
+
+    // Function to check if any object in `history` has the specified event
+    function iterateHistory(history: { event: string }[] | undefined, event: string): boolean {
+      return history?.some(entry => entry.event === event) ?? false;
+  }
+  
 
 
     return (
@@ -175,7 +190,7 @@ useEffect(() => {
        </div>
                 </div>
                 <div className="flex justify-center">
-                { !ludoSet &&<div className="bg-gray-300 rounded-xl w-48 p-2 ">
+                { !iterateHistory(battle?.history, "ludoCode_set") &&<div className="bg-gray-300 rounded-xl w-48 p-2 ">
                     <div className=" font-bold p-1 text-xl text-center">Ludo Code</div>
                    {userId === battle?.player2 ? <div className="flex gap-2 justify-between  bg-gray-400 rounded-lg m-2 p-3">
                         <div className="font-mono text-lg">{battle.ludoCode ? battle.ludoCode : "Wating..."}</div>
@@ -194,7 +209,7 @@ useEffect(() => {
                       }}>Set</div>
                       </div>}
                 </div> }
-                { ludoSet &&<div className="bg-gray-300 rounded-xl w-48 p-2 ">
+                { iterateHistory(battle?.history, "ludoCode_set") &&<div className="bg-gray-300 rounded-xl w-48 p-2 ">
                     <div className=" font-bold p-1 text-xl text-center">Ludo Code</div>
                    {<div className="flex gap-2 justify-between  bg-gray-400 rounded-lg m-2 p-3">
                         <div className="font-mono text-lg">{battle?.ludoCode}</div>
