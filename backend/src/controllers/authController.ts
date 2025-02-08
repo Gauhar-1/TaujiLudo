@@ -71,24 +71,24 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
             userId : user._id
         })
 
-        if(!profile){
-            return res.status(500).json("Profile not found");
+        if(profile){
+            let referredByUser = null;
+            if (ref) {
+                referredByUser = await Profile.findOne({ Referal: ref });
+        
+                if (referredByUser) {
+                    // Increment referral count
+                    referredByUser.referrals += 1;
+                    await referredByUser.save();
+        
+                    // Assign referrer to the new user
+                    profile.referredBy = referredByUser.phoneNumber;
+                    await user.save();
+                }
         }
 
          // Check if referral code exists
-    let referredByUser = null;
-    if (ref) {
-        referredByUser = await Profile.findOne({ Referal: ref });
-
-        if (referredByUser) {
-            // Increment referral count
-            referredByUser.referrals += 1;
-            await referredByUser.save();
-
-            // Assign referrer to the new user
-            profile.referredBy = referredByUser.phoneNumber;
-            await user.save();
-        }
+  
     }
         // JWT generation logic here
         // const token = jwt.sign(
