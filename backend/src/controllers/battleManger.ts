@@ -172,14 +172,15 @@ export const manageRequest = async(req: any, res: any)=>{
 }
 
 export const handleLudoCode = async(req: any, res: any)=>{
-    const { battleId , ludoCode } = req.body;
+    const { battleId , ludoCode, event, details } = req.body;
 
     if(!battleId || !ludoCode){
         res.status(400).json("feilds Missing: " + battleId + " " + ludoCode);
     }
 
     const battle = await Battle.findByIdAndUpdate( battleId, {
-        ludoCode
+        ludoCode,
+        $push: { history: { event, timestamp: new Date(), details } },
     });
 
     if(!battle){
