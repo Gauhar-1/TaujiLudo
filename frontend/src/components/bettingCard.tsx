@@ -14,32 +14,56 @@ export const BettingCard = (props : any)=>{
         
         try{
 
-           const respose = await axios.post(`${API_URL}/api/auth/battles/join`, {
+           const response = await axios.post(`${API_URL}/api/auth/battles/join`, {
                 name ,
                 userId ,
                 battleId : props.battle._id,
-                event,
-                details
             });
+            if(!response.data){
+                console.log("Response not found");
+            }
 
-            console.log(respose.data);
             // navigate('/battle');
         }
         catch(err){
             console.log("Error :" + err);
         }
     }
+
     const deleteBattle = () => {
         socket.emit("deleteBattle", props.battle._id);
         console.log("Battleid: "+ props.battle._id);
       };
 
+      const manageRequest = async()=>{
+        try{
+            const response = await axios.post(`${API_URL}/api/auth/manageRequest`, {
+                event,
+                details,
+                battleId :props.battle._id,
+            });
+
+            if(!response.data){
+                console.log("Response not found");
+            }
+
+        }
+        catch(err){
+            console.log("Error: "+err);
+        }
+      }
+
    // Function to check if any object in `history` has the specified event
-function iterateHistory(history: Record<string, { event: string }>, event: string): boolean {
+   function iterateHistory(
+    history: Record<string, { event: string }> | { event: string }[],
+    event: string
+  ): boolean {
+    if (Array.isArray(history)) {
+      return history.some(entry => entry.event === event);
+    }
     return Object.values(history).some(entry => entry.event === event);
   }
   
-
     return ( 
         <div>
     <div className="border-black bg-white rounded-t-md mx-2 my-1 p-2 text-sm">
@@ -70,7 +94,7 @@ function iterateHistory(history: Record<string, { event: string }>, event: strin
                             if(iterateHistory(props.battle.history,"opponent_found" )){
                                 setEvent("player_entered");
                                 setDetails(`${props.battle.player1Name} joined the battle`);
-                                joinBattle();
+                                manageRequest();
                             }
                         } }>{iterateHistory(props.battle.history,"opponent_found") ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                             setBattleId(props.battle._id);
@@ -81,18 +105,19 @@ function iterateHistory(history: Record<string, { event: string }>, event: strin
                                                 setEvent("opponent_entered");
                                                 setDetails(`${props.battle.player2Name} joined the battle`);
                                                  setBattleId(props.battle._id);
-                                                 joinBattle();
+                                                 manageRequest();
                                              }
                                          } }>{iterateHistory(props.battle.history,"player_entered") ?  "Enter" :"Requested"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                                              setBattleId(props.battle._id);
                                              setEvent("opponent_canceled");
                                              setDetails(`Opponent left the battle`);
-                                             joinBattle();
+                                             manageRequest();
                                          } }>cancel</button></> : <button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md bg-purple-700`} onClick={() => {
                                              setEvent("opponent_found");
                                              setDetails(`Opponent matched successfully`);
                                              setBattleId(props.battle._id);
                                              joinBattle();
+                                             manageRequest();
                                          } }>play</button>}
        </div>
     </div>
