@@ -147,7 +147,7 @@ export const manageRequest = async(req: any, res: any)=>{
         console.log("feilds Missing: " + event + " " + details  );
     }
 
-    if(event === "opponent_canceled "){
+    if(event === "opponent_canceled"){
         const battle = await Battle.findByIdAndUpdate(battleId,
             { $set: { history: {} } } // Set profile to an empty object
         );
