@@ -4,7 +4,7 @@ import { useUserContext } from "../hooks/UserContext";
 
 
  export const RechargeUser = ()=>{
-    const { setUserId  } = useUserContext();
+    const { setPhoneNumber  } = useUserContext();
     const [ searchClicked , setSearchClicked ] = useState(false);
     return (
          <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
@@ -16,7 +16,7 @@ import { useUserContext } from "../hooks/UserContext";
                 <div className="px-6  flex flex-col gap-2">
                     <div className="text-gray-400">Search Player :</div>
                     <input type="text" placeholder="Name , Phone Number, userId" className="border border-black rounded-md px-2 py-1" onChange={(e)=>{
-                        setUserId(e.target.value);
+                        setPhoneNumber(e.target.value);
                     }}/>
                     <div className="bg-gray-400 p-1 rounded-lg text-center w-32 text-white" onClick={()=>{
                         setSearchClicked(true);

@@ -108,11 +108,11 @@ export const getProfile = async(req: any, res: any, next: any)=>{
   }
 }
 export const findProfile = async(req: any, res: any, next: any)=>{
-  const { userId } = req.query;
+  const { phoneNumber } = req.query;
 
 
   try{
-      let profile =await Profile.find({userId});
+      let profile =await Profile.find({phoneNumber});
 
     if(!profile){
       console.log("profile not found");
