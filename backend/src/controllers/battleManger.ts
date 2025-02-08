@@ -115,7 +115,7 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
         {
             player2Name: name,
             player2 : userId,
-            status: "in-progress",
+            // status: "in-progress",
             createdAt:  date,
             $push: { history: { event, timestamp: new Date(), details } },
         });

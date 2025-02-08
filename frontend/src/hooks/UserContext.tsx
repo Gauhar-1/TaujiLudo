@@ -1,9 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+// Define the structure of the Profile type (Update this as per your needs)
+interface Profile {
+  userId?: string;
+  name?: string;
+  email?: string;
+  phoneNumber?: string;
+  [key: string]: any; // Allows additional properties
+}
+
 // Define the structure of the UserContext
 interface UserContextType {
-  profile: object;
-  setProfile: (id: object) => void;
+  profile: Profile;
+  setProfile: (profile: Profile) => void;
   id: string;
   setId: (id: string) => void;
   userId: string;
@@ -17,105 +26,97 @@ interface UserContextType {
   phoneNumber: string;
   setPhoneNumber: (phone: string) => void;
   login: boolean;
-  setLogin: (phone: boolean) => void;
+  setLogin: (status: boolean) => void;
   opponentFound: boolean;
-  setOpponentFound: (phone: boolean) => void;
+  setOpponentFound: (status: boolean) => void;
   adminClicked: boolean;
-  setAdminClicked: (phone: boolean) => void;
+  setAdminClicked: (status: boolean) => void;
   amount: number;
-  setAmount: (phone: number) => void;
+  setAmount: (amount: number) => void;
+  event: string;
+  setEvent: (event: string) => void;
+  details: string;
+  setDetails: (details: string) => void;
 }
 
 // Helper function to safely parse JSON
-const safeParse = (value: string | null) => {
-  try {
-    return value ? JSON.parse(value) : null;
-  } catch {
-    return null;
-  }
-};
+// const safeParse = (value: string | null) => {
+//   try {
+//     return value ? JSON.parse(value) : null;
+//   } catch {
+//     return null;
+//   }
+// };
 
-
-// Helper function to initialize state from localStorage
-const getInitialValue = <T extends string | number | boolean  | object>(
-  key: string,
-  defaultValue: T
-): T => {
+// Helper function to initialize state from sessionStorage
+const getInitialValue = <T,>(key: string, defaultValue: T): T => {
   const storedValue = sessionStorage.getItem(key);
   if (storedValue !== null) {
     try {
       const parsedValue = JSON.parse(storedValue);
       if (typeof parsedValue === typeof defaultValue) {
-        return parsedValue;
+        return parsedValue as T;
       }
     } catch {
-      return defaultValue // Ignore parsing errors and return the default value
+      return defaultValue; // Ignore parsing errors and return the default value
     }
   }
   return defaultValue;
 };
-
-
-
-// Helper function to ensure the phone number starts with +91
-// const formatPhoneNumber = (phone: string | undefined | null): string => {
-//   if (!phone || typeof phone !== "string") {
-//     console.error("Invalid phone number");
-//     return "+91";
-//   }
-//   if (!phone.startsWith("+91")) {
-//     return `+91${phone}`;
-//   }
-//   return phone;
-// };
 
 // Context creation
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Provider Component
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // State with localStorage initialization
-  const [userId, setUserId] = useState<string>(() => getInitialValue("userId", "") as string);
-  const [paymentId, setPaymentId] = useState<string>(() => getInitialValue("paymentId", "") as string);
-  const [id, setId] = useState<string>(() => getInitialValue("id", "") as string);
-const [phoneNumber, setPhoneNumber] = useState<string>(() => getInitialValue("phoneNumber", "") as string);
-const [name, setName] = useState<string>(() => getInitialValue("name", "") as string);
-const [battleId, setBattleId] = useState<string>(() => getInitialValue("battleId", "") as string);
-const [login, setLogin] = useState<boolean>(() => getInitialValue("login", false) as boolean);
-const [adminClicked, setAdminClicked] = useState<boolean>(() => getInitialValue("adminClicked", false) as boolean);
-const [opponentFound, setOpponentFound] = useState<boolean>(() => getInitialValue("opponentFound", false) as boolean);
-const [amount, setAmount] = useState<number>(() => getInitialValue("amount", 5) as number);
-const [profile, setProfile] = useState<object>(() => getInitialValue("profile",{}) as object);
+  const [userId, setUserId] = useState(() => getInitialValue("userId", ""));
+  const [paymentId, setPaymentId] = useState(() => getInitialValue("paymentId", ""));
+  const [id, setId] = useState(() => getInitialValue("id", ""));
+  const [event, setEvent] = useState(() => getInitialValue("event", ""));
+  const [details, setDetails] = useState(() => getInitialValue("details", ""));
+  const [phoneNumber, setPhoneNumber] = useState(() => getInitialValue("phoneNumber", ""));
+  const [name, setName] = useState(() => getInitialValue("name", ""));
+  const [battleId, setBattleId] = useState(() => getInitialValue("battleId", ""));
+  const [login, setLogin] = useState(() => getInitialValue("login", false));
+  const [adminClicked, setAdminClicked] = useState(() => getInitialValue("adminClicked", false));
+  const [opponentFound, setOpponentFound] = useState(() => getInitialValue("opponentFound", false));
+  const [amount, setAmount] = useState(() => getInitialValue("amount", 5));
+  const [profile, setProfile] = useState<Profile>(() => getInitialValue("profile", {}));
 
-
-  
-
-  // Wrapper to enforce +91 prefix in setPhoneNumber
-  // const setPhoneNumber = (phone: string) => {
-  //   const formattedPhone = formatPhoneNumber(phone);
-  //   setPhoneNumberState(formattedPhone);
-  // };
-
-  // Update localStorage when state changes
+  // Update sessionStorage when state changes
   useEffect(() => {
-    const updateLocalStorage = (key: string , value: string | boolean | number) => {
-      const existingValue = safeParse(sessionStorage.getItem(key));
-      if (existingValue !== value) {
-        sessionStorage.setItem(key, JSON.stringify(value));
-      }
+    const updateSessionStorage = (key: string, value: any) => {
+      sessionStorage.setItem(key, JSON.stringify(value));
     };
 
-    updateLocalStorage("userId", userId);
-    updateLocalStorage("phoneNumber", phoneNumber); // Ensures the +91 prefix is saved as a string
-    updateLocalStorage("name", name);
-    updateLocalStorage("battleId", battleId);
-    updateLocalStorage("login", login);
-    updateLocalStorage("opponentFound", opponentFound);
-    updateLocalStorage("amount", amount);
-    updateLocalStorage("id", id);
-    updateLocalStorage("paymentId", paymentId);
-    updateLocalStorage("adminClicked", adminClicked);
-  }, [userId, phoneNumber, name, battleId,login, opponentFound,amount]);
+    updateSessionStorage("userId", userId);
+    updateSessionStorage("phoneNumber", phoneNumber);
+    updateSessionStorage("name", name);
+    updateSessionStorage("battleId", battleId);
+    updateSessionStorage("login", login);
+    updateSessionStorage("opponentFound", opponentFound);
+    updateSessionStorage("amount", amount);
+    updateSessionStorage("id", id);
+    updateSessionStorage("paymentId", paymentId);
+    updateSessionStorage("adminClicked", adminClicked);
+    updateSessionStorage("details", details);
+    updateSessionStorage("event", event);
+    updateSessionStorage("profile", profile);
+  }, [
+    userId,
+    phoneNumber,
+    name,
+    battleId,
+    login,
+    opponentFound,
+    amount,
+    id,
+    paymentId,
+    adminClicked,
+    details,
+    event,
+    profile
+  ]);
 
   // Context value
   const contextValue: UserContextType = {
@@ -140,13 +141,17 @@ const [profile, setProfile] = useState<object>(() => getInitialValue("profile",{
     profile,
     setProfile,
     adminClicked,
-    setAdminClicked
+    setAdminClicked,
+    event,
+    setEvent,
+    details,
+    setDetails
   };
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 };
 
-// Custom hook to usze the UserContext
+// Custom hook to use the UserContext
 export const useUserContext = (): UserContextType => {
   const context = useContext(UserContext);
   if (!context) {
