@@ -100,7 +100,7 @@ export const BettingCard = (props : any)=>{
                         } }>{hasOpponentFound ? "play" : "Waiting"}</button><button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
                             setBattleId(props.battle._id);
                             deleteBattle();
-                        } }>Delete</button></> : userId === props.battle.player2 && props.battle.history.length?
+                        } }>Delete</button></> : userId === props.battle.player2 && hasOpponentFound ?
                         <><button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md ${hasPlayerEntered ? "bg-purple-700" : "bg-gray-500"}`} onClick={() => {
                                              if(hasPlayerEntered){
                                                 setBattleId(props.battle._id);
