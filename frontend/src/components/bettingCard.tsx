@@ -37,7 +37,7 @@ export const BettingCard = (props : any)=>{
 
       const manageRequest = async()=>{
         try{
-            const response = await axios.post(`${API_URL}/api/auth/manageRequest`, {
+            const response = await axios.post(`${API_URL}/api/auth/battles/manageRequest`, {
                 event,
                 details,
                 battleId :props.battle._id,
