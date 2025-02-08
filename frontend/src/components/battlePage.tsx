@@ -29,7 +29,7 @@ interface Battle {
 
 export const BattlePage = ()=>{ 
     const navigate = useNavigate();
-    const { battleId, userId, ludoSet, setLudoSet} = useUserContext();
+    const { battleId, userId} = useUserContext();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [reason, setReason] = useState<string>("");
@@ -205,7 +205,6 @@ useEffect(() => {
                       }}/>
                      <div className="text-center bg-blue-600 rounded-lg p-1 text-white " onClick={()=>{
                         handleLudoCode();
-                        setLudoSet(true);
                       }}>Set</div>
                       </div>}
                 </div> }
