@@ -9,7 +9,7 @@ export const  WithdrawToBank = ()=>{
    const [name ,setName] = useState("");
    const [IFSC ,setIFSCcode] = useState("");
    const [accountNumber , setAccountNumber] = useState("");
-   const { userId,amount, setAmount } = useUserContext();
+   const { userId,amount } = useUserContext();
 
 
    const handleWithdraw = async () => {
@@ -26,7 +26,6 @@ export const  WithdrawToBank = ()=>{
               }
           });
           console.log('Withdrawal request submitted.');
-          setAmount(amount - token);
           navigate('/wallet');
       } catch (err : any) {
           console.log('Error in withdrawal: ' + err.response?.data?.message || err.message);

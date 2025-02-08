@@ -8,7 +8,7 @@ export const  WithdrawToUPI = ()=>{
 
     const [token, setToken] = useState(0);
     const [upiId, setUpiId] = useState("");
-    const { userId, setAmount , amount } = useUserContext();
+    const { userId , amount } = useUserContext();
 
     const handleWithdraw = async () => {
 
@@ -20,7 +20,6 @@ export const  WithdrawToUPI = ()=>{
                 paymentMethod: 'upi',
                 destinationDetails : upiId
             });
-            setAmount((amount - token));
             console.log('Withdrawal request submitted.');
             navigate('/wallet');
         } catch (err : any) {

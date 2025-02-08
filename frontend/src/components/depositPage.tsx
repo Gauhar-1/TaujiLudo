@@ -14,7 +14,7 @@ export const DepositPage = ()=>{
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const navigate = useNavigate();
 
-    const { userId, amount, setAmount } = useUserContext();
+    const { userId, amount } = useUserContext();
 
     useEffect(()=>{
         const handleInfoBar = async()=>{
@@ -61,7 +61,6 @@ export const DepositPage = ()=>{
         try {
             const response = await axios.post(`${API_URL}/api/auth/deposit`,  formData );
             setUpiLink(response.data.upiLink);
-            setAmount( amount + token);
             navigate("/wallet");
         } catch (err : any) {
             console.log('Error initiating deposit: ' + err.response?.data?.message || err.message);
