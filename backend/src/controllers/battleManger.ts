@@ -110,6 +110,18 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
     if(!battleId || !name  || !userId || !event || !details){
         console.log("feilds Missing: " + name + " " + battleId + " " + userId + " " + event + " " + details);
     }
+
+    if(event === "opponent_canceled "){
+        const battle = await Battle.findByIdAndUpdate(battleId,
+            { $set: { history: {} } } // Set profile to an empty object
+        );
+
+        if(!battle){
+            console.log("battle not found");
+        }
+    
+        return res.status(200).json(battle);
+    }
     
     const battle = await Battle.findByIdAndUpdate(battleId,
         {

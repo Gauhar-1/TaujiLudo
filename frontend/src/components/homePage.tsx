@@ -179,7 +179,7 @@ export const HomePage = (props: any) => {
                         </div>
                         <div className="flex flex-col gap-3">
                             {onGoingB && onGoingB.map((battle: any) => (
-                                <BettingCard key={battle._id} battle={battle} name={props.name} setBattleId={props.setBattleId} />
+                                <BettingCard key={battle._id} battle={battle}  />
                             ))}
                         </div>
                     </div>
