@@ -56,8 +56,9 @@ export const sendOtp : RequestHandler = expressAsyncHandler(async (req: Request,
 export const verifyOtp  = (async (req: any, res: any, next: any) => {
     const phone  = req.body.phoneNumber;
     const otp  = req.body.otp;
-    const ref  = req.body.ref;
+    const ref  = req.body.ref || "";
     try {
+
         const user = await User.findOne({ phone, otp });
 
         if (!user) {
