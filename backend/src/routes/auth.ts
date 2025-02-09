@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { sendOtp, verifyOtp } from '../controllers/authController';
 import { AllTransaction, depositAmount, findTransaction, getTransaction, paymentProof, rejectPayment, ReqTransaction, verifyPayment, withdrawAmount } from '../controllers/moneyController';
 import { allNotifications, getNotifications, markAsRead } from '../controllers/notifyController';
-import { blockedPlayer, completeKYC, createProfile, findProfile, getBlockedOnes, getProfile, getReferal, rejectKyc, unBlockPlayer, updateAmount, updateProfile, verifyKyc } from '../controllers/ProfileManager';
+import { blockedPlayer, completeKYC, findProfile, getBlockedOnes, getProfile, getReferal, rejectKyc, unBlockPlayer, updateAmount, updateProfile, verifyKyc } from '../controllers/ProfileManager';
 import { battleHistory, canceledBattle, completeBattle, createBattle, deleteBattle, handleLudoCode, inProgressBattle, joinBattle, manageRequest, pendingBattle, runningBattle, showBattles, uploadScreenShot } from '../controllers/battleManger';
 import {io} from '../app';
 import express from "express";
@@ -13,7 +13,6 @@ import { Socket } from 'socket.io';
 import { createAdminDetails, getAdmin, infoSettings, QRsettings, supportSettings, UPIsettings } from '../controllers/adminController';
 
 const router = Router();
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 router.post('/send-otp', sendOtp);
 router.post('/verify-otp', verifyOtp);
@@ -24,7 +23,7 @@ router.post('/reject-payment',  rejectPayment);
 router.post('/verify-kyc', verifyKyc);
 router.post('/reject-kyc',  rejectKyc);
 router.get('/notifications', getNotifications);
-router.post('/new-Profile', createProfile);
+// router.post('/new-Profile', createProfile);
 router.post('/update-Profile', updateProfile);
 router.get('/update-Amount', updateAmount);
 router.post('/battles/create', createBattle);
