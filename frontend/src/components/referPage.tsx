@@ -5,14 +5,25 @@ import { API_URL } from "../utils/url";
 
 export const ReferPage = ()=>{
     const divRef = useRef<HTMLDivElement>(null);
-    const [referalLink, setReferralLink] = useState("");
-    const { userId } = useUserContext();
+    const [referalLink, setReferalLink] = useState("");
+    const { phoneNumber } = useUserContext();
 
     useEffect(() => {
-        axios.get(`${API_URL}/api/auth/findProfile` ,{ params : { userId }})
-          .then((res) => setReferralLink(res.data.referralLink))
-          .catch(console.error);
-      }, [userId]);
+        const handleReferal = async()=>{
+            const response = await axios.get(`${API_URL}/api/auth/findProfile` ,{ params : { phoneNumber }});
+
+            if(!response.data){
+                return console.log("Response Not found");
+            }
+
+            const { referalLink } = response.data[0];
+            setReferalLink(referalLink);
+        }
+
+        handleReferal();
+
+        
+      }, [phoneNumber]);
 
   const copyToClipboard = () => {
     if (divRef.current) {
@@ -44,7 +55,7 @@ export const ReferPage = ()=>{
                     <div className="bg-gray-400 text-center rounded-t-lg text-gray-200 font-bold p-1">Referal Code</div>
                     <div className="flex p-1  justify-center">
                         <div className="flex ">
-                            <div ref={divRef} className="bg-gray-400 p-4 rounded-md m-1 text-white w-40 text-center">{referalLink}</div>
+                            <div ref={divRef} className="bg-gray-400 p-4 rounded-md m-1 text-white w-40 text-center truncate">{referalLink}</div>
                             <button className="bg-gray-400 p-4 rounded-md m-1 text-white" onClick={()=>{
                                 copyToClipboard();
                             }}>

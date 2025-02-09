@@ -31,13 +31,13 @@ export const ProfilePage = ()=>{
         }
   
         try {
-          const response = await axios.post(
-            `${API_URL}/api/auth/new-Profile`,
-             { phoneNumber} 
+          const response = await axios.get(
+            `${API_URL}/api/auth/findProfile`,
+             { params :{ phoneNumber }} 
           );
   
           if (response.data) {
-            const {phoneNumber, name, email, userId } = response.data;
+            const {phoneNumber, name, email, userId } = response.data[0];
             setName(name );
             setEmail(email );
             setPhoneNumber(phoneNumber);
@@ -53,7 +53,7 @@ export const ProfilePage = ()=>{
       };
   
       fetchProfile();
-    }, [phoneNumber]);
+    }, []);
   
     const updateProfile = async () => {
       if (!name || !phoneNumber || !email) {
