@@ -23,7 +23,6 @@ router.post('/reject-payment',  rejectPayment);
 router.post('/verify-kyc', verifyKyc);
 router.post('/reject-kyc',  rejectKyc);
 router.get('/notifications', getNotifications);
-// router.post('/new-Profile', createProfile);
 router.post('/update-Profile', updateProfile);
 router.get('/update-Amount', updateAmount);
 router.post('/battles/create', createBattle);
