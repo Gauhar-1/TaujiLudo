@@ -3,64 +3,64 @@ import User from "../models/User";
 import crypto from 'crypto';
 import { faker } from "@faker-js/faker"; // Import faker
 
-export const createProfile = async (req: any, res: any, next: any) => {
-  const { phoneNumber } = req.body;
+// export const createProfile = async (req: any, res: any, next: any) => {
+//   const { phoneNumber } = req.body;
 
 
-  if (!phoneNumber) {
-    console.log("PhoneNumber is not Missing " + phoneNumber);
-  }
+//   if (!phoneNumber) {
+//     console.log("PhoneNumber is not Missing " + phoneNumber);
+//   }
 
-  try {
-    const user = await User.findOne({phone: phoneNumber});
-    if (!user) {
-      console.log("User not found");
-      return res.status(404).json({ message: "User not found" });
-    }
+//   try {
+//     const user = await User.findOne({phone: phoneNumber});
+//     if (!user) {
+//       console.log("User not found");
+//       return res.status(404).json({ message: "User not found" });
+//     }
 
-    const oldProfile = await Profile.findOne({ phoneNumber });
-    if (oldProfile) {
-      return res.status(200).json(oldProfile);
-    }
+//     const oldProfile = await Profile.findOne({ phoneNumber });
+//     if (oldProfile) {
+//       return res.status(200).json(oldProfile);
+//     }
 
-    const Referal = crypto.randomBytes(5).toString('hex');
+//     const Referal = crypto.randomBytes(5).toString('hex');
 
-    console.log("Referal: "+ Referal);
+//     console.log("Referal: "+ Referal);
 
-    const referralLink = `https://taujiludo.in/?ref=${Referal}`;
+//     const referralLink = `https://taujiludo.in/?ref=${Referal}`;
 
-    const randomName = faker.person.firstName(); // Generates a random first name
-const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`; // Generates a unique email
+//     const randomName = faker.person.firstName(); // Generates a random first name
+// const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`; // Generates a unique email
 
-    const profile = await Profile.create({
-      userId: user._id,
-      name: randomName,
-      email: randomEmail,
-      phoneNumber,
-      amount: 5,
-      imgUrl: "image",
-      status: "active",
-      cashWon: 0,
-      BattlePlayed: 0,
-      Referal,
-      referralLink,
-      gameWon: 0, // Corrected field name
-      gameLost: 0, // Corrected field name
-      "kycDetails.status" : "pending",
-    });
+//     const profile = await Profile.create({
+//       userId: user._id,
+//       name: randomName,
+//       email: randomEmail,
+//       phoneNumber,
+//       amount: 5,
+//       imgUrl: "image",
+//       status: "active",
+//       cashWon: 0,
+//       BattlePlayed: 0,
+//       Referal,
+//       referralLink,
+//       gameWon: 0, // Corrected field name
+//       gameLost: 0, // Corrected field name
+//       "kycDetails.status" : "pending",
+//     });
 
-    if (!profile) {
-      console.log("Profile creation failed");
-      return res.status(500).json({ message: "Profile creation failed" });
-    }
-    console.log("Profile creation success");
+//     if (!profile) {
+//       console.log("Profile creation failed");
+//       return res.status(500).json({ message: "Profile creation failed" });
+//     }
+//     console.log("Profile creation success");
 
-    res.status(200).json(profile);
-  } catch (err) {
-    console.error("Error creating profile:", err);
-    res.status(500).json({ message: "Error creating profile", err});
-  }
-};
+//     res.status(200).json(profile);
+//   } catch (err) {
+//     console.error("Error creating profile:", err);
+//     res.status(500).json({ message: "Error creating profile", err});
+//   }
+// };
 
 
 export const updateProfile = async(req: any, res: any, next: any)=>{
