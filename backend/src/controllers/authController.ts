@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import expressAsyncHandler from 'express-async-handler';
 import axios from 'axios';
 import Profile from '../models/Profile.js';
+import { faker } from '@faker-js/faker/.';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -67,29 +69,53 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
              res.status(400).json({ error: 'Invalid or expired OTP' });
         }
 
-        const profile = await Profile.findOne({
+        let profile = await Profile.findOne({
             userId : user._id
         })
 
-        if(profile){
+        if(!profile){
+
+            const Referal = crypto.randomBytes(5).toString('hex');
+
+            console.log("Referal: "+ Referal);
+        
+            const referralLink = `https://taujiludo.in/?ref=${Referal}`;
+        
+            const randomName = faker.person.firstName(); // Generates a random first name
+        const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`; // Generates a unique email
+        
+             profile = await Profile.create({
+              userId: user._id,
+              name: randomName,
+              email: randomEmail,
+              phoneNumber : phone,
+              amount: 5,
+              imgUrl: "image",
+              status: "active",
+              cashWon: 0,
+              BattlePlayed: 0,
+              Referal,
+              referralLink,
+              gameWon: 0, // Corrected field name
+              gameLost: 0, // Corrected field name
+              "kycDetails.status" : "pending",
+            });
+
             let referredByUser = null;
             if (ref) {
                 referredByUser = await Profile.findOne({ Referal: ref });
         
                 if (referredByUser) {
-                    // Increment referral count
-                    referredByUser.referrals += 1;
+                    referredByUser.referrals.push({  phoneNumber : phone, timestamp: new Date(), referalEarning: 0 }); // Example earning amount
                     await referredByUser.save();
-        
-                    // Assign referrer to the new user
+            
                     profile.referredBy = referredByUser.phoneNumber;
-                    await user.save();
+                    await profile.save();
+            
                 }
         }
-
-         // Check if referral code exists
-  
     }
+    
         // JWT generation logic here
         // const token = jwt.sign(
         //     { userId: user._id, phoneNumber: user.phone },
