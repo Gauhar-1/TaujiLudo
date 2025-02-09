@@ -24,10 +24,16 @@ const ProfileSchema = new mongoose.Schema({
     BattlePlayed : {type: Number, required: true},
     Referal : {type: String, required: true},
     referredBy: { type: String, default: null }, // Stores the referrer’s code
-    referrals: { type: Number, default: 0 }, // Number of successful referrals
+    referalLink: { type: String, default: null }, // Stores the referrer’s code
     status: {     type: String,
       enum: ["active", "blocked"], // Define allowed string values
       required: true, },
+      referrals: [
+        {
+          phoneNumber: { type: String, default : null },
+          timestamp: { type: Date, default: null },
+          referalEarning: { type: String ,  default: null},
+        },],
     createdAt: { type: Date, default: Date.now },
   });
   

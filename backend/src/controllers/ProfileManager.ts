@@ -27,6 +27,8 @@ export const createProfile = async (req: any, res: any, next: any) => {
 
     console.log("Referal: "+ Referal);
 
+    const referralLink = `https://taujiludo.in/?ref=${Referal}`;
+
     const randomName = faker.person.firstName(); // Generates a random first name
 const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`; // Generates a unique email
 
@@ -41,6 +43,7 @@ const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 100
       cashWon: 0,
       BattlePlayed: 0,
       Referal,
+      referralLink,
       gameWon: 0, // Corrected field name
       gameLost: 0, // Corrected field name
       "kycDetails.status" : "pending",
@@ -342,6 +345,9 @@ export const getReferal = async(req: any, res:any)=>{
     if (!profile) return res.status(404).json({ message: "profile not found" });
 
     const referralLink = `https://taujiludo.in/?ref=${profile.Referal}`;
+
+    profile.referalLink = referralLink;
+    await profile.save()
     res.json({ referralLink });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
