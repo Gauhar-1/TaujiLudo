@@ -5,11 +5,11 @@ import { API_URL } from "../utils/url";
 
 export const ReferPage = ()=>{
     const divRef = useRef<HTMLDivElement>(null);
-    const [, setReferralLink] = useState("");
+    const [referalLink, setReferralLink] = useState("");
     const { userId } = useUserContext();
 
     useEffect(() => {
-        axios.get(`${API_URL}/api/auth/getReferral/${userId}`)
+        axios.get(`${API_URL}/api/auth/findProfile` ,{ params : { userId }})
           .then((res) => setReferralLink(res.data.referralLink))
           .catch(console.error);
       }, [userId]);
@@ -44,7 +44,7 @@ export const ReferPage = ()=>{
                     <div className="bg-gray-400 text-center rounded-t-lg text-gray-200 font-bold p-1">Referal Code</div>
                     <div className="flex p-1  justify-center">
                         <div className="flex ">
-                            <div ref={divRef} className="bg-gray-400 p-4 rounded-md m-1 text-white w-40 text-center">34534</div>
+                            <div ref={divRef} className="bg-gray-400 p-4 rounded-md m-1 text-white w-40 text-center">{referalLink}</div>
                             <button className="bg-gray-400 p-4 rounded-md m-1 text-white" onClick={()=>{
                                 copyToClipboard();
                             }}>
