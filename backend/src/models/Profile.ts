@@ -24,7 +24,7 @@ const ProfileSchema = new mongoose.Schema({
   BattlePlayed: { type: Number, required: true, default: 0 },
   Referal: { type: String, required: true },
   referredBy: { type: String, default: null },
-  referalLink: { type: String, default: null },
+  referalLink: { type: String, required: true },
   status: {
     type: String,
     enum: ["active", "blocked"],
@@ -34,7 +34,7 @@ const ProfileSchema = new mongoose.Schema({
   referrals: [
     {
       phoneNumber: { type: String, default: null },
-      timestamp: { type: Date, default: Date.now },
+      timestamp: { type: Date, default: null },
       referalEarning: { type: Number, default: 0 }, // Fixed type from string to number
     },
   ],
