@@ -158,6 +158,19 @@ export const manageRequest = async(req: any, res: any)=>{
     
         return res.status(200).json(battle);
     }
+    else if(event === "opponent_entered"){
+        const battle = await Battle.findByIdAndUpdate(battleId,
+            {  status: "in-progress",
+               $push: { history: { event, timestamp: new Date(), details } },
+             } 
+        );
+
+        if(!battle){
+            console.log("battle not found");
+        }
+    
+        return res.status(200).json(battle);
+    }
 
     const battle = await Battle.findByIdAndUpdate(battleId,
         {
