@@ -5,6 +5,7 @@ import axios from "axios";
 import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
 import { io } from "socket.io-client";
+import { RunningBattle } from "./runningBattleCard";
 
 
 
@@ -39,6 +40,7 @@ export const HomePage = () => {
   const [userName] = useState(() => getLocalStorageValue("name", "Noobie"));
   
   const [onGoingB, setOnGoingB] = useState([]);
+  const [pendingB, setPendingB] = useState([]);
 
   // Centralized LocalStorage Setter
   const updateLocalStorage = (key: string, value: any) => {
@@ -87,11 +89,34 @@ export const HomePage = () => {
     handleInfoBar();
   },[])
 
-  // Fetch ongoing battles
+  // Fetch Pending battles
   useEffect(() => {
     const fetchOngoingBattles = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/auth/battles/pending`);
+        if (response?.data) {
+          setPendingB(response.data);
+        }
+
+      } catch (error) {
+        console.error("Error fetching ongoing battles:", error);
+      }
+    };
+
+    fetchOngoingBattles();
+
+    const interval = setInterval( fetchOngoingBattles, 1000);
+
+    // Cleanup on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
+
+  // Fetch ongoing battles
+  useEffect(() => {
+    const fetchOngoingBattles = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/auth/battles`, { params : { status :  "in-progress"}});
         if (response?.data) {
           setOnGoingB(response.data);
         }
@@ -165,7 +190,7 @@ export const HomePage = () => {
                            
                         </div>
                     
-                    <div className="bg-white mt-2 h-2"></div>
+                    <div className="bg-white mt-2 h-2 "></div>
                     <div className="bg-gray-300">
                         <div className="flex justify-between">
                             <div className="flex">
@@ -178,8 +203,22 @@ export const HomePage = () => {
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                            {onGoingB && onGoingB.map((battle: any) => (
+                            {pendingB && pendingB.map((battle: any) => (
                                 <BettingCard key={battle._id} battle={battle} />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="bg-white mt-2 h-2 mb-2"></div>
+                    <div className="bg-gray-300">
+                        <div className="flex justify-between">
+                            <div className="flex">
+                                <img src="../../battleIcon.png" alt="" className="size-6 m-2" />
+                                <div className="m-2 font-semibold">Running Battles</div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            {onGoingB && onGoingB.map((battle: any) => (
+                                <RunningBattle key={battle._id} battle={battle} />
                             ))}
                         </div>
                     </div>
