@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import expressAsyncHandler from 'express-async-handler';
 import axios from 'axios';
 import Profile from '../models/Profile.js';
-import { faker } from '@faker-js/faker/.';
+import { faker } from "@faker-js/faker";
 import crypto from 'crypto';
 
 dotenv.config();
