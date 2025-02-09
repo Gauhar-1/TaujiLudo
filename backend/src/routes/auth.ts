@@ -44,7 +44,10 @@ router.post('/blockPlayer', blockedPlayer);
 router.get('/blockedOnes', getBlockedOnes);
 router.post('/unblockPlayer', unBlockPlayer);
 router.post('/createState', createState);
-router.post('/kyc',upload.single('image'), completeKYC);
+router.post('/kyc', upload.fields([
+    { name: "image", maxCount: 1 },
+    { name: "image2", maxCount: 1 }
+  ]), completeKYC);
 router.get('/transaction', getTransaction);
 router.get('/allTransaction', AllTransaction);
 router.get('/reqTransaction', ReqTransaction);

@@ -9,8 +9,6 @@ const ProfileSchema = new mongoose.Schema({
   imgUrl: { type: String, required: true },
   cashWon: { type: Number, required: true, default: 0 },
   gameWon: { type: Number, required: true, default: 0 },
-  filename: { type: String, default: null },
-  path: { type: String, default: null },
   kycDetails: {
     Name: { type: String, default: null },
     DOB: { type: String, default: null },
@@ -18,6 +16,8 @@ const ProfileSchema = new mongoose.Schema({
     documentName: { type: String, default: null },
     documentNumber: { type: String, default: null },
     status: { type: String, default: null },
+    frontView: { type: String, default: null },
+    backView: { type: String, default: null },
     reason: { type: String, default: null },
   },
   gameLost: { type: Number, required: true, default: 0 },

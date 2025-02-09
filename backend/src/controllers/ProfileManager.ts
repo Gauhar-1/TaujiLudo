@@ -225,26 +225,25 @@ export const updateAmount = async(req:any, res:any, next:any)=>{
 }
 export const completeKYC = async(req: any, res: any, next: any)=>{
 
-    const { userId, Name ,DOB, state, documentName, documentNumber  }  = req.body;
+    const { userId, Name ,DOB, state,  documentNumber  }  = req.body;
 
-    if(!userId || !Name|| !DOB || !state || !documentName || !documentNumber){
-        console.log("Fields not found", userId,DOB, state, documentName, documentNumber);
+    if(!userId || !Name|| !DOB || !state  || !documentNumber){
+        console.log("Fields not found", userId,DOB, state, documentNumber);
     }
-    if(!req.file){
-        console.log("file not found")
+    if (!req.files || !req.files["image"] || !req.files["image2"]) {
+      return res.status(400).json({ message: "Both images are required!" });
     }
  
     try {
         const profile = await Profile.findOneAndUpdate({userId} ,{
-          filename: req.file?.filename,
-          path: req.file?.path,
           kycDetails : {
             Name,
             DOB,
             state,
-            documentName,
             documentNumber,
-            status: "pending"
+            status: "pending",
+            frontView: req.files["image"][0].filename,
+            backView: req.files["image2"][0].filename,
           }
         });
 
