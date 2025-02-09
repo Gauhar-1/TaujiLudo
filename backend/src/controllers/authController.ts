@@ -80,7 +80,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
 
             console.log("Referal: "+ Referal);
         
-            const referralLink = `https://taujiludo.in/?ref=${Referal}`;
+            const referalLink = `https://taujiludo.in/?ref=${Referal}`;
         
             const randomName = faker.person.firstName(); // Generates a random first name
         const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`; // Generates a unique email
@@ -96,7 +96,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
               cashWon: 0,
               BattlePlayed: 0,
               Referal,
-              referralLink,
+              referalLink,
               gameWon: 0, // Corrected field name
               gameLost: 0, // Corrected field name
               "kycDetails.status" : "pending",
