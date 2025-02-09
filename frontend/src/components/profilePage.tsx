@@ -9,13 +9,13 @@ export const ProfilePage = ()=>{
     const [editClicked, setEditClicked] = useState(false);
     const [ kycClicked, setKycClicked ] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
     const [email, setEmail] = useState( () => localStorage.getItem("email") ||  "@gmail.com");
     const navigate = useNavigate();
     const { name, setName, phoneNumber, userId, setPhoneNumber , setUserId, setLogin } = useUserContext();
     const [ Name , setname ] = useState("")
     const [ DOB , setDOB ] = useState("")
     const [ state , setState ] = useState("")
-    const [ documentName , setDocumentName ] = useState("")
     const [ documentNumber , setDocumentNumber ] = useState("")
 
   
@@ -78,17 +78,17 @@ export const ProfilePage = ()=>{
     };
 
     const uploadScreenshot = async () => {
-      if (!selectedFile || !userId) {
+      if (!selectedFile ||  !selectedFile2 ||  !userId) {
         alert("Please select a file to upload.");
         return;
       }
       const formData = new FormData();
       formData.append("image", selectedFile);
+      formData.append("image2", selectedFile2);
       formData.append("userId", userId);
       formData.append("Name", Name);
       formData.append("DOB", DOB);
       formData.append("state", state);
-      formData.append("documentName", documentName);
       formData.append("documentNumber", documentNumber);
 
       console.log("Form data:", selectedFile, userId);
@@ -129,29 +129,37 @@ export const ProfilePage = ()=>{
             </div>}
              {/*********** *Kyc upload **************/}
              { kycClicked && <div className="absolute z-30 top-32 left-12 bg-gray-400 p-8 rounded-lg">
-                <input  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1">
+                    <div className="font-bold text-xs">Front View :</div>
+                  <input  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
                     if(e.target.files)
                     setSelectedFile(e.target.files[0])
                 }} />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="font-bold text-xs">Back View :</div>
+                  <input  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
+                    if(e.target.files)
+                    setSelectedFile2(e.target.files[0])
+                }} />
+                  </div>
+                </div>
                 <div className="flex flex-col gap-3 pt-2">
                 <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs">Enter the Name:</div>
+                    <div className="font-bold text-xs">Enter the Name :</div>
             <input type="text" className="rounded-md p-1"  onChange={(e)=>{setname(e.target.value)}}/>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs"> Date of Birth:</div>
+                    <div className="font-bold text-xs"> Date of Birth :</div>
             <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDOB(e.target.value)}}/>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs"> State:</div>
+                    <div className="font-bold text-xs"> State :</div>
             <input type="text" className="rounded-md p-1"   onChange={(e)=>{setState(e.target.value)}}/>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs"> Document Name:</div>
-            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDocumentName(e.target.value)}}/>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs"> Document Number:</div>
+                    <div className="font-bold text-xs"> Aadhar Number :</div>
             <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDocumentNumber(e.target.value)}}/>
                 </div>
                 </div>
