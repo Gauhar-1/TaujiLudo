@@ -203,8 +203,8 @@ useEffect(() => {
                 { !iterateHistory(battle?.history, "ludoCode_set") &&<div className="bg-gray-300 rounded-xl w-48 p-2 ">
                     <div className=" font-bold p-1 text-xl text-center">Ludo Code</div>
                    {userId === battle?.player2 ? <div className="flex gap-2 justify-between  bg-gray-400 rounded-lg m-2 p-3">
-                        <div className="font-mono text-lg">{battle.ludoCode ? battle.ludoCode : "Wating..."}</div>
-                        <div ref={divRef} onClick={()=>{
+                        <div ref={divRef} className="font-mono text-lg">{battle.ludoCode ? battle.ludoCode : "Wating..."}</div>
+                        <div  onClick={()=>{
                                 copyToClipboard();
                             }}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" 
