@@ -11,7 +11,7 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
-  const { setUserId , phoneNumber, setPhoneNumber, setLogin } = useUserContext();
+  const { setUserId , phoneNumber, setPhoneNumber,setName, setLogin } = useUserContext();
 
   // Validate phone number (basic validation)
   const isPhoneNumberValid = (phone: string) => /^(\+91)?[6-9]\d{9}$/.test(phone);
@@ -67,6 +67,7 @@ export const LoginPage = () => {
       if (response.data.success) {
         toast.success("OTP verified successfully!");
         setUserId(response.data.userId);
+        setName(response.data.name);
         setLogin(true);
         setPhoneNumber(phoneNumber);
         navigate("/winCash");

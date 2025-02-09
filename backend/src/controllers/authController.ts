@@ -128,7 +128,9 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
             success: true,
             message: 'OTP verified successfully',
              token: 'JWT_TOKEN',
-            userId : user._id });
+            userId : user._id,
+            name : profile.name
+         });
     } catch (error) {
         console.error('Error verifying OTP:', error);
         next(error)
