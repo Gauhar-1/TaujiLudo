@@ -13,25 +13,35 @@ const app = express();
 
 const server = http.createServer(app);
 
-const io = new Server(server, {
-    cors: {
-      origin: "*", // Adjust based on your frontend URL
-      methods: ["GET", "POST"],
-    },
-  });
+
 
 connectDB();
 
 app.use(bodyParser.json());
-app.use(cors());
+// ✅ Improved CORS Configuration
+const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in"]; // Change this to your frontend URL
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins, // Adjust based on your frontend URL
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use('/api/auth', router);
 
-
-const uploadDir = path.join(__dirname,'../public/uploads');
-
-
-app.use('/uploads', express.static(uploadDir));
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
