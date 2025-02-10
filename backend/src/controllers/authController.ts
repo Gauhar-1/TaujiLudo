@@ -1,4 +1,4 @@
-import  jwt  from 'jsonwebtoken';
+import  jwt, { JwtPayload }  from 'jsonwebtoken';
 import User from '../models/User.js';
 import { sendOTP } from '../utils/otpService';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
@@ -118,11 +118,18 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
     }
     
         // JWT generation logic here
-        // const token = jwt.sign(
-        //     { userId: user._id, phoneNumber: user.phone },
-        //     process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in env
-        //     { expiresIn: "7d" } // Token valid for 7 days
-        // );
+        const token = jwt.sign(
+            { userId: user._id, phoneNumber: user.phone, name : profile.name },
+            process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in env
+            { expiresIn: "7d" } // Token valid for 7 days
+        );
+
+        res.cookie("authToken", token, {
+            httpOnly: true,
+            secure: true, // Use only in HTTPS
+            sameSite: "Strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
 
         res.status(200).json({ 
             success: true,
@@ -137,3 +144,23 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
         res.status(500).json({ error: 'Error verifying OTP' });
     }
 });
+
+export const autoLogin = async(req:any, res:any)=>{
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ success: false, message: "Not authenticated" });
+  
+    try {
+      const decoded = jwt.verify(token,  process.env.JWT_SECRET as string)  as JwtPayload;
+      const user = await Profile.findOne(decoded.userId);
+      if (!user) return res.status(401).json({ success: false, message: "User not found" });
+  
+      res.json({ success: true, user });
+    } catch (err) {
+      res.status(401).json({ success: false, message: "Invalid token" });
+    }
+}
+
+export const logOut = async (req: any, res: any)=>{
+    res.clearCookie("token");
+    res.json({ success: true, message: "Logged out successfully" });
+}

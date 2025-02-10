@@ -47,11 +47,13 @@ export const Notifications = ()=>{
           }));
         }
 
-        // Merge & Sort by `createdAt`
-        const mergedData = [...notifications, ...profiles].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.kycDetails.createdAt).getTime()
-        );
-        console.log("Merge data: ", mergedData);
+       // Merge & Sort by `createdAt`
+const mergedData = [...notifications, ...profiles].sort((a, b) => {
+  const dateA = new Date(a.kycDetails?.createdAt || a.createdAt).getTime();
+  const dateB = new Date(b.kycDetails?.createdAt || b.createdAt).getTime();
+
+  return dateB - dateA; // Sort newest first
+});
 
         setCombinedData(mergedData);
             }
