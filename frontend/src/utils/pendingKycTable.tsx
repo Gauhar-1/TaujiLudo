@@ -5,7 +5,7 @@ import {  KycView } from "./action";
 import { API_URL } from "./url";
 
 interface Column {
-  id: "no" | "userId" | "name" | "number"  | "action" ;
+  id: "no" | "userId" | "name" | "phone" | "number"  | "action" ;
   label: string;
   minWidth?: number;
   align?: "right";
@@ -15,7 +15,8 @@ interface Column {
 const columns: readonly Column[] = [
   { id: "no", label: "#" },
   { id: "userId", label: "User ID", minWidth: 220 },
-  { id: "name", label: "Documnent Name", minWidth: 170 },
+  { id: "name", label: "Name", minWidth: 170 },
+  { id: "phone", label: "Phone Number", minWidth: 170 },
   { id: "number", label: "Documnent Number", minWidth: 170 },
   { id: "action", label: "Action", minWidth: 170 },
 ];
@@ -24,6 +25,7 @@ interface Data {
   no: number;
   userId: string;
   name: string;
+  phone: string;
   number: string;
   action: ReactElement;
 }
@@ -32,6 +34,7 @@ function createData(
     no: number,
     userId: string,
     name: string,
+    phone: string,
     number: string,
     action: ReactElement,
 ): Data {
@@ -39,6 +42,7 @@ function createData(
     no,
     userId,
     name,
+    phone,
     number,
     action,
   };
@@ -58,12 +62,13 @@ export const StickyTable: React.FC = () => {
       try {
         const response = await axios.get(`${API_URL}/api/auth/getProfiles`);
         const fetchedBattles = response.data.map((profile: any, index: number) => {
-          console.log("Document Name"+profile.kycDetails)
+           const {kycDetails} = profile;
           return createData(
             index + 1,
             profile.userId,
-            profile.kycDetails.documnetName ,
-            profile.kycDetails.documnetNumber ,
+            profile.name,
+            profile.phoneNumber,
+            kycDetails.documentNumber,
             <div className="flex gap-2">
                 <KycView battleId={profile._id}></KycView>
               </div>

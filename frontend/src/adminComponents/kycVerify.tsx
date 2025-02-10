@@ -2,11 +2,11 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { useUserContext } from "../hooks/UserContext"
 import { API_URL } from "../utils/url"
+import { useNavigate } from "react-router-dom"
 // import { useLocation } from "react-router-dom"
 
 export const KycVerification = ()=>{
     const [ username, setUserName ] = useState("");
-    const [ phoneNumber, setPhoneNumber ] = useState("");
     const [ email, setEmail ] = useState("");
     const [ kycDetails, setKycDetails ] = useState({
         Name: "",
@@ -15,35 +15,36 @@ export const KycVerification = ()=>{
         documentName: "",
         documentNumber: "",
         status: "",
-        filename: "",
-        path: ""
+        frontView: "",
+        backView: "",
     });
     const [ rejectClicked, setRejectClicked ] = useState(false);
     const [ frontViewClicked, setFrontViewClicked ] = useState(false);
     const [ backViewClicked, setBackViewClicked ] = useState(false);
     const [ reason, setReason ] = useState("");
 
-    const { userId } = useUserContext();
+    const { phoneNumber, userId } = useUserContext();
+
+    const navigate = useNavigate();
     // const navigate = useLocation();
     
     useEffect(()=>{
         const handle = async()=>{
-            if(userId){
-                console.log("UserId: " + userId);
+            if(phoneNumber){
+                console.log("UserId: " + phoneNumber);
             }
-            try{const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { userId }});
+            try{const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { phoneNumber }});
 
             if(!response.data){
                  return console.log("response not found" , response.data);
             }
             console.log(response.data)
 
-            const { name , phoneNumber , email, kycDetails, filename, path } = response.data[0];
+            const { name ,  email, kycDetails, filename, path } = response.data[0];
 
 
             setKycDetails(kycDetails);
             setUserName(name);
-            setPhoneNumber(phoneNumber || "N/A");
             setEmail(email  || "N/A");
             kycDetails.filename = filename;
             kycDetails.path = path;
@@ -54,7 +55,7 @@ export const KycVerification = ()=>{
             }
         }
         handle();
-    },[userId]);
+    },[]);
     
 
     const handleVerify = async()=>{
@@ -65,7 +66,7 @@ export const KycVerification = ()=>{
 
             const response = await axios.post(`${API_URL}/api/auth/verify-kyc`,{userId})
 
-            if(response.data){
+            if(!response.data){
                 console.log("Response: "+response.data);
             }
 
@@ -121,10 +122,6 @@ export const KycVerification = ()=>{
                        </div>
                        <div className="p-4">
                        <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2">Doucument Name</div>
-                        <div className="border border-gray-400 w-40 p-2">{kycDetails.documentName}</div>
-                       </div>
-                       <div className="flex">
                         <div className="border border-gray-400 w-40 p-2">Doucument No.</div>
                         <div className="border border-gray-400 w-40 p-2">{kycDetails.documentNumber}</div>
                        </div>
@@ -157,8 +154,8 @@ export const KycVerification = ()=>{
                         </div>
                        
                        </div >
-                       { frontViewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${kycDetails.filename}`} alt="" className="rounded-lg" />
+                       { frontViewClicked && <div className="bg-gray-400 p-6 mx-6 my-4  rounded-lg">
+                            <img src={`${API_URL}/uploads/${kycDetails.frontView}`} alt="" className="rounded-lg" />
                         </div> }
                        <div className="flex">
                         <div className="border border-gray-400 w-40 p-2">Back Side</div>
@@ -176,8 +173,8 @@ export const KycVerification = ()=>{
 </svg>
                         </div>
                        </div>
-                       { backViewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${kycDetails.filename}`} alt="" className="rounded-lg" />
+                       { backViewClicked && <div className="bg-gray-400 p-6 mx-6 my-4  rounded-lg">
+                            <img src={`${API_URL}/uploads/${kycDetails.backView}`} alt="" className="rounded-lg" />
                         </div> }
                        <div className="flex">
                         <div className="border border-gray-400 w-40 p-2">Verify Status</div>
