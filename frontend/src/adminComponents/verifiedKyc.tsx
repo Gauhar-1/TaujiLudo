@@ -1,4 +1,4 @@
-import { StickyTable } from "../utils/pendingKycTable"
+import { StickyTable } from "../utils/verifiedKycTable"
 
 
  export const VerifiedKyc = ()=>{
