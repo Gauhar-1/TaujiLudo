@@ -111,7 +111,7 @@ export const KycVerification = ()=>{
                            <div className=" font-semibold  py-3 px-4 text-blue-600 border-b-2">KYC Status
                            </div>
                            <div className="flex gap-2 py-3 px-4">
-                            <div className="bg-green-400 text-white py-1 px-2 rounded-md" onClick={handleVerify}>Approve</div>
+                           {kycDetails.status === "pending" && <div className="bg-green-400 text-white py-1 px-2 rounded-md" onClick={handleVerify}>Approve</div>}
                             <div className="bg-red-500 text-white py-1 px-2 rounded-md" onClick={()=>{
                                 setRejectClicked(true);
                             }}> Reject</div>

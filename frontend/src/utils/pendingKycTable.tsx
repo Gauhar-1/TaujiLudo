@@ -70,7 +70,7 @@ export const StickyTable: React.FC = () => {
             profile.phoneNumber,
             kycDetails.documentNumber,
             <div className="flex gap-2">
-                <KycView battleId={profile._id}></KycView>
+                <KycView phoneNumber={profile.phoneNumber}></KycView>
               </div>
           );
         });
