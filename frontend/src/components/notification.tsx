@@ -30,7 +30,7 @@ export const Notifications = ()=>{
         if (response.data) {
           notifications = response.data.map((n: any) => ({
             ...n,
-            Date : new Date(n.createdAt).toISOString(),
+            Date : new Date().toISOString(),
             type: "notification", // Add type identifier
           }));
         }
@@ -42,7 +42,7 @@ export const Notifications = ()=>{
         if (profileResponse.data) {
           profiles = profileResponse.data.map((p: any) => ({
             ...p,
-            Date : new Date(p.createdAt).toISOString(),
+            Date :new Date().toISOString(),
             type: "profile", // Add type identifier
           }));
         }
