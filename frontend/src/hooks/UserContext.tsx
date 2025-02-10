@@ -1,4 +1,6 @@
+import axios from "axios";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { API_URL } from "../utils/url";
 
 // Define the structure of the Profile type (Update this as per your needs)
 interface Profile {
@@ -41,14 +43,6 @@ interface UserContextType {
   setDetails: (details: string) => void;
 }
 
-// Helper function to safely parse JSON
-// const safeParse = (value: string | null) => {
-//   try {
-//     return value ? JSON.parse(value) : null;
-//   } catch {
-//     return null;
-//   }
-// };
 
 // Helper function to initialize state from sessionStorage
 const getInitialValue = <T,>(key: string, defaultValue: T): T => {
@@ -86,6 +80,28 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [amount, setAmount] = useState(() => getInitialValue("amount", 5));
   const [profile, setProfile] = useState<Profile>(() => getInitialValue("profile", {}));
 
+
+   // Check Auth on Mount
+   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+
+        if (response.data.success) {
+          const userData = response.data.user;
+          setUserId(userData.userId);
+          setName(userData.name);
+          setPhoneNumber(userData.phoneNumber);
+          setLogin(true);
+        }
+      } catch (err) {
+        console.log("User not logged in");
+        setLogin(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
   // Update sessionStorage when state changes
   useEffect(() => {
     const updateSessionStorage = (key: string, value: any) => {

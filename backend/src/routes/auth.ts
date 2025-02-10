@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sendOtp, verifyOtp } from '../controllers/authController';
+import { autoLogin, logOut, sendOtp, verifyOtp } from '../controllers/authController';
 import { AllTransaction, depositAmount, findTransaction, getTransaction, paymentProof, rejectPayment, ReqTransaction, verifyPayment, withdrawAmount } from '../controllers/moneyController';
 import { allNotifications, getNotifications, markAsRead } from '../controllers/notifyController';
 import { blockedPlayer, completeKYC, findProfile, getBlockedOnes, getProfile, getReferal, kycCompletedProfiles, rejectKyc, unBlockPlayer, updateAmount, updateProfile, verifyKyc } from '../controllers/ProfileManager';
@@ -16,6 +16,8 @@ const router = Router();
 
 router.post('/send-otp', sendOtp);
 router.post('/verify-otp', verifyOtp);
+router.get('/me', autoLogin);
+router.post('/logout', logOut);
 router.post('/deposit',upload.single('image'), depositAmount);
 router.post('/withdraw', withdrawAmount);
 router.post('/verify-payment', verifyPayment);

@@ -62,7 +62,9 @@ export const LoginPage = () => {
         phoneNumber,
         otp,
         ref: referralCode
-      });
+      },
+      { withCredentials: true } 
+    );
 
       if (response.data.success) {
         toast.success("OTP verified successfully!");
