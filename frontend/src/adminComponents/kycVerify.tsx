@@ -194,7 +194,10 @@ export const KycVerification = ()=>{
             setReason(e.target.value)
         }}
       ></textarea>
-                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={handleReject}>sent</div>
+                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
+                                handleReject();
+                                navigate('/admin/pendingKyc')
+                            }}>sent</div>
                             <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
                                 setRejectClicked(false);
                             }}>cancel</div>
