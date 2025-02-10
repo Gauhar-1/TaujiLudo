@@ -118,7 +118,7 @@ export const KycVerification = ()=>{
                            </div>
                        </div>
 
-                       <div className="bg-blue-700 shadow-md font-semibold  py-3 px-4 text-gray-300 border-b-2">KYC Document Details
+                       <div className="bg-blue-700 shadow-md font-semibold  py-3 px-4 text-gray-300 border-b-2">KYC Document Detail
                        </div>
                        <div className="p-4">
                        <div className="flex">
