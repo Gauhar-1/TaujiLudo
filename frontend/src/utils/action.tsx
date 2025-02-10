@@ -20,13 +20,13 @@ export const Transaction = (props : any)=>{
 }
 export const KycView = (props : any)=>{
     const navigate = useNavigate();
-    const { setId } =useUserContext();
+    const {  setPhoneNumber } =useUserContext();
 
 
 
     return <div className="bg-blue-500 rounded-md w-16 text-center text-white p-2" onClick={()=>{
-        setId(props.userId);
-        navigate('kycView');
+        setPhoneNumber(props.phoneNumber)
+        navigate('/admin/pendingKyc/kycView');
     }}>View</div>
 }
 

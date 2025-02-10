@@ -175,7 +175,9 @@ export const verifyPayment = async (req: any, res: any) => {
         // Update notification as transaction completed
         await Notification.updateOne(
             { paymentReference: transaction.paymentReference },
-            { $set: { status: "success" } }
+            { $set: { status: "success" },
+            createdAt : Date.now
+        }
         );
 
         res.status(200).json({ success: true, message: "Payment verified and tokens added" });
@@ -220,7 +222,10 @@ export const  rejectPayment = async (req: any ,res : any) => {
 
         // Update notification as transaction completed
         const notification = await Notification.findOneAndUpdate({paymentReference : transaction.paymentReference}, 
-       { status:'failed', reason});
+       { status:'failed', 
+        reason,
+        createdAt : Date.now
+       });
 
         if (!notification) {
             console.log('notification not found');
