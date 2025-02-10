@@ -94,7 +94,10 @@ export const AdminSideBar = ( props : any)=>{
                   props.setSidebarClicked(false);
                   navigate("pendingKyc");
                  }}>Pending KYC</div>
-                 <div className="text-sm">Approved KYC</div>
+                 <div className="text-sm" onClick={()=>{
+                  props.setSidebarClicked(false);
+                  navigate("verifiedKyc");
+                 }}>Approved KYC</div>
                 </div>}
               <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
                 // props.setSidebarClicked(false);

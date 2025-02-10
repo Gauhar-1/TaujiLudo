@@ -110,6 +110,30 @@ export const getProfile = async(req: any, res: any, next: any)=>{
     console.log("Error: " + err);
   }
 }
+export const kycCompletedProfiles = async(req: any, res: any, next: any)=>{
+  
+
+  try{
+
+    const profile =await Profile.find({
+      status : "active",
+       "kycDetails.status": "verified" ,
+    }).sort({ createdAt : -1 });
+
+    if(!profile){
+      console.log("profile not found");
+    }
+
+    if (profile.length === 0) {
+      return res.status(404).json({ message: "No profiles with Verified KYC found" });
+    }
+
+    res.status(200).json(profile);
+  }
+  catch(err){
+    console.log("Error: " + err);
+  }
+}
 export const findProfile = async(req: any, res: any, next: any)=>{
   const { phoneNumber } = req.query;
 
