@@ -173,10 +173,11 @@ export const verifyPayment = async (req: any, res: any) => {
         await Transaction.findByIdAndUpdate(sanitizedTransactionId, { $set: { status: "completed" } });
 
         // Update notification as transaction completed
+        const date =Date.now;
         await Notification.updateOne(
             { paymentReference: transaction.paymentReference },
             { $set: { status: "success" },
-            createdAt : Date.now
+            createdAt : date
         }
         );
 
@@ -221,10 +222,11 @@ export const  rejectPayment = async (req: any ,res : any) => {
         console.log(`Tokens didn't add to user ${transaction.userId}: ${transaction.amount}`);
 
         // Update notification as transaction completed
+        const date =Date.now;
         const notification = await Notification.findOneAndUpdate({paymentReference : transaction.paymentReference}, 
        { status:'failed', 
         reason,
-        createdAt : Date.now
+        createdAt : date
        });
 
         if (!notification) {
