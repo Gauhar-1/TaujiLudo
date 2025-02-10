@@ -5,7 +5,7 @@ echo "Deployment started..."
 
 # Clean untracked files and symbolic links
 echo "Cleaning untracked files..."
-git clean -fdx || { echo "Error cleaning untracked files"; exit 1; }
+git clean -fdX || { echo "Error cleaning untracked files"; exit 1; }
 
 # Stash local changes if there are any
 echo "Stashing local changes..."
