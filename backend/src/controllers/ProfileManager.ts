@@ -301,8 +301,10 @@ export const  verifyKyc = async (req: any ,res : any) => {
       }
 
       // Update the transaction as completed
-      if(profile.kycDetails)
-      profile.kycDetails.status = 'verified';
+      if(profile.kycDetails){
+        profile.kycDetails.status = 'verified';
+        profile.kycDetails.createdAt = new Date();
+      }
       await profile.save();
 
   
@@ -341,6 +343,7 @@ export const  rejectKyc = async (req: any ,res : any) => {
       if(profile.kycDetails){
         profile.kycDetails.status = 'pending';
         profile.kycDetails.reason = reason;
+        profile.kycDetails.createdAt = new Date();
       }
       await profile.save();
 
