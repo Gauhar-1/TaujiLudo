@@ -176,6 +176,7 @@ export const verifyPayment = async (req: any, res: any) => {
         await Notification.updateOne(
             { paymentReference: transaction.paymentReference },
             { $set: { status: "success" },
+            createdAt : new Date().toISOString(),
         }
         );
 
@@ -223,6 +224,7 @@ export const  rejectPayment = async (req: any ,res : any) => {
         const notification = await Notification.findOneAndUpdate({paymentReference : transaction.paymentReference}, 
        { status:'failed', 
         reason,
+        createdAt : new Date().toISOString(),
        });
 
         if (!notification) {
