@@ -17,9 +17,11 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
         </div>
       )}
             <div className="flex justify-end text-gray-500">
-            <div>
-            {formatDistanceToNowStrict(new Date(notification.Date), { addSuffix: true })}
-    </div>
+           { notification.kycDetails.createdAt ? <div>
+            {formatDistanceToNowStrict(new Date(notification.kycDetails.createdAt), { addSuffix: true })}
+    </div> : <div>
+            {formatDistanceToNowStrict(new Date(notification.createdAt), { addSuffix: true })}
+    </div>}
             </div>
         </div>
     )

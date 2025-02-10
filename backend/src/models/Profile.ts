@@ -19,6 +19,7 @@ const ProfileSchema = new mongoose.Schema({
     frontView: { type: String, default: null },
     backView: { type: String, default: null },
     reason: { type: String, default: null },
+    createdAt: { type: Date, default: Date.now },
   },
   gameLost: { type: Number, required: true, default: 0 },
   BattlePlayed: { type: Number, required: true, default: 0 },

@@ -49,7 +49,7 @@ export const Notifications = ()=>{
 
         // Merge & Sort by `createdAt`
         const mergedData = [...notifications, ...profiles].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.kycDetails.createdAt).getTime()
         );
         console.log("Merge data: ", mergedData);
 
