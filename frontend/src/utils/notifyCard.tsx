@@ -1,7 +1,7 @@
 import {  formatDistanceToNowStrict } from "date-fns"
 
 export const  NotifyCard = ( { notification }: { notification: any })=>{
-    if (!notification.createdAt ){
+    if (!notification.Date ){
         return null;
     } 
     return (
@@ -18,7 +18,7 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
       )}
             <div className="flex justify-end text-gray-500">
             <div>
-            {formatDistanceToNowStrict(new Date(notification.createdAt), { addSuffix: true })}
+            {formatDistanceToNowStrict(new Date(notification.Date), { addSuffix: true })}
     </div>
             </div>
         </div>
