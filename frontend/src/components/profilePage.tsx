@@ -17,6 +17,7 @@ export const ProfilePage = ()=>{
     const [ DOB , setDOB ] = useState("")
     const [ state , setState ] = useState("")
     const [ documentNumber , setDocumentNumber ] = useState("")
+    const [ kycStatus , setKycStatus ] = useState("")
 
   
     // Get phoneNumber from location state or fallback
@@ -37,12 +38,13 @@ export const ProfilePage = ()=>{
           );
   
           if (response.data) {
-            const {phoneNumber, name, email, userId } = response.data[0];
+            const {phoneNumber, name, email, userId, kycDetails } = response.data[0];
             setName(name );
             setEmail(email );
             setPhoneNumber(phoneNumber);
             setName(name);
             setUserId(userId);
+            setKycStatus(kycDetails.status);
             console.log("Profile fetched successfully.");
           } else {
             console.warn("Failed to fetch profile.");
@@ -201,12 +203,15 @@ export const ProfilePage = ()=>{
                     <img src="../../wallet.png" alt="" className="size-7 absolute top-0 left-16 mt-2   " />
                     <div className="absolute top-8 left-10 mt-1">My Wallet</div>
                 </div>
-                <div className="bg-gray-100  rounded-md h-16 w-40 relative hover:bg-gray-700 " onClick={()=>{
+                { kycStatus === "pending" &&<div className="bg-red-500  rounded-md h-16 w-40 flex justify-center " onClick={()=>{
                       setKycClicked(true);
                     }}>
+                    <div className="absolute text-center py-4  font-bold text-white" >Kyc pending</div>
+                </div>}
+                { kycStatus === "verified" &&<div className="bg-gray-100  rounded-md h-16 w-40 relative hover:bg-gray-700 ">
                     <img src="../../kyc.png" alt=""  className="size-7 absolute top-0 left-16 mt-2 " />
                     <div className="absolute top-8 left-6 mt-1 font-bold" >Kyc completed</div>
-                </div>
+                </div>}
 
                
             </div>
