@@ -80,12 +80,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [opponentFound, setOpponentFound] = useState(() => getInitialValue("opponentFound", false));
   const [amount, setAmount] = useState(() => getInitialValue("amount", 5));
   const [profile, setProfile] = useState<Profile>(() => getInitialValue("profile", {}));
+  const navigate = useNavigate();
 
 
    // Check Auth on Mount
    useEffect(() => {
     const checkAuth = async () => {
-      const navigate = useNavigate();
+   
       try {
         const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
 
