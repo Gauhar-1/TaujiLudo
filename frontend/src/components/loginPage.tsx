@@ -153,7 +153,7 @@ export const LoginPage = () => {
               }
             }}
           >
-            {sendOtp && !canResend ? "Verify OTP" : !sendOtp && canResend ?  "Send OTP" : `Resend in ${resendTimeout}s` }
+            {!sendOtp && canResend ? "Send OTP" : !sendOtp && !canResend ?  "Verify OTP" : `Resend in ${resendTimeout}s` }
           </button>
 
          
