@@ -55,7 +55,7 @@ export const LoginPage = () => {
       if (response.data.success) {
         toast.success("OTP sent successfully!");
         setSendOtp(true);
-        setResendTimeout(30); // Reset Timer
+         setResendTimeout(30); // Reset Timer
         setCanResend(false);
       } else {
         toast.error(response.data.message || "Invalid phone number.");
@@ -144,7 +144,7 @@ export const LoginPage = () => {
 
           {/* Action Button */}
           <button
-            className="bg-purple-600 text-white w-full py-2 rounded-md text-center hover:bg-indigo-700" disabled={!canResend}
+            className="bg-purple-600 text-white w-full py-2 rounded-md text-center hover:bg-indigo-700"
             onClick={() => {
               if (!sendOtp) {
                 handleSendOtp();
@@ -153,7 +153,7 @@ export const LoginPage = () => {
               }
             }}
           >
-            {sendOtp ? "Verify OTP" : canResend ? "Send OTP" : `Resend in ${resendTimeout}s`}
+            {sendOtp && !canResend ? "Verify OTP" : !sendOtp && canResend ?  "Send OTP" : `Resend in ${resendTimeout}s` }
           </button>
 
          
