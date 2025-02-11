@@ -12,7 +12,7 @@ export const LoginPage = () => {
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [resendTimeout, setResendTimeout] = useState(30);
-  const [canResend, setCanResend] = useState(false);
+  const [canResend, setCanResend] = useState(true);
   const { setUserId , phoneNumber, setPhoneNumber,setName, setLogin } = useUserContext();
 
   // Validate phone number (basic validation)
