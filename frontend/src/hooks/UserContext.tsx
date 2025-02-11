@@ -92,8 +92,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUserId(userData.userId);
           setName(userData.name);
           setPhoneNumber(userData.phoneNumber);
-          setLogin(true);
         }
+        setLogin(true);
       } catch (err) {
         console.log("User not logged in");
         setLogin(false);
