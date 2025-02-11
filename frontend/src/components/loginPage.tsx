@@ -11,6 +11,8 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [resendTimeout, setResendTimeout] = useState(30);
+  const [canResend, setCanResend] = useState(false);
   const { setUserId , phoneNumber, setPhoneNumber,setName, setLogin } = useUserContext();
 
   // Validate phone number (basic validation)
@@ -23,6 +25,19 @@ export const LoginPage = () => {
     const refCode = searchParams.get("ref");
     if (refCode) setReferralCode(refCode);
   }, [searchParams]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (!canResend && resendTimeout > 0) {
+      timer = setInterval(() => {
+        setResendTimeout((prev) => prev - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+
+    return () => clearInterval(timer);
+  }, [canResend, resendTimeout]);
 
   // Send OTP handler
   const handleSendOtp = async () => {
@@ -40,6 +55,8 @@ export const LoginPage = () => {
       if (response.data.success) {
         toast.success("OTP sent successfully!");
         setSendOtp(true);
+        setResendTimeout(30); // Reset Timer
+        setCanResend(false);
       } else {
         toast.error(response.data.message || "Invalid phone number.");
       }
@@ -127,7 +144,7 @@ export const LoginPage = () => {
 
           {/* Action Button */}
           <button
-            className="bg-purple-600 text-white w-full py-2 rounded-md text-center hover:bg-indigo-700"
+            className="bg-purple-600 text-white w-full py-2 rounded-md text-center hover:bg-indigo-700" disabled={!canResend}
             onClick={() => {
               if (!sendOtp) {
                 handleSendOtp();
@@ -136,7 +153,7 @@ export const LoginPage = () => {
               }
             }}
           >
-            {sendOtp ? "Verify OTP" : "Send OTP"}
+            {sendOtp ? "Verify OTP" : canResend ? "Send OTP" : `Resend in ${resendTimeout}s`}
           </button>
 
          

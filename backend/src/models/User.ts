@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
         enum: ["active", "blocked"], // Define allowed string values
         required: true, },
     otpExpires: { type: Date, required: false },
+    resendAvailableAt: { type: Date, required: true },
 });
 
 const User = mongoose.model('User', userSchema);
