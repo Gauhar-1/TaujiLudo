@@ -15,28 +15,28 @@ export const sendOtp : RequestHandler = expressAsyncHandler(async (req: Request,
     const  phone  = req.body.phoneNumber;
 
     if (!phone) 
-        return console.log('Phone number is required  0.' );
+        return console.log('Phone number is required.' );
 
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     try {
+
+        const resendAvailableAt = new Date(Date.now() + 30 * 1000);
+
         const user = await User.findOneAndUpdate(
             { phone },
-            { otp, status: "active",  otpExpires: new Date(Date.now() + 10 * 60 * 1000) },
+            { otp, status: "active",  otpExpires: new Date(Date.now() + 10 * 60 * 1000), resendAvailableAt  },
             { upsert: true, new: true }
         );
 
         if(!user){
             await User.create(
                 { phone },
-                { otp,status: "active", otpExpires: new Date(Date.now() + 10 * 60 * 1000) },
-            { upsert: true, new: true }
+                { otp,status: "active", otpExpires: new Date(Date.now() + 10 * 60 * 1000), resendAvailableAt },
+            { upsert: true, new: true },
             );
         }
- 
-        if (!phone) 
-            return console.log('Phone number is required  1.' );
 
         const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
         const response = await axios.get(URL);
@@ -44,7 +44,10 @@ export const sendOtp : RequestHandler = expressAsyncHandler(async (req: Request,
 
         res.status(200).json({ 
             success: true,
-            message: 'OTP sent successfully' });
+            message: 'OTP sent successfully',
+            resendAfter: resendAvailableAt 
+        },
+        );
     } catch (error) {
         console.error('Error sending OTP:', error);
         next(error);
@@ -134,7 +137,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
         res.status(200).json({ 
             success: true,
             message: 'OTP verified successfully',
-             token: 'JWT_TOKEN',
+             token,
             userId : user._id,
             name : profile.name
          });
