@@ -1,6 +1,6 @@
-import axios from "axios";
+// import axios from "axios";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { API_URL } from "../utils/url";
+// import { API_URL } from "../utils/url";
 
 // Define the structure of the Profile type (Update this as per your needs)
 interface Profile {
@@ -82,26 +82,26 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
    // Check Auth on Mount
-   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+  //  useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
 
-        if (response.data.success) {
-          const userData = response.data.user;
-          setUserId(userData.userId);
-          setName(userData.name);
-          setPhoneNumber(userData.phoneNumber);
-        }
-        setLogin(true);
-      } catch (err) {
-        console.log("User not logged in");
-        setLogin(false);
-      }
-    };
+  //       if (response.data.success) {
+  //         const userData = response.data.user;
+  //         setUserId(userData.userId);
+  //         setName(userData.name);
+  //         setPhoneNumber(userData.phoneNumber);
+  //       }
+  //       setLogin(true);
+  //     } catch (err) {
+  //       console.log("User not logged in");
+  //       setLogin(false);
+  //     }
+  //   };
 
-    checkAuth();
-  }, []);
+  //   checkAuth();
+  // }, []);
   // Update sessionStorage when state changes
   useEffect(() => {
     const updateSessionStorage = (key: string, value: any) => {
