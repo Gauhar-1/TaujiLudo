@@ -150,20 +150,37 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
     }
 });
 
-export const autoLogin = async(req:any, res:any)=>{
+export const autoLogin = async (req: any, res: any) => {
+    console.log("🔵 AutoLogin Request Received");
+    
     const token = req.cookies.token;
-    if (!token) return res.status(401).json({ success: false, message: "Not authenticated" });
-  
-    try {
-      const decoded = jwt.verify(token,  process.env.JWT_SECRET as string)  as JwtPayload;
-      const user = await Profile.findOne({ userId: decoded.userId });
-      if (!user) return res.status(401).json({ success: false, message: "User not found" });
-  
-      res.json({ success: true, user });
-    } catch (err) {
-      res.status(401).json({ success: false, message: "Invalid token" });
+    console.log("🔵 Token from Cookie:", token);
+
+    if (!token) {
+        console.log("🛑 No token found, returning 401");
+        return res.status(401).json({ success: false, message: "Not authenticated" });
     }
-}
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+        console.log("✅ Token Decoded:", decoded);
+
+        const user = await Profile.findOne({ userId: decoded.userId });
+        console.log("🔵 User from DB:", user);
+
+        if (!user) {
+            console.log("🛑 User not found, returning 401");
+            return res.status(401).json({ success: false, message: "User not found" });
+        }
+
+        console.log("✅ AutoLogin Success, Returning Response");
+        res.json({ success: true, user });
+
+    } catch (err) {
+        console.error("🛑 JWT Verification Failed:", err);
+        return res.status(401).json({ success: false, message: "Invalid or expired token" });
+    }
+};
 
 export const logOut = async (req: any, res: any) => {
     res.clearCookie("token", {
