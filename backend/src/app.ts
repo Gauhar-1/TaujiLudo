@@ -8,6 +8,9 @@ import { router  } from './routes/auth';
 import path from 'path';
 import fs from "fs"
 import socketManager from './routes/socketManager';
+import cookieParser from "cookie-parser";
+
+
 
 const app = express();
 
@@ -18,6 +21,7 @@ const server = http.createServer(app);
 connectDB();
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 // ✅ Improved CORS Configuration
 const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in"]; // Change this to your frontend URL
 app.use(

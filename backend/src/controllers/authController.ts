@@ -153,7 +153,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
 export const autoLogin = async (req: any, res: any) => {
     console.log("🔵 AutoLogin Request Received");
     
-    const token = req.body.token;
+    const token = req.cookies.token;
     console.log("🔵 Token from Cookie:", token);
 
     if (!token) {
