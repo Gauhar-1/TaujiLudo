@@ -55,6 +55,8 @@ export const sendOtp : RequestHandler = expressAsyncHandler(async (req: Request,
     }
 });
 
+// "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzgwYWJjZmE2ZjE4ZjUxMzg0MGUwODQiLCJwaG9uZU51bWJlciI6IjcwMDI5MjYyNTEiLCJuYW1lIjoiR29oYXIiLCJpYXQiOjE3MzkyOTAzMzAsImV4cCI6MTczOTg5NTEzMH0.IAfDxMQIJZ04c7WnEtFpP_ZSYhzC-6_gGjJ4lnxEJZw"
+
 
 export const verifyOtp  = (async (req: any, res: any, next: any) => {
     const phone  = req.body.phoneNumber;
@@ -127,7 +129,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
             { expiresIn: "7d" } // Token valid for 7 days
         );
 
-        res.cookie("authToken", token, {
+        res.cookie("token", token, {
             httpOnly: true,
             secure: true, // Use only in HTTPS
             sameSite: "None",
@@ -154,7 +156,7 @@ export const autoLogin = async(req:any, res:any)=>{
   
     try {
       const decoded = jwt.verify(token,  process.env.JWT_SECRET as string)  as JwtPayload;
-      const user = await Profile.findOne(decoded.userId);
+      const user = await Profile.findOne({ userId: decoded.userId });
       if (!user) return res.status(401).json({ success: false, message: "User not found" });
   
       res.json({ success: true, user });
@@ -163,7 +165,12 @@ export const autoLogin = async(req:any, res:any)=>{
     }
 }
 
-export const logOut = async (req: any, res: any)=>{
-    res.clearCookie("token");
+export const logOut = async (req: any, res: any) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: true, // ✅ Required for HTTPS
+        sameSite: "None",
+    });
+
     res.json({ success: true, message: "Logged out successfully" });
-}
+};
