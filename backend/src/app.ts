@@ -19,23 +19,17 @@ connectDB();
 
 app.use(bodyParser.json());
 // ✅ Improved CORS Configuration
-const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in"]; // Change this to your frontend URL
+const allowedOrigins = [ "https://taujiludo.in"]; // Change this to your frontend URL
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, origin);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
   })
 );
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins, // Adjust based on your frontend URL
+    origin:"*", // Adjust based on your frontend URL
     methods: ["GET", "POST"],
   },
 });
