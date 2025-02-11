@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { API_URL } from "../utils/url";
+import { useNavigate } from "react-router-dom";
 
 // Define the structure of the Profile type (Update this as per your needs)
 interface Profile {
@@ -84,6 +85,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
    // Check Auth on Mount
    useEffect(() => {
     const checkAuth = async () => {
+      const navigate = useNavigate();
       try {
         const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
 
@@ -93,10 +95,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setName(userData.name);
           setPhoneNumber(userData.phoneNumber);
           setLogin(true);
+          navigate('/winCash');
         }
       } catch (err) {
         console.log("User not logged in");
-        setLogin(false);
+        // setLogin(false);
       }
     };
 
