@@ -11,7 +11,7 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState<string | null>(null);
-  const [resendTimeout, setResendTimeout] = useState(30);
+  const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
   const { setUserId , phoneNumber, setPhoneNumber,setName, setLogin } = useUserContext();
 
@@ -28,17 +28,20 @@ export const LoginPage = () => {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (!canResend && resendTimeout > 0) {
+    if (!canResend && sendOtp) {
       timer = setInterval(() => {
-        setResendTimeout((prev) => prev - 1);
+        setResendTimeout((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setCanResend(true);
+            return 30; // Reset timeout for next cycle
+          }
+          return prev - 1;
+        });
       }, 1000);
-    } else {
-      setCanResend(true);
     }
-
     return () => clearInterval(timer);
-  }, [canResend, resendTimeout]);
-
+  }, [canResend, sendOtp]);
   // Send OTP handler
   const handleSendOtp = async () => {
     if (!isPhoneNumberValid(phoneNumber)) {
@@ -56,7 +59,7 @@ export const LoginPage = () => {
         toast.success("OTP sent successfully!");
         setSendOtp(true);
          setResendTimeout(30); // Reset Timer
-        setCanResend(false);
+        setCanResend(true);
       } else {
         toast.error(response.data.message || "Invalid phone number.");
       }
@@ -144,19 +147,21 @@ export const LoginPage = () => {
 
           {/* Action Button */}
           <button
-            className="bg-purple-600 text-white w-full py-2 rounded-md text-center hover:bg-indigo-700"
-            onClick={() => {
-              if (!sendOtp) {
-                handleSendOtp();
-              } else {
-                handleVerifyOtp();
-              }
-            }}
-          >
-            {!sendOtp && canResend ? "Send OTP" : !sendOtp && !canResend ?  "Verify OTP" : `Resend in ${resendTimeout}s` }
-          </button>
-
-         
+        className="bg-purple-600 text-white w-full py-2 rounded-md text-center hover:bg-indigo-700"
+        onClick={() => {
+          if (!sendOtp) {
+            handleSendOtp();
+          } else if (canResend) {
+            handleVerifyOtp();
+          }
+        }}
+      >
+        {!sendOtp
+          ? "Send OTP"
+          : !canResend
+          ? `Resend in ${resendTimeout}s`
+          : "Verify OTP"}
+      </button>
         </div>
       </div>
     </div>
