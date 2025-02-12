@@ -64,7 +64,7 @@ export const StickyTable: React.FC = () => {
   useEffect(() => {
     const runningBattle = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/auth/battles`, { params : { status: "canceled" }});
+        const response = await axios.get(`${API_URL}/api/auth/battles`, { params : { status: "disputed" }});
         const fetchedBattles = response.data.map((profile: any, index: number) => {
           const date = new Date(profile.createdAt).toLocaleString();
           return createData(
