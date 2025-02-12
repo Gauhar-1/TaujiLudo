@@ -233,27 +233,53 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
 
 export const uploadScreenShot = async(req: any, res: any, next: any)=>{
 
-    const { battleId  }  = req.body;
-
-    if(!battleId){
-        console.log("battleId not found");
-    }
-    if(!req.file){
-        console.log("file not found")
-    }
- 
     try {
-        const battle = await Battle.findByIdAndUpdate(battleId ,{
-          filename: req.file?.filename,
-          path: req.file?.path,
-          status : "completed",
-        });
-
-        if(!battle){
-            console.log("battle is not found");
+        const { battleId, playerId } = req.body;
+    
+        if (!battleId) {
+          return res.status(400).json({ error: "battleId is required" });
         }
-
-        res.status(200).json({ message: 'Image uploaded successfully', battle });
+    
+        if (!req.file) {
+          return res.status(400).json({ error: "File is required" });
+        }
+    
+        const battle = await Battle.findById(battleId);
+        if (!battle) {
+          return res.status(404).json({ error: "Battle not found" });
+        }
+    
+        // Ensure player is part of the battle
+        if (![battle.player1, battle.player2].includes(playerId)) {
+          return res.status(403).json({ error: "You are not part of this battle" });
+        }
+    
+        // Store the proof and handle disputes
+        if (!battle.dispute) {
+          battle.dispute = {
+            players: [playerId],
+            proofs: [{ player: playerId, filename: req.file.filename, path: req.file.path }],
+            resolved: false,
+            winner: null,
+          };
+        } else {
+          // Prevent duplicate uploads by the same player
+          const alreadyUploaded = battle.dispute.proofs.some(proof => proof.player === playerId);
+          if (alreadyUploaded) {
+            return res.status(400).json({ error: "You have already uploaded a screenshot" });
+          }
+    
+          battle.dispute.players.push(playerId);
+          battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path });
+    
+          // If both players upload screenshots, mark as disputed
+          if (battle.dispute.players.length > 1) {
+            battle.status = "disputed";
+          }
+        }
+    
+        await battle.save();
+        res.status(200).json({ message: "Screenshot uploaded successfully", battle });
       } catch (err) {
         console.log("error: " + err);
         res.status(500).json({ error: 'Failed to upload image' });

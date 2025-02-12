@@ -6,6 +6,13 @@ interface BattleEvent {
   details?: string; // Optional details
 }
 
+interface Dispute {
+  players: string[]; // Players who claim they won
+  proofs: { player: string; filename: string; path: string }[]; // Screenshot uploads
+  resolved: boolean;
+  winner: string | null; // Final decision
+}
+
 interface IBattle extends Document {
   player1Name: string;
   player2Name: string | null;
@@ -15,12 +22,13 @@ interface IBattle extends Document {
   prize: number;
   filename: string | null;
   path: string | null;
-  status: "pending" | "in-progress" | "canceled" | "completed";
+  status: "pending" | "in-progress" | "canceled" | "completed" | "disputed";
   ludoCode: string | null;
   winner: string | null;
   reason: string | null;
   createdAt: Date;
   history: BattleEvent[]; // Added history field
+  dispute?: Dispute; // Optional dispute field
 }
 
 const BattleSchema: Schema = new Schema({
@@ -32,7 +40,7 @@ const BattleSchema: Schema = new Schema({
   prize: { type: Number, required: true },
   filename: { type: String, default: null },
   path: { type: String, default: null },
-  status: { type: String, enum: ["pending", "in-progress", "canceled", "completed"], default: "pending" },
+  status: { type: String, enum: ["pending", "in-progress", "canceled", "completed", "disputed"], default: "pending" },
   ludoCode: { type: String, default: null },
   winner: { type: String, default: null },
   reason: { type: String, default: null },
@@ -46,6 +54,12 @@ const BattleSchema: Schema = new Schema({
       details: { type: String },
     },
   ],
+  dispute: {
+    players: [{ type: String }],
+    proofs: [{ player: String, filename: String, path: String }],
+    resolved: { type: Boolean, default: false },
+    winner: { type: String, default: null },
+  },
 });
 
 export default mongoose.model<IBattle>("Battle", BattleSchema);
