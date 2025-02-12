@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { API_URL } from "../utils/url";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // Define the structure of the Profile type (Update this as per your needs)
 interface Profile {
@@ -81,6 +81,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [amount, setAmount] = useState(() => getInitialValue("amount", 5));
   const [profile, setProfile] = useState<Profile>(() => getInitialValue("profile", {}));
   const navigate = useNavigate();
+  const location = useLocation();
 
 
    // Check Auth on Mount
@@ -96,7 +97,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setName(userData.name);
           setPhoneNumber(userData.phoneNumber);
           setLogin(true);
-          navigate('/winCash');
+           // Navigate only if coming from login page
+           if (location.pathname === "/") {
+              navigate("/winCash");
+            }
         }
       } catch (err) {
         console.log("User not logged in");
@@ -105,7 +109,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     checkAuth();
-  }, []);
+  }, [location.pathname]);
   // Update sessionStorage when state changes
   useEffect(() => {
     const updateSessionStorage = (key: string, value: any) => {
