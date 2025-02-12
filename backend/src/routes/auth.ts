@@ -34,7 +34,7 @@ router.post('/battles/setLudoCode', handleLudoCode);
 router.get('/battles/pending', pendingBattle);
 router.get('/battles/inBattle', inProgressBattle);
 router.get('/battles/runningBattle', runningBattle);
-router.get('/battles/runningBattle', disputeBattle);
+router.get('/battles/disputeBattle', disputeBattle);
 router.post('/battles/:id/complete', completeBattle);
 router.post('/battles/inBattle/uploads',upload.single('image'), uploadScreenShot);
 router.post('/battles/inBattle/canceled', canceledBattle);
