@@ -250,7 +250,7 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
         }
     
         // Ensure player is part of the battle
-        if (![battle.player1, battle.player2].includes(playerId)) {
+        if (![battle.player1, battle.player2].includes(playerId as string)) {
           return res.status(403).json({ error: "You are not part of this battle" });
         }
     
@@ -258,7 +258,7 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
         if (!battle.dispute) {
           battle.dispute = {
             players: [playerId],
-            proofs: [{ player: playerId, filename: req.file.filename, path: req.file.path }],
+            proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path }],
             resolved: false,
             winner: null,
           };
