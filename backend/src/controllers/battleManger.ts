@@ -337,6 +337,15 @@ export const runningBattle = async(req: any, res: any)=>{
 
     res.status(200).json(battle);
 }
+export const disputeBattle = async(req: any, res: any)=>{
+    const battle = await Battle.find({ status: "disputed" }).sort({ createdAt : -1});
+
+    if(!battle){
+        console.log("Battle not found");
+    }
+
+    res.status(200).json(battle);
+}
 
 export const deleteBattle = async(req: any, res: any, next: any)=>{
 
