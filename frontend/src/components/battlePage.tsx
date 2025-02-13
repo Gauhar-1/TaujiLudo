@@ -106,7 +106,8 @@ useEffect(() => {
     const formData = new FormData();
     formData.append("image", selectedFile);
     formData.append("battleId", battle._id);
-    formData.append("playerId", phoneNumber);
+    formData.append("playerId", userId);
+    formData.append("phoneNumber", phoneNumber);
 
     try {
       await axios.post(`${API_URL}/api/auth/battles/inBattle/uploads`, formData, {

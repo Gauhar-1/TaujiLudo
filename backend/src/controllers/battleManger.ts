@@ -234,7 +234,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
 export const uploadScreenShot = async(req: any, res: any, next: any)=>{
 
     try {
-        const { battleId, playerId } = req.body;
+        const { battleId, playerId, phoneNumber } = req.body;
     
         if (!battleId) {
           return res.status(400).json({ error: "battleId is required" });
@@ -257,7 +257,7 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
         // Store the proof and handle disputes
         if (!battle.dispute) {
           battle.dispute = {
-            players: [playerId],
+            players: [phoneNumber],
             proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path , reason : "" }],
             resolved: false,
             winner: null,
