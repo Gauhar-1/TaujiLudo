@@ -258,7 +258,7 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
         if (!battle.dispute) {
           battle.dispute = {
             players: [playerId],
-            proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path }],
+            proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path , reason : "" }],
             resolved: false,
             winner: null,
           };
@@ -270,7 +270,7 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
           }
     
           battle.dispute.players.push(playerId);
-          battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path });
+          battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason : "" });
     
           // If both players upload screenshots, mark as disputed
           if (battle.dispute.players.length > 1) {
@@ -355,3 +355,74 @@ export const deleteBattle = async(req: any, res: any, next: any)=>{
 
     res.status(200).json(battle);
 }
+
+export const  determineWinner = async (req: any ,res : any) => {
+    const { battleId , userId } = req.body;
+  
+    if (!battleId) {
+        return res.status(400).json({ success: false, message: "BattleID is required." });
+    }
+  
+    try {
+  
+        const battle = await Battle.findOne({battleId});
+  
+        if (!battle) {
+            console.log('Battle not found');
+            return res.status(404).json({ success: false, message: 'Battle not found' });
+        }
+  
+        if(battle.dispute){
+            battle.dispute.winner = userId;
+            battle.dispute.resolved = true;
+            battle.status = "completed";
+        }
+        await battle.save();
+  
+        res.status(200).json({ success: true, message: 'Winner determined successfully' });
+    } catch (err : any) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Winner determination failed', error: err.message });
+    }
+  }
+  
+  export const  rejectDispute = async (req: any ,res : any) => {
+    const { userId , battleId , reason } = req.body;
+  
+    if (!battleId) {
+        return res.status(400).json({ success: false, message: "Battle ID is required." });
+    }
+    if (!reason ) {
+        return res.status(400).json({ success: false, message: "reason is required." });
+    }
+  
+    try {
+        // Find the transaction by payment reference
+        const battle = await Battle.findById(battleId);
+  
+        if (!battle) {
+            console.log('Profile not found');
+            return res.status(404).json({ success: false, message: 'Profile not found' });
+        }
+  
+        if(battle.dispute){
+            battle.dispute.proofs[0].player === userId ?
+            battle.dispute.proofs[0].reason = reason : battle.dispute.proofs[1].reason = reason;
+        }
+        await battle.save();
+  
+        // Update notification as transaction completed
+      //   const notification = await Notification.findOneAndUpdate({paymentReference : transaction.paymentReference}, 
+      //  { status:'failed', reason});
+  
+        // if (!notification) {
+        //     console.log('notification not found');
+        //     return res.status(404).json({ success: false, message: 'notification  not found' });
+        // }
+  
+        res.status(200).json({ success: true, message: 'Kyc Rejected and notification sent' });
+    } catch (err : any) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Kyc rejection failed', error: err.message });
+    }
+  }
