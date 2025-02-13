@@ -28,7 +28,8 @@ export const DisputeResult = ()=>{
                 _id : {},
                 player : ""
             }],
-        }
+        },
+        reason: ""
 
     });
     const [ rejectClicked, setRejectClicked ] = useState(false);
@@ -142,6 +143,26 @@ export const DisputeResult = ()=>{
                                 <div className="p-2 w-60 border">{battle.dispute.players[0] }</div>
                             </div>
                         <div className="flex">
+                                { (() => {
+    const proofs = battle?.dispute?.proofs || []; // Ensure proofs exist
+    const proof1 = proofs[1]; // Get second proof safely
+    const proof0 = proofs[0]; // Get first proof safely
+
+    // ✅ Hide div if any proof has a filename
+    if (proof1?.filename || proof0?.filename) return null;
+
+    return (
+        <div>
+             <div className="p-2 w-28 border">Clicked </div>
+             <div className="p-2 w-60 border">
+            {battle?.reason ? "Cancel" : "Lose"}
+        </div>
+        </div>
+       
+    );
+})()}
+                            </div>
+                        <div className="flex">
                                 <div className="p-2 w-28 border">status </div>
                                 { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "wiiner" : "loser" }</div>}
                             </div>
@@ -183,6 +204,26 @@ export const DisputeResult = ()=>{
                         <div className="flex">
                                 <div className="p-2 w-28 border">Phone </div>
                                 <div className="p-2 w-60 border">{battle.dispute.players[1] }</div>
+                            </div>
+                            <div className="flex">
+                                { (() => {
+    const proofs = battle?.dispute?.proofs || []; // Ensure proofs exist
+    const proof1 = proofs[1]; // Get second proof safely
+    const proof0 = proofs[0]; // Get first proof safely
+
+    // ✅ Hide div if any proof has a filename
+    if (proof1?.filename || proof0?.filename) return null;
+
+    return (
+        <div>
+             <div className="p-2 w-28 border">Clicked </div>
+             <div className="p-2 w-60 border">
+            {battle?.reason ? "Cancel" : "Lose"}
+        </div>
+        </div>
+       
+    );
+})()}
                             </div>
                             <div className="flex">
                                 <div className="p-2 w-28 border">status </div>

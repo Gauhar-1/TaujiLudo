@@ -9,6 +9,8 @@ export const  WithdrawToBank = ()=>{
    const [name ,setName] = useState("");
    const [IFSC ,setIFSCcode] = useState("");
    const [accountNumber , setAccountNumber] = useState("");
+   const [message, setMessage] = useState("");
+   const [balanceLess, setBalanceLess] = useState(false);
    const { userId,amount } = useUserContext();
 
 
@@ -27,9 +29,15 @@ export const  WithdrawToBank = ()=>{
           });
           console.log('Withdrawal request submitted.');
           navigate('/wallet');
-      } catch (err : any) {
-          console.log('Error in withdrawal: ' + err.response?.data?.message || err.message);
-      }
+      } catch (err: any) {
+         if (err.response) {
+             console.log("Error Response:", err.response.data);
+             setMessage(err.response.data.message);
+             setBalanceLess(true);
+         } else {
+             console.log("Error in withdrawal:", err);
+         }
+     }
   };
 
     const navigate = useNavigate();
@@ -73,6 +81,12 @@ export const  WithdrawToBank = ()=>{
                  </div>
                 </div>
             </div>
+            {  balanceLess &&<div className="absolute top-60 bg-gray-200 mx-10 shadow-xl p-10 rounded-md flex flex-col gap-4">
+                <div className=" border-2 border-gray-500  p-2 font-serif text-lg rounded-md text-purple-700">{message}</div>
+                <div className="bg-blue-500 text-white p-2 text-center rounded-lg" onClick={()=>{
+                    setBalanceLess(false);
+                }}>Ok</div>
+             </div>}
         </div>
     )
 }

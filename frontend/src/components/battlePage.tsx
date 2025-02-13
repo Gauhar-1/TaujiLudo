@@ -287,7 +287,9 @@ useEffect(() => {
                 <div className="text-center bg-red-600 mt-4 rounded-lg p-2 text-white"  onClick={()=>{
                     navigate('/home')
                 }}>Yes, I lose</div>
-                <div className="text-center bg-blue-600 mt-4 rounded-lg p-2 mx-16 text-white">No</div>
+                <div className="text-center bg-blue-600 mt-4 rounded-lg p-2 mx-16 text-white" onClick={()=>{
+                  setLosed(false);
+                }}>No</div>
                 </div>}
             {canceled && <div className="bg-gray-100 absolute top-64 left-10 w-80 rounded-lg p-4">
                 <div className="flex  px-2">
