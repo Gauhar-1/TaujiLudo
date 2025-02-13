@@ -312,10 +312,7 @@ export const canceledBattle = async( req: any, res: any, next: any)=>{
    if (battle.reason) {
        battle.status = "canceled";
    }  
-   else{
-         battle.status = "disputed";
-   }
-   
+ 
     // Save updated battle status and reason
     battle.reason = reason;
     await battle.save();
@@ -326,6 +323,19 @@ export const canceledBattle = async( req: any, res: any, next: any)=>{
     catch(err){
         console.log("error: " + err);
     }
+}
+
+export const battleLost = async(req: any, res: any, next: any)=>{
+    const { battleId, userId } = req.body;
+
+    if (!battleId) return res.status(400).json({ error: "battleId is required" });
+
+    const battle = await Battle.findById(battleId);
+   if (!battle) return res.status(404).json({ error: "Battle not found" });
+
+   battle.loser = userId;
+   await battle.save();
+   res.json("Loser assigned Successfully");
 }
 
 export const completeBattle = async(req: any, res: any)=>{

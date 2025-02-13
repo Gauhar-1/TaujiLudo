@@ -26,6 +26,7 @@ interface IBattle extends Document {
   status: "pending" | "in-progress" | "canceled" | "completed" | "disputed";
   ludoCode: string | null;
   winner: string | null;
+  loser: string | null;
   reason: string | null;
   createdAt: Date;
   history: BattleEvent[]; // Added history field
@@ -44,6 +45,7 @@ const BattleSchema: Schema = new Schema({
   status: { type: String, enum: ["pending", "in-progress", "canceled", "completed", "disputed"], default: "pending" },
   ludoCode: { type: String, default: null },
   winner: { type: String, default: null },
+  loser: { type: String, default: null },
   reason: { type: String, default: null },
   createdAt: { type: Date, default: Date.now },
 

@@ -137,6 +137,21 @@ useEffect(() => {
       console.log("Error: "+ err);
     }
   }
+  const handleLost = async()=>{
+     
+    try{
+      const response = await axios.post(`${API_URL}/api/auth/battles/inBattle/lost`, { 
+         battleId : battle?._id ,
+         userId
+        });
+      if(!response.data){
+        console.log("response not found");
+      }
+    }
+    catch(err){
+      console.log("Error: "+ err);
+    }
+  }
 
   const copyToClipboard = () => {
     if (divRef.current) {
@@ -285,7 +300,8 @@ useEffect(() => {
                 }}>X</div>
                 </div>
                 <div className="text-center bg-red-600 mt-4 rounded-lg p-2 text-white"  onClick={()=>{
-                    navigate('/home')
+                    handleLost();
+                    navigate('/home');
                 }}>Yes, I lose</div>
                 <div className="text-center bg-blue-600 mt-4 rounded-lg p-2 mx-16 text-white" onClick={()=>{
                   setLosed(false);
