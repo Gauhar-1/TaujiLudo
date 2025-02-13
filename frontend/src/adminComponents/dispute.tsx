@@ -18,7 +18,7 @@ export const DisputeResult = ()=>{
         player2 : "",
         dispute : {
             players : [],
-            resolved : false,
+            resolved : true,
             proofs : [{
                 filename: "",
                 _id : {},
