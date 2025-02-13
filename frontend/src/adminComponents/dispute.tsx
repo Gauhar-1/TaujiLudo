@@ -26,7 +26,8 @@ export const DisputeResult = ()=>{
             proofs : [{
                 filename: "",
                 _id : {},
-                player : ""
+                player : "",
+                clicked : ""
             }],
         },
         reason: ""
@@ -143,30 +144,16 @@ export const DisputeResult = ()=>{
                                 <div className="p-2 w-60 border">{battle.dispute.players[0] }</div>
                             </div>
                         <div className="flex">
-                                { (() => {
-    const proofs = battle?.dispute?.proofs || []; // Ensure proofs exist
-    const proof1 = proofs[1]; // Get second proof safely
-    const proof0 = proofs[0]; // Get first proof safely
-
-    // ✅ Hide div if any proof has a filename
-    if (proof1?.filename || proof0?.filename) return null;
-
-    return (
-        <div>
              <div className="p-2 w-28 border">Clicked </div>
              <div className="p-2 w-60 border">
-            {battle?.reason ? "Cancel" : "Lose"}
+            {battle.dispute.proofs[0].player === battle.player1 ? battle.dispute.proofs[0].clicked  : battle.dispute.proofs[1].clicked }
         </div>
-        </div>
-       
-    );
-})()}
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">status </div>
-                                { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "wiiner" : "loser" }</div>}
+                                { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "winner" : "loser" }</div>}
                             </div>
-                        <div className="flex">
+                       { (battle.dispute.proofs[0].player === battle.player1 ? battle.dispute.proofs[0].clicked === "Won" : battle.dispute.proofs[1].clicked === "Won") && <div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>
                                 <div className="p-2 w-60 border">
                                     <div className="bg-green-300 w-11 p-1 rounded-md" onClick={()=>{
@@ -178,10 +165,10 @@ export const DisputeResult = ()=>{
                                         }
                                     }}>{ viewClicked ? "back" : "view"}</div>
                                 </div>
-                            </div>
+                            </div>}
                            {!rejectClicked && <div className="flex text-center">
                                 {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                    {battle.dispute.proofs[0].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
                                         navigate('/admin/disputeBattle')
@@ -191,8 +178,8 @@ export const DisputeResult = ()=>{
                                 }}>Reject</div>
                             </div>}
                         </div>
-                        { viewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.dispute.proofs[1].player === battle.player1 ? battle.dispute.proofs[1].filename : battle.dispute.proofs[0].filename}`} alt="" className="rounded-lg" />
+                        { viewClicked  && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
+                            <img src={`${API_URL}/uploads/${battle.dispute.proofs[0].player === battle.player1 ? battle.dispute.proofs[0].filename : battle.dispute.proofs[1].filename}`} alt="" className="rounded-lg" />
                         </div> }
 
                         <div className="bg-gray-300 my-6 h-2"></div>
@@ -206,30 +193,17 @@ export const DisputeResult = ()=>{
                                 <div className="p-2 w-60 border">{battle.dispute.players[1] }</div>
                             </div>
                             <div className="flex">
-                                { (() => {
-    const proofs = battle?.dispute?.proofs || []; // Ensure proofs exist
-    const proof1 = proofs[1]; // Get second proof safely
-    const proof0 = proofs[0]; // Get first proof safely
-
-    // ✅ Hide div if any proof has a filename
-    if (proof1?.filename || proof0?.filename) return null;
-
-    return (
-        <div>
              <div className="p-2 w-28 border">Clicked </div>
              <div className="p-2 w-60 border">
-            {battle?.reason ? "Cancel" : "Lose"}
+            {battle.dispute.proofs[0].player === battle.player2 ? battle.dispute.proofs[0].clicked  : battle.dispute.proofs[1].clicked }
         </div>
-        </div>
-       
-    );
-})()}
                             </div>
+                            
                             <div className="flex">
                                 <div className="p-2 w-28 border">status </div>
                                 { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player2 ? "winner" : "loser" }</div>}
                             </div>
-                        <div className="flex">
+                        { ( battle.dispute.proofs[0].player === battle.player2 ? battle.dispute.proofs[0].clicked === "Won" : battle.dispute.proofs[1].clicked === "Won") &&<div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>
                                 <div className="p-2 w-60 border">
                                     <div className="bg-green-300 w-11 p-1 rounded-md" onClick={()=>{
@@ -241,10 +215,10 @@ export const DisputeResult = ()=>{
                                         }
                                     }}>{ viewClicked2? "back" : "view"}</div>
                                 </div>
-                            </div>
+                            </div>}
                            {!rejectClicked2 && <div className="flex text-center">
                                 {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                    {battle.dispute.proofs[0].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
                                 }}}>Approve</div>}
@@ -254,7 +228,7 @@ export const DisputeResult = ()=>{
                             </div>}
                         </div>
                         { viewClicked2 && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.dispute.proofs[1].player === battle.player2 ? battle.dispute.proofs[1].filename : battle.dispute.proofs[0].filename}`} alt="" className="rounded-lg" />
+                            <img src={`${API_URL}/uploads/${battle.dispute.proofs[0].player === battle.player2 ? (battle.dispute.proofs[0].filename ? battle.dispute.proofs[0].filename : null ): battle.dispute.proofs[1].filename}`} alt="" className="rounded-lg" />
                         </div> }
                     </div>
                     {rejectClicked && <div className="bg-gray-400 px-10 py-6 absolute top-60 shadow-md rounded-lg w-80 m-6">

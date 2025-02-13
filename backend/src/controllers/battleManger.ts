@@ -445,6 +445,7 @@ export const  determineWinner = async (req: any ,res : any) => {
             battle.dispute.winner = userId;
             battle.dispute.resolved = true;
             battle.status = "completed";
+            battle.winner = "decided";
         }
         await battle.save();
   
