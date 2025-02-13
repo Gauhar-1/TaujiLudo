@@ -49,7 +49,7 @@ export const Notifications = ()=>{
           })) || [];
     
           // 🔵 Fetch Battles
-          const battleResponse = await axios.get(`${API_URL}/api/auth/battles/battleHistory`, {
+          const battleResponse = await axios.get(`${API_URL}/api/auth/battles/battleHistory`, { params : {userId},
             withCredentials: true,
           });
     
@@ -61,8 +61,8 @@ export const Notifications = ()=>{
     
           // 🔵 Merge & Sort by `createdAt`
           const mergedData = [...notifications, ...profiles, ...battles].sort((a, b) => {
-            const dateA = new Date(a.kycDetails?.createdAt || a.createdAt || (a.dispute ? a.dispute.timestamp : 0)).getTime();
-            const dateB = new Date(b.kycDetails?.createdAt || b.createdAt || (b.dispute ? b.dispute.timestamp : 0)).getTime();
+            const dateA = new Date(a.kycDetails?.createdAt || a.createdAt || (a.dispute ? a.dispute?.timestamp : 0)).getTime();
+            const dateB = new Date(b.kycDetails?.createdAt || b.createdAt || (b.dispute ? b.dispute?.timestamp : 0)).getTime();
             return dateB - dateA; // Sort newest first
           });
     
@@ -82,13 +82,12 @@ export const Notifications = ()=>{
     .filter((notification) => 
       {if (notification.type === "notification") return !!notification.reason;
     if (notification.type === "profile") return !!notification.kycDetails?.reason;
-    if (notification.type === "Battle") return notification.dispute && Object.keys(notification.dispute).length > 0;
+    if (notification.type === "Battle") return notification.dispute;
     return false;}
     )
     .map((notification) => (
       <NotifyCard key={notification._id} notification={notification} />
     ))}
-          
         </div>
     )
 }

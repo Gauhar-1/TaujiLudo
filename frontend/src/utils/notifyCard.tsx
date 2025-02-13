@@ -18,7 +18,10 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
           {notification.kycDetails.reason}
         </div>
       ) :  <div className="w-full overflow-auto break-words">
-      {notification.dispute.proofs[1].player === userId ? notification.dispute.proofs[1].reason : notification.dispute.proofs[0].reason }
+      {notification.dispute?.proofs?.[1]?.player === userId 
+  ? notification.dispute?.proofs?.[1]?.reason 
+  : notification.dispute?.proofs?.[0]?.reason || "No reason provided"}
+
     </div>}
             <div className="flex justify-end text-gray-500">
            { notification.type === "profile"  ? <div>
@@ -26,7 +29,7 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
     </div> : notification.type === "notification"  ? <div>
             {formatDistanceToNowStrict(new Date(notification.createdAt), { addSuffix: true })}
     </div> :<div>
-            {formatDistanceToNowStrict(new Date(notification.dispute.timestamp), { addSuffix: true })}
+            {formatDistanceToNowStrict(new Date(notification.dispute?.timestamp), { addSuffix: true })}
     </div>}
             </div>
         </div>
