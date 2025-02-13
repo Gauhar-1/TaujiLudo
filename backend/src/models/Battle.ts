@@ -8,7 +8,7 @@ interface BattleEvent {
 
 interface Dispute {
   players: string[]; // Players who claim they won
-  proofs: { player: string; filename: string;  path: string ; reason: string }[]; // Screenshot uploads
+  proofs: { player: string; filename: string;  path: string ; reason: string;  clicked: string | null;  }[]; // Screenshot uploads
   resolved: boolean;
   winner: string | null; // Final decision
   timestamp: Date;
@@ -59,7 +59,7 @@ const BattleSchema: Schema = new Schema({
   ],
   dispute: {
     players: [{ type: String }],
-    proofs: [{ player: String, filename: String, path: String, reason : String }],
+    proofs: [{ player: String, filename: String, path: String, reason : String, clicked : String }],
     resolved: { type: Boolean, default: false },
     winner: { type: String, default: null },
     timestamp: { type: Date, default: Date.now },
