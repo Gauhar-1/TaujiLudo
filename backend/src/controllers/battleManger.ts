@@ -333,7 +333,13 @@ export const battleLost = async(req: any, res: any, next: any)=>{
     const battle = await Battle.findById(battleId);
    if (!battle) return res.status(404).json({ error: "Battle not found" });
 
-   battle.loser = userId;
+   if(battle.loser){
+      battle.status = "disputed"    
+   }
+   else{
+       battle.loser = userId;
+   }
+
    await battle.save();
    res.json("Loser assigned Successfully");
 }
