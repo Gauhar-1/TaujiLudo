@@ -379,7 +379,7 @@ export const  determineWinner = async (req: any ,res : any) => {
         }
         await battle.save();
   
-        res.status(200).json({ success: true, message: 'Winner determined successfully' });
+        res.status(200).json({ success: true, message: 'Winner determined successfully', battle });
     } catch (err : any) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Winner determination failed', error: err.message });
@@ -420,7 +420,7 @@ export const  determineWinner = async (req: any ,res : any) => {
         //     return res.status(404).json({ success: false, message: 'notification  not found' });
         // }
   
-        res.status(200).json({ success: true, message: 'Kyc Rejected and notification sent' });
+        res.status(200).json({ success: true, message: 'Kyc Rejected and notification sent', battle });
     } catch (err : any) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Kyc rejection failed', error: err.message });
