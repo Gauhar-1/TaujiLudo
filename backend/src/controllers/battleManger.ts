@@ -274,40 +274,50 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
           battle.dispute.players.push(phoneNumber);
           battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason : "" });
     
-          // If both players upload screenshots, mark as disputed
-          if (battle.dispute.players.length > 1) {
-            battle.status = "disputed";
-          }
-        }
+      // ✅ Case 1: If one player uploaded a screenshot and the other neither uploaded nor provided a reason
+if (
+    battle.dispute.proofs.length === 1 &&
+    battle.dispute.proofs.some(proof => proof.filename) &&
+    !battle.reason
+) {
+    battle.status = "completed"; // The player who uploaded wins
+}
+
+// ✅ Case 2: If both players either provide conflicting inputs or don't upload anything
+else {
+    battle.status = "disputed"; // Remains disputed
+}
+
     
         await battle.save();
         res.status(200).json({ message: "Screenshot uploaded successfully", battle });
-      } catch (err) {
+      } }catch (err) {
         console.log("error: " + err);
         res.status(500).json({ error: 'Failed to upload image' });
       }
 }
 
 export const canceledBattle = async( req: any, res: any, next: any)=>{
+    
+   try{ 
+    const { reason, battleId } = req.body;
+    
+    if (!battleId) return res.status(400).json({ error: "battleId is required" });
+   if (!reason) return res.status(400).json({ error: "Reason is required" });
 
-    const { reason , battleId } = req.body;
+   const battle = await Battle.findById(battleId);
+   if (!battle) return res.status(404).json({ error: "Battle not found" });
 
-    if(!battleId){
-       console.log("BattleId not found");
-    }
-    if(!reason){
-        console.log("reason not found");
-    }
+   // ✅ If a reason is already present, set status to "canceled"
+   if (battle.reason) {
+       battle.status = "canceled";
+   }
+   
+    // Save updated battle status and reason
+    battle.reason = reason;
+    await battle.save();
 
-   try{ const battle = await Battle.findByIdAndUpdate( battleId, {
-        reason,
-        status : "canceled",
-        
-    } )
-
-    if(!battle){
-        console.log("battle not found");
-    }
+    res.status(200).json({ message: "Battle updated successfully", battle });
 
     res.status(200).json(battle);}
     catch(err){
