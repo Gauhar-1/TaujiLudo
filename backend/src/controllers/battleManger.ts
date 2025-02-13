@@ -253,12 +253,14 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
         if (![battle.player1, battle.player2].includes(playerId as string)) {
           return res.status(403).json({ error: "You are not part of this battle" });
         }
-    
+        
+        
+        
         // Store the proof and handle disputes
         if (!battle.dispute) {
           battle.dispute = {
             players: [phoneNumber],
-            proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path , reason : "" }],
+            proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path , reason : "", clicked : "Won" }],
             resolved: false,
             winner: null,
             timestamp: new Date(),
@@ -272,21 +274,11 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
           }
     
           battle.dispute.players.push(phoneNumber);
-          battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason : "" });
+          battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason : "", clicked : "Won"  });
     
-      // ✅ Case 1: If one player uploaded a screenshot and the other neither uploaded nor provided a reason
-if (
-    battle.dispute.proofs.length === 1 &&
-    battle.dispute.proofs.some(proof => proof.filename) &&
-    !battle.reason
-) {
-    battle.status = "completed"; // The player who uploaded wins
-}
-
-// ✅ Case 2: If both players either provide conflicting inputs or don't upload anything
-else {
-    battle.status = "disputed"; // Remains disputed
-}
+      
+        // 🏆 Update battle status based on conditions
+        updateBattleStatus(battle);
 
     
         await battle.save();
@@ -300,7 +292,7 @@ else {
 export const canceledBattle = async( req: any, res: any, next: any)=>{
     
    try{ 
-    const { reason, battleId } = req.body;
+    const { reason, battleId, userId, phoneNumber } = req.body;
     
     if (!battleId) return res.status(400).json({ error: "battleId is required" });
    if (!reason) return res.status(400).json({ error: "Reason is required" });
@@ -308,13 +300,29 @@ export const canceledBattle = async( req: any, res: any, next: any)=>{
    const battle = await Battle.findById(battleId);
    if (!battle) return res.status(404).json({ error: "Battle not found" });
 
-   // ✅ If a reason is already present, set status to "canceled"
-   if (battle.reason) {
-       battle.status = "canceled";
-   }  
- 
+
+   if (!battle.dispute) {
+    battle.dispute = {
+        players: [phoneNumber],
+        proofs: [{ player: userId, filename: "", path: "", reason, clicked: "Canceled" }],
+        resolved: false,
+        winner: null,
+        timestamp: new Date(),
+    };
+} else {
+    // Ensure player doesn't cancel twice
+    const alreadyCanceled = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Canceled");
+    if (alreadyCanceled) return res.status(400).json({ error: "You have already canceled the battle" });
+
+    battle.dispute.players.push(phoneNumber);
+    battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
+}
+
+   // 🏆 Update battle status based on conditions
+   updateBattleStatus(battle);
+
+
     // Save updated battle status and reason
-    battle.reason = reason;
     await battle.save();
 
     res.status(200).json({ message: "Battle updated successfully", battle });
@@ -333,16 +341,50 @@ export const battleLost = async(req: any, res: any, next: any)=>{
     const battle = await Battle.findById(battleId);
    if (!battle) return res.status(404).json({ error: "Battle not found" });
 
-   if(battle.loser){
-      battle.status = "disputed"    
-   }
-   else{
-       battle.loser = userId;
-   }
+   if (!battle.dispute) {
+    battle.dispute = {
+        players: [userId],
+        proofs: [{ player: userId, filename: "", path: "", reason: "", clicked: "Lost" }],
+        resolved: false,
+        winner: null,
+        timestamp: new Date(),
+    };
+} else {
+    // Ensure player doesn't declare lost twice
+    const alreadyLost = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Lost");
+    if (alreadyLost) return res.status(400).json({ error: "You have already marked yourself as lost" });
+
+    battle.dispute.players.push(userId);
+    battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason: "", clicked: "Lost" });
+}
+
+
+   // 🏆 Update battle status based on conditions
+   updateBattleStatus(battle);
 
    await battle.save();
    res.json("Loser assigned Successfully");
 }
+
+// 🔥 Status Update Logic
+const updateBattleStatus = (battle: any) => {
+    const player1Action = battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player1)?.clicked;
+    const player2Action = battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player2)?.clicked;
+
+    const statusMap: { [key: string]: string } = {
+        "Won-Canceled": "Disputed",
+        "Lost-Canceled": "Disputed",
+        "Canceled-Lost": "Disputed",
+        "Lost-Lost": "Disputed",
+        "Canceled-Canceled": "Canceled",
+        "Won-Lost": "In-Progress",
+        "Lost-Won": "In-Progress",
+        "Canceled-Won": "Disputed",
+    };
+
+    const statusKey = `${player1Action || "None"}-${player2Action || "None"}`;
+    battle.status = statusMap[statusKey] || "Disputed";
+};
 
 export const completeBattle = async(req: any, res: any)=>{
     const { winner, screenShot , id} = req.body;
