@@ -368,8 +368,14 @@ export const battleLost = async(req: any, res: any, next: any)=>{
 
 // 🔥 Status Update Logic
 const updateBattleStatus = (battle: any) => {
-    const player1Action = battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player1)?.clicked;
-    const player2Action = battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player2)?.clicked;
+    const player1Action = battle.player1 
+    ? battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player1)?.clicked || "None" 
+    : "None";
+
+const player2Action = battle.player2 
+    ? battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player2)?.clicked || "None" 
+    : "None";
+
 
     const statusMap: { [key: string]: string } = {
         "Won-Canceled": "Disputed",
