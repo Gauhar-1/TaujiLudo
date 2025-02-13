@@ -311,6 +311,9 @@ export const canceledBattle = async( req: any, res: any, next: any)=>{
    // ✅ If a reason is already present, set status to "canceled"
    if (battle.reason) {
        battle.status = "canceled";
+   }  
+   else{
+         battle.status = "disputed";
    }
    
     // Save updated battle status and reason
