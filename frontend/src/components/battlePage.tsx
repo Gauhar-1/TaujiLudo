@@ -90,6 +90,8 @@ useEffect(() => {
       await axios.post(`${API_URL}/api/auth/battles/inBattle/canceled`, {
         battleId: battle?._id,
         reason,
+        userId,
+        phoneNumber
       });
       navigate("/home");
     } catch (err) {
