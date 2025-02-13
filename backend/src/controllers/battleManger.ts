@@ -231,107 +231,97 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
   };
   
 
-export const uploadScreenShot = async(req: any, res: any, next: any)=>{
-
+  export const uploadScreenShot = async (req: any, res: any, next: any) => {
     try {
-        const { battleId, playerId, phoneNumber } = req.body;
-    
-        if (!battleId) {
-          return res.status(400).json({ error: "battleId is required" });
-        }
-    
-        if (!req.file) {
-          return res.status(400).json({ error: "File is required" });
-        }
-    
-        const battle = await Battle.findById(battleId);
-        if (!battle) {
-          return res.status(404).json({ error: "Battle not found" });
-        }
-    
-        // Ensure player is part of the battle
-        if (![battle.player1, battle.player2].includes(playerId as string)) {
-          return res.status(403).json({ error: "You are not part of this battle" });
-        }
-        
-        
-        
-        // Store the proof and handle disputes
-        if (!battle.dispute) {
-          battle.dispute = {
-            players: [phoneNumber],
-            proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path , reason : "", clicked : "Won" }],
-            resolved: false,
-            winner: null,
-            timestamp: new Date(),
-            
-          };
-        } else {
-          // Prevent duplicate uploads by the same player
-          const alreadyUploaded = battle.dispute.proofs.some(proof => proof.player === playerId);
-          if (alreadyUploaded) {
-            return res.status(400).json({ error: "You have already uploaded a screenshot" });
-          }
-    
-          battle.dispute.players.push(phoneNumber);
-          battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason : "", clicked : "Won"  });
-    
-      
-        // 🏆 Update battle status based on conditions
-        updateBattleStatus(battle);
-
-    
-        await battle.save();
-        res.status(200).json({ message: "Screenshot uploaded successfully", battle });
-      } }catch (err) {
-        console.log("error: " + err);
-        res.status(500).json({ error: 'Failed to upload image' });
+      const { battleId, playerId, phoneNumber } = req.body;
+  
+      if (!battleId) return res.status(400).json({ error: "battleId is required" });
+  
+      if (!req.file) return res.status(400).json({ error: "File is required" });
+  
+      const battle = await Battle.findById(battleId);
+      if (!battle) return res.status(404).json({ error: "Battle not found" });
+  
+      if (![battle.player1, battle.player2].includes(playerId)) {
+        return res.status(403).json({ error: "You are not part of this battle" });
       }
-}
-
-export const canceledBattle = async( req: any, res: any, next: any)=>{
-    
-   try{ 
-    const { reason, battleId, userId, phoneNumber } = req.body;
-    
-    if (!battleId) return res.status(400).json({ error: "battleId is required" });
-   if (!reason) return res.status(400).json({ error: "Reason is required" });
-
-   const battle = await Battle.findById(battleId);
-   if (!battle) return res.status(404).json({ error: "Battle not found" });
-
-
-   if (!battle.dispute) {
-    battle.dispute = {
-        players: [phoneNumber],
-        proofs: [{ player: userId, filename: "", path: "", reason, clicked: "Canceled" }],
-        resolved: false,
-        winner: null,
-        timestamp: new Date(),
-    };
-} else {
-    // Ensure player doesn't cancel twice
-    const alreadyCanceled = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Canceled");
-    if (alreadyCanceled) return res.status(400).json({ error: "You have already canceled the battle" });
-
-    battle.dispute.players.push(phoneNumber);
-    battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
-}
-
-   // 🏆 Update battle status based on conditions
-   updateBattleStatus(battle);
-
-
-    // Save updated battle status and reason
-    await battle.save();
-
-    res.status(200).json({ message: "Battle updated successfully", battle });
-
-    res.status(200).json(battle);}
-    catch(err){
-        console.log("error: " + err);
+  
+      console.log(`🖼️ Uploading Screenshot for Battle ${battleId} by ${playerId}`);
+  
+      // Initialize dispute if missing
+      if (!battle.dispute) {
+        battle.dispute = {
+          players: [phoneNumber],
+          proofs: [{ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" }],
+          resolved: false,
+          winner: null,
+          timestamp: new Date(),
+        };
+      } else {
+        const alreadyUploaded = battle.dispute.proofs.some(proof => proof.player === playerId);
+        if (alreadyUploaded) {
+          return res.status(400).json({ error: "You have already uploaded a screenshot" });
+        }
+  
+        battle.dispute.players.push(phoneNumber);
+        battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" });
+      }
+  
+      // ✅ Update status only after adding proofs
+      updateBattleStatus(battle);
+      await battle.save();
+  
+      console.log(`✅ Screenshot uploaded & battle status updated: ${battle.status}`);
+      res.status(200).json({ message: "Screenshot uploaded successfully", battle });
+  
+    } catch (err) {
+      console.error("❌ Error in uploadScreenShot:", err);
+      next(err); // Pass the error to the next middleware
     }
-}
+  };
+  
+
+  export const canceledBattle = async (req: any, res: any, next: any) => {
+    try {
+      const { reason, battleId, userId, phoneNumber } = req.body;
+  
+      if (!battleId) return res.status(400).json({ error: "battleId is required" });
+      if (!reason) return res.status(400).json({ error: "Reason is required" });
+  
+      const battle = await Battle.findById(battleId);
+      if (!battle) return res.status(404).json({ error: "Battle not found" });
+  
+      console.log(`🚨 Player ${userId} requested battle cancelation for ${battleId}`);
+  
+      if (!battle.dispute) {
+        battle.dispute = {
+          players: [phoneNumber],
+          proofs: [{ player: userId, filename: "", path: "", reason, clicked: "Canceled" }],
+          resolved: false,
+          winner: null,
+          timestamp: new Date(),
+        };
+      } else {
+        const alreadyCanceled = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Canceled");
+        if (alreadyCanceled) return res.status(400).json({ error: "You have already canceled the battle" });
+  
+        battle.dispute.players.push(phoneNumber);
+        battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
+      }
+  
+      // ✅ Update status after cancel action
+      updateBattleStatus(battle);
+      await battle.save();
+  
+      console.log(`✅ Battle cancelation recorded & status updated: ${battle.status}`);
+      res.status(200).json({ message: "Battle canceled successfully", battle });
+  
+    } catch (err) {
+      console.error("❌ Error in canceledBattle:", err);
+      next(err);
+    }
+  };
+  
 
 export const battleLost = async(req: any, res: any, next: any)=>{
     const { battleId, userId } = req.body;

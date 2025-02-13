@@ -99,46 +99,41 @@ useEffect(() => {
     }
   };
 
-  // Upload Screenshot
-  const uploadScreenshot = async () => {
-    if (!selectedFile || !battle) {
-      alert("Please select a file to upload.");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("image", selectedFile);
-    formData.append("battleId", battle._id);
-    formData.append("playerId", userId);
-    formData.append("phoneNumber", phoneNumber);
-    console.log("Phone Number: "+ phoneNumber);
-
-    try {
-      await axios.post(`${API_URL}/api/auth/battles/inBattle/uploads`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      navigate("/home");
-    } catch (err) {
-      console.error("Error uploading screenshot:", err);
-    }
-  };
-
-  const handleLudoCode = async()=>{
-     
-    try{
-      const response = await axios.post(`${API_URL}/api/auth/battles/setLudoCode`, { 
-         battleId : battle?._id ,
-         ludoCode,
-         event : "ludoCode_set",
-         details : "ludo Code set"
-        });
-      if(!response.data){
-        console.log("response not found");
-      }
-    }
-    catch(err){
-      console.log("Error: "+ err);
-    }
+ // Upload Screenshot
+const uploadScreenshot = async () => {
+  if (!selectedFile || !battle) {
+    alert("Please select a file to upload.");
+    return;
   }
+
+  const formData = new FormData();
+  formData.append("image", selectedFile);
+  formData.append("battleId", battle._id);
+  formData.append("playerId", userId);
+  formData.append("phoneNumber", phoneNumber);
+  
+  console.log("Uploading Screenshot...");
+  console.log("Phone Number:", phoneNumber);
+
+  try {
+    const response = await axios.post(`${API_URL}/api/auth/battles/inBattle/uploads`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (response.status === 200) {
+      alert("Screenshot uploaded successfully.");
+      navigate("/home"); // ✅ Navigate only on success
+    } else {
+      console.error("Unexpected response:", response);
+      alert("Failed to upload screenshot. Please try again.");
+    }
+  } catch (err) {
+    console.error("Error uploading screenshot:", err);
+    alert("An error occurred while uploading. Please check your internet connection.");
+  }
+};
+
+  
   const handleLost = async()=>{
      
     try{
@@ -163,6 +158,23 @@ useEffect(() => {
         .catch((err) => console.error("Failed to copy:", err));
     }
   };
+  const handleLudoCode = async()=>{
+     
+    try{
+      const response = await axios.post(`${API_URL}/api/auth/battles/setLudoCode`, { 
+         battleId : battle?._id ,
+         ludoCode,
+         event : "ludoCode_set",
+         details : "ludo Code set"
+        });
+      if(!response.data){
+        console.log("response not found");
+      }
+    }
+    catch(err){
+      console.log("Error: "+ err);
+    }
+  }
 
     // Function to check if any object in `history` has the specified event
     function iterateHistory(history: { event: string }[] | undefined, event: string): boolean {
