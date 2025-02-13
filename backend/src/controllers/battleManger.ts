@@ -368,18 +368,18 @@ const player2Action = battle.player2
 
 
     const statusMap: { [key: string]: string } = {
-        "Won-Canceled": "Disputed",
-        "Lost-Canceled": "Disputed",
-        "Canceled-Lost": "Disputed",
-        "Lost-Lost": "Disputed",
-        "Canceled-Canceled": "Canceled",
-        "Won-Lost": "In-Progress",
-        "Lost-Won": "In-Progress",
-        "Canceled-Won": "Disputed",
+        "Won-Canceled": "disputed",
+        "Lost-Canceled": "disputed",
+        "Canceled-Lost": "disputed",
+        "Lost-Lost": "disputed",
+        "Canceled-Canceled": "canceled",
+        "Won-Lost": "in-Progress",
+        "Lost-Won": "in-Progress",
+        "Canceled-Won": "disputed",
     };
 
     const statusKey = `${player1Action || "None"}-${player2Action || "None"}`;
-    battle.status = statusMap[statusKey] || "Disputed";
+    battle.status = statusMap[statusKey] || "disputed";
 };
 
 export const completeBattle = async(req: any, res: any)=>{
