@@ -478,6 +478,7 @@ export const  determineWinner = async (req: any ,res : any) => {
         if(battle.dispute){
             battle.dispute.proofs[0].player === userId ?
             battle.dispute.proofs[0].reason = reason : battle.dispute.proofs[1].reason = reason;
+            battle.dispute.timestamp = new Date();
         }
         await battle.save();
   

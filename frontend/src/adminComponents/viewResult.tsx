@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { API_URL } from "../utils/url"
 import axios from "axios"
 import { useUserContext } from "../hooks/UserContext"
+import { useNavigate } from "react-router-dom"
 
 export const BattleResult = ()=>{
 
@@ -34,6 +35,7 @@ export const BattleResult = ()=>{
     const [ rejectClicked, setRejectClicked ] = useState(false);
     const [ viewClicked, setViewClicked ] = useState(false);
     const [ reason, setReason ] = useState("");
+    const navigate = useNavigate();
 
     useEffect(()=>{
         const handle = async()=>{
@@ -160,13 +162,17 @@ export const BattleResult = ()=>{
      onChange={(e)=>{
         setReason(e.target.value);
      }} ></textarea>
-                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg">sent</div>
-                            <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
+                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
                                 setRejectClicked(false);
-                                {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                {
+                                    setUserId(battle.dispute.winner)
                                     setBattleId(battle._id);
                                     handleReject();
-                            }}}>cancel</div>
+                                    navigate('/admin/completeBattle')
+                            }}}>sent</div>
+                            <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
+                                setRejectClicked(false);
+                              }}>cancel</div>
                         </div>}
                  </div>
     )
