@@ -373,8 +373,8 @@ const player2Action = battle.player2
         "Canceled-Lost": "disputed",
         "Lost-Lost": "disputed",
         "Canceled-Canceled": "canceled",
-        "Won-Lost": "in-Progress",
-        "Lost-Won": "in-Progress",
+        "Won-Lost": "completed",
+        "Lost-Won": "completed",
         "Canceled-Won": "disputed",
     };
 
