@@ -163,6 +163,7 @@ export const DisputeResult = ()=>{
                                     {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
+                                        navigate('/admin/disputeBattle')
                                 }}}>Approve</div>}
                                 <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
                                     setRejectClicked(true);
@@ -185,7 +186,7 @@ export const DisputeResult = ()=>{
                             </div>
                             <div className="flex">
                                 <div className="p-2 w-28 border">status </div>
-                                { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "wiiner" : "loser" }</div>}
+                                { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player2 ? "winner" : "loser" }</div>}
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>

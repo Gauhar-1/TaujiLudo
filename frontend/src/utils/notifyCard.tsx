@@ -11,16 +11,20 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
         <div className="w-full overflow-auto break-words">
           {notification.reason}
         </div>
-      ) : (
+      ) : notification.type === "profile"  ? (
         <div className="w-full overflow-auto break-words">
           {notification.kycDetails.reason}
         </div>
-      )}
+      ) :  <div className="w-full overflow-auto break-words">
+      {notification.dispute.reason}
+    </div>}
             <div className="flex justify-end text-gray-500">
            { notification.type === "profile"  ? <div>
             {formatDistanceToNowStrict(new Date(notification.kycDetails.createdAt), { addSuffix: true })}
-    </div> : <div>
+    </div> : notification.type === "notification"  ? <div>
             {formatDistanceToNowStrict(new Date(notification.createdAt), { addSuffix: true })}
+    </div> :<div>
+            {formatDistanceToNowStrict(new Date(notification.dispute.timestap), { addSuffix: true })}
     </div>}
             </div>
         </div>

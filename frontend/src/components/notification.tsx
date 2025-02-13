@@ -23,43 +23,52 @@ export const Notifications = ()=>{
      useEffect(()=>{
 
       const loadNotificatons = async()=>{
-       try{ const response = await axios
-        .get(`${API_URL}/api/auth/notifications`, {params: { userId }})
-
-        let notifications = [];
-        if (response.data) {
-          notifications = response.data.map((n: any) => ({
+        try {
+          // 🔵 Fetch Notifications
+          const response = await axios.get(`${API_URL}/api/auth/notifications`, {
+            params: { userId },
+            withCredentials: true, // Ensure cookies are sent
+          });
+    
+          let notifications = response.data?.map((n: any) => ({
             ...n,
-            Date : new Date().toISOString(),
-            type: "notification", // Add type identifier
-          }));
-        }
-              
-               // Fetch Profiles
-        const profileResponse = await axios.get(`${API_URL}/api/auth/getProfiles`);
-
-        let profiles = [];
-        if (profileResponse.data) {
-          profiles = profileResponse.data.map((p: any) => ({
+            Date: new Date().toISOString(),
+            type: "notification",
+          })) || [];
+    
+          // 🔵 Fetch Profiles
+          const profileResponse = await axios.get(`${API_URL}/api/auth/getProfiles`, {
+            withCredentials: true,
+          });
+    
+          let profiles = profileResponse.data?.map((p: any) => ({
             ...p,
-            Date :new Date().toISOString(),
-            type: "profile", // Add type identifier
-          }));
+            Date: new Date().toISOString(),
+            type: "profile",
+          })) || [];
+    
+          // 🔵 Fetch Battles
+          const battleResponse = await axios.get(`${API_URL}/api/auth/battles/battleHistory`, {
+            withCredentials: true,
+          });
+    
+          let battles = battleResponse.data?.map((b: any) => ({
+            ...b,
+            Date: new Date().toISOString(),
+            type: "Battle",
+          })) || [];
+    
+          // 🔵 Merge & Sort by `createdAt`
+          const mergedData = [...notifications, ...profiles, ...battles].sort((a, b) => {
+            const dateA = new Date(a.kycDetails?.createdAt || a.createdAt || a.dispute.timestap).getTime();
+            const dateB = new Date(b.kycDetails?.createdAt || b.createdAt || b.dispute.timestap).getTime();
+            return dateB - dateA; // Sort newest first
+          });
+    
+          setCombinedData(mergedData);
+        } catch (err) {
+          console.error("🛑 Error loading notifications:", err);
         }
-
-       // Merge & Sort by `createdAt`
-const mergedData = [...notifications, ...profiles].sort((a, b) => {
-  const dateA = new Date(a.kycDetails?.createdAt || a.createdAt).getTime();
-  const dateB = new Date(b.kycDetails?.createdAt || b.createdAt).getTime();
-
-  return dateB - dateA; // Sort newest first
-});
-
-        setCombinedData(mergedData);
-            }
-              catch(err){
-                console.log("err :" +err);
-              }
           }
           
           loadNotificatons();
