@@ -365,7 +365,7 @@ export const  determineWinner = async (req: any ,res : any) => {
   
     try {
   
-        const battle = await Battle.findOne({battleId});
+        const battle = await Battle.findById(battleId);
   
         if (!battle) {
             console.log('Battle not found');

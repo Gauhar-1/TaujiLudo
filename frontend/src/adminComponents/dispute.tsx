@@ -198,13 +198,15 @@ export const DisputeResult = ()=>{
             setReason(e.target.value);
         }}
       ></textarea>
-                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg">sent</div>
+                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
+                                setRejectClicked2(false);
+                                {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                    setBattleId(battle._id);
+                                    handleReject();
+                            }}}>sent</div>
                             <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
                                  setRejectClicked2(false);
-                                 {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
-                                     setBattleId(battle._id);
-                                     handleReject();
-                            }}}>cancel</div>
+                                 }}>cancel</div>
                         </div>}
                     {rejectClicked2 && <div className="bg-gray-400 px-10 py-6 absolute top-60 shadow-md rounded-lg w-80 m-6">
                         <div className="pb-2 text-lg font-bold text-blue-600">{`Send to ${battle.player2Name}`}</div>
@@ -215,13 +217,16 @@ export const DisputeResult = ()=>{
       onChange={(e)=>{
         setReason(e.target.value);
       }}></textarea>
-                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg">sent</div>
-                            <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
+                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
                                 setRejectClicked2(false);
                                 {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                     setBattleId(battle._id);
                                     handleReject();
-                            }}}>cancel</div>
+                            }}}>sent</div>
+                            <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
+                                setRejectClicked2(false);
+                               
+                            }}>cancel</div>
                         </div>}
                  </div>
     )
