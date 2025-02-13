@@ -5,18 +5,35 @@ import { useUserContext } from "../hooks/UserContext"
 
 export const BattleResult = ()=>{
 
-    const { battleId } = useUserContext();
+    const { battleId, userId , setBattleId, setUserId} = useUserContext();
     const [ battle, setBattle ] = useState({
+        _id: "",
         amount: 0,
         winner: "",
         filename: "",
         path: "",
         player1Name : "",
         player2Name : "",
+        player1 : "",
+        player2 : "",
+        status : "",
+        dispute : {
+            players : [],
+            resolved : false,
+            winner : "",
+            proofs : [{
+                filename: "",
+                _id : {},
+                player : "",
+                clicked : ""
+            }],
+        },
+        reason: ""
 
     });
     const [ rejectClicked, setRejectClicked ] = useState(false);
     const [ viewClicked, setViewClicked ] = useState(false);
+    const [ reason, setReason ] = useState("");
 
     useEffect(()=>{
         const handle = async()=>{
@@ -36,7 +53,40 @@ export const BattleResult = ()=>{
         }
 
         handle();
-    },[battleId])
+    },[battleId]);
+
+    const handleVerify = async()=>{
+        try{
+            if(battleId){
+                console.log("Battle Id", battleId);
+            }
+
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`,{ battleId, userId })
+
+            if(!response.data){
+                console.log("Response: "+response.data);
+            }
+        }
+        catch(err){
+            console.log("Error: "+ err);
+        }
+    }
+    const handleReject = async()=>{
+        try{
+            if(userId){
+                console.log("User Id",userId);
+            }
+
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId, reason, battleId})
+
+            if(!response.data){
+                console.log("Response: "+response.data);
+            }
+        }
+        catch(err){
+            console.log("Error: "+ err);
+        }
+    }
 
     
     return (
@@ -64,11 +114,15 @@ export const BattleResult = ()=>{
                         <div className="p-4">
                         <div className="flex">
                                 <div className="p-2 w-28 border">Winner</div>
-                                <div className="p-2 w-60 border">{battle.winner}</div>
+                                <div className="p-2 w-60 border">{battle.winner === battle.player1 ? battle.player1Name : battle.player2Name }</div>
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">Loser</div>
-                                <div className="p-2 w-60 border">{battle.winner === battle.player1Name ? battle.player2Name : battle.player1Name }</div>
+                                <div className="p-2 w-60 border">{battle.winner === battle.player2 ? battle.player2Name : battle.player1Name }</div>
+                            </div>
+                        <div className="flex">
+                                <div className="p-2 w-28 border">Status</div>
+                                <div className={`p-2 font-bold w-60 border ${battle.winner === "decided"? "text-green-400" : "text-red-500" }`}>{battle.winner === "decided"? "Approved" : "Pending" }</div>
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>
@@ -84,26 +138,35 @@ export const BattleResult = ()=>{
                                 </div>
                             </div>
                            {!rejectClicked && <div className="flex text-center">
-                                <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2">Approve</div>
+                                <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
+                                    {battle.dispute.proofs[0].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                        setBattleId(battle._id);
+                                        handleVerify();
+                                }}}>Approve</div>
                                 <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
                                     setRejectClicked(true);
                                 }}>Reject</div>
                             </div>}
                         </div>
                         { viewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.filename}`} alt="" className="rounded-lg" />
+                            <img src={`${API_URL}/uploads/${battle.dispute.proofs[0].player === battle.player1 ? battle.dispute.proofs[0].filename : battle.dispute.proofs[1].filename}`} alt="" className="rounded-lg" />
                         </div> }
                     </div>
-                    {rejectClicked && <div className="bg-gray-400 p-10 absolute w-80 m-6">
+                    {rejectClicked && <div className="bg-gray-400 p-10 absolute top-56 rounded-md shadow-lg w-80 m-6">
                         <textarea
         className="w-full border border-gray-300 p-2 rounded resize-none break-words whitespace-normal"
         rows={4}
         placeholder="Type your text here..."
-      ></textarea>
+     onChange={(e)=>{
+        setReason(e.target.value);
+     }} ></textarea>
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg">sent</div>
                             <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
                                 setRejectClicked(false);
-                            }}>cancel</div>
+                                {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                    setBattleId(battle._id);
+                                    handleReject();
+                            }}}>cancel</div>
                         </div>}
                  </div>
     )
