@@ -15,7 +15,8 @@ export const Notifications = ()=>{
       userId?: string;
       type?: string;
       createdAt: string;
-      profile?: any; // Store profile data if available
+      profile?: any;
+      dispute : [] // Store profile data if available
     }[]
   >([]);
 
@@ -60,8 +61,8 @@ export const Notifications = ()=>{
     
           // 🔵 Merge & Sort by `createdAt`
           const mergedData = [...notifications, ...profiles, ...battles].sort((a, b) => {
-            const dateA = new Date(a.kycDetails?.createdAt || a.createdAt || a.dispute.timestap).getTime();
-            const dateB = new Date(b.kycDetails?.createdAt || b.createdAt || b.dispute.timestap).getTime();
+            const dateA = new Date(a.kycDetails?.createdAt || a.createdAt || (a.dispute ? a.dispute.timestamp : 0)).getTime();
+            const dateB = new Date(b.kycDetails?.createdAt || b.createdAt || (b.dispute ? b.dispute.timestamp : 0)).getTime();
             return dateB - dateA; // Sort newest first
           });
     
@@ -79,7 +80,10 @@ export const Notifications = ()=>{
         <div className="bg-gray-300 py-20 min-h-screen max-w-sm flex flex-col gap-2">
            {combinedData
     .filter((notification) => 
-      notification.type === "notification" ? notification.reason : notification.kycDetails?.reason
+      {if (notification.type === "notification") return !!notification.reason;
+    if (notification.type === "profile") return !!notification.kycDetails?.reason;
+    if (notification.type === "Battle") return notification.dispute && Object.keys(notification.dispute).length > 0;
+    return false;}
     )
     .map((notification) => (
       <NotifyCard key={notification._id} notification={notification} />
