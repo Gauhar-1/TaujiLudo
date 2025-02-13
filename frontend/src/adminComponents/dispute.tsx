@@ -18,6 +18,7 @@ export const DisputeResult = ()=>{
         player2 : "",
         dispute : {
             players : [],
+            resolved : false,
             proofs : [{
                 filename: "",
                 _id : {},
@@ -136,11 +137,11 @@ export const DisputeResult = ()=>{
                                 </div>
                             </div>
                            {!rejectClicked && <div className="flex text-center">
-                                <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
+                                { battle.dispute.resolved && <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
                                     {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
-                                }}}>Approve</div>
+                                }}}>Approve</div>}
                                 <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
                                     setRejectClicked(true);
                                 }}>Reject</div>
@@ -174,11 +175,11 @@ export const DisputeResult = ()=>{
                                 </div>
                             </div>
                            {!rejectClicked2 && <div className="flex text-center">
-                                <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
+                                { battle.dispute.resolved && <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
                                     {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
-                                }}}>Approve</div>
+                                }}}>Approve</div>}
                                 <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
                                     setRejectClicked2(true);
                                 }}>Reject</div>
