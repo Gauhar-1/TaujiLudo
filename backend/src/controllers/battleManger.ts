@@ -75,33 +75,33 @@ export const showBattles = async(req: any, res: any, next: any)=>{
         }
 }
 
-export const battleHistory = async( req : any, res: any, next: any )=>{
-
-    try{
+export const battleHistory = async (req: any, res: any, next: any) => {
+    try {
         const { userId } = req.query;
 
-        const battle = await Battle.find( { player1 : userId }).sort({ createdAt : -1 });
-        
-        if(!battle){
-            console.log("player1 is not found");
-            
-            const battle = await Battle.find({ player2 : userId }).sort({ createdAt : -1 });
-            
-            if(!battle){
-                console.log(" No Battle found ");
-            }
-            
-            res.status(200).json(battle);
+        // 🔵 First, search for battles where the user is `player1`
+        let battle = await Battle.find({ player1: userId }).sort({ createdAt: -1 });
 
-            return;
+        // 🔵 If no battles are found, check `player2`
+        if (battle.length === 0) {
+            console.log("player1 not found, checking player2...");
+
+            battle = await Battle.find({ player2: userId }).sort({ createdAt: -1 });
         }
-        
-        res.status(200).json(battle);
+
+        // 🔴 If still no battles found, return 404
+        if (battle.length === 0) {
+            return res.status(404).json({ message: "No battle history found for this user." });
+        }
+
+        // ✅ Return battles if found
+        return res.status(200).json(battle);
+    } catch (err : any) {
+        console.error("Error:", err);
+        return res.status(500).json({ error: err.message });
     }
-    catch(err){
-        console.log("error: " +err);
-    }
-}
+};
+
 
 export const joinBattle= async(req: any, res: any, next: any)=>{
 

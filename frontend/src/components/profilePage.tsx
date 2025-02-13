@@ -103,6 +103,19 @@ export const ProfilePage = ()=>{
       }
     };
 
+    const handleLogOut = async()=>{
+      try{
+           const response = await axios.post(`${API_URL}/api/auth/logout`);
+
+           if(!response.data.success){
+             console.log("Reponse false");
+           }
+      }
+      catch(err){
+        console.error(err);
+      }
+    }
+
     
 
     return ( 
@@ -240,9 +253,10 @@ export const ProfilePage = ()=>{
                 </div>
                 <div className="mt-16 ">
                 <div className="absolute w-80 bg-gray-300 text-black rounded-xl p-2 m-8 border border-black text-center hover:cursor-pointer hover:bg-green-500 hover:text-white" onClick={()=>{
-                    navigate('/');
+                    handleLogOut();
                     setLogin(false);
-                    localStorage.clear();
+                    navigate('/');
+                    sessionStorage.clear();
                 }}>Log out</div>
                 </div>
         </div>
