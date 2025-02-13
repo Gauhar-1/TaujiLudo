@@ -108,6 +108,7 @@ useEffect(() => {
     formData.append("battleId", battle._id);
     formData.append("playerId", userId);
     formData.append("phoneNumber", phoneNumber);
+    console.log("Phone Number: "+ phoneNumber);
 
     try {
       await axios.post(`${API_URL}/api/auth/battles/inBattle/uploads`, formData, {

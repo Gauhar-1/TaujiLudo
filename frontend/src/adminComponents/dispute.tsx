@@ -143,7 +143,7 @@ export const DisputeResult = ()=>{
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">status </div>
-                                <div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "wiiner" : "loser" }</div>
+                                { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "wiiner" : "loser" }</div>}
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>
@@ -185,7 +185,7 @@ export const DisputeResult = ()=>{
                             </div>
                             <div className="flex">
                                 <div className="p-2 w-28 border">status </div>
-                                <div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "loser" : "winner" }</div>
+                                { battle.dispute.winner &&<div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "wiiner" : "loser" }</div>}
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>
@@ -201,7 +201,7 @@ export const DisputeResult = ()=>{
                                 </div>
                             </div>
                            {!rejectClicked2 && <div className="flex text-center">
-                                { battle.dispute.resolved && <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
+                                {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
                                     {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
@@ -226,13 +226,13 @@ export const DisputeResult = ()=>{
         }}
       ></textarea>
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
-                                setRejectClicked2(false);
+                                setRejectClicked(false);
                                 {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                     setBattleId(battle._id);
                                     handleReject();
                             }}}>sent</div>
                             <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
-                                 setRejectClicked2(false);
+                                 setRejectClicked(false);
                                  }}>cancel</div>
                         </div>}
                     {rejectClicked2 && <div className="bg-gray-400 px-10 py-6 absolute top-60 shadow-md rounded-lg w-80 m-6">
