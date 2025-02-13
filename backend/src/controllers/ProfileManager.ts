@@ -307,13 +307,6 @@ export const  verifyKyc = async (req: any ,res : any) => {
       }
       await profile.save();
 
-  
-      // Add tokens to the user's wallet (mocked here)
-      // Replace with your wallet update logic
-
-      // Update notification as transaction completed
-      // await Notification.updateOne({paymentReference : transaction.paymentReference, status:'success'})
-
       res.status(200).json({ success: true, message: 'Kyc verified and notification sent' });
   } catch (err : any) {
       console.error(err);
