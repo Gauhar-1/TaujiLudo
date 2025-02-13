@@ -18,7 +18,7 @@ export const DisputeResult = ()=>{
         player2 : "",
         dispute : {
             players : [],
-            resolved : true,
+            resolved : false,
             proofs : [{
                 filename: "",
                 _id : {},
@@ -65,6 +65,8 @@ export const DisputeResult = ()=>{
                 console.log("Response: "+response.data);
             }
 
+            setBattle(response.data.battle);
+
         }
         catch(err){
             console.log("Error: "+ err);
@@ -78,9 +80,10 @@ export const DisputeResult = ()=>{
 
             const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId, reason, battleId})
 
-            if(response.data){
+            if(!response.data){
                 console.log("Response: "+response.data);
             }
+            setBattle(response.data.battle);
 
         }
         catch(err){
