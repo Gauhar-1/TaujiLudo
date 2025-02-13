@@ -3,7 +3,7 @@ import { autoLogin, logOut, sendOtp, verifyOtp } from '../controllers/authContro
 import { AllTransaction, depositAmount, findTransaction, getTransaction, paymentProof, rejectPayment, ReqTransaction, verifyPayment, withdrawAmount } from '../controllers/moneyController';
 import { allNotifications, getNotifications, markAsRead } from '../controllers/notifyController';
 import { blockedPlayer, completeKYC, findProfile, getBlockedOnes, getProfile, getReferal, kycCompletedProfiles, rejectKyc, unBlockPlayer, updateAmount, updateProfile, verifyKyc } from '../controllers/ProfileManager';
-import { battleHistory, canceledBattle, completeBattle, createBattle, deleteBattle, disputeBattle, handleLudoCode, inProgressBattle, joinBattle, manageRequest, pendingBattle, runningBattle, showBattles, uploadScreenShot } from '../controllers/battleManger';
+import { battleHistory, canceledBattle, completeBattle, createBattle, deleteBattle, determineWinner, disputeBattle, handleLudoCode, inProgressBattle, joinBattle, manageRequest, pendingBattle, rejectDispute, runningBattle, showBattles, uploadScreenShot } from '../controllers/battleManger';
 import {io} from '../app';
 import express from "express";
 import path from 'path';
@@ -35,6 +35,8 @@ router.get('/battles/pending', pendingBattle);
 router.get('/battles/inBattle', inProgressBattle);
 router.get('/battles/runningBattle', runningBattle);
 router.get('/battles/disputeBattle', disputeBattle);
+router.post('/battles/disputeBattle/approve', determineWinner);
+router.post('/battles/disputeBattle/reject', rejectDispute);
 router.post('/battles/:id/complete', completeBattle);
 router.post('/battles/inBattle/uploads',upload.single('image'), uploadScreenShot);
 router.post('/battles/inBattle/canceled', canceledBattle);

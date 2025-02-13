@@ -58,7 +58,7 @@ export const DisputeResult = ()=>{
                 console.log("Battle Id", battleId);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/verify-kyc`,{ battleId, userId })
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`,{ battleId, userId })
 
             if(!response.data){
                 console.log("Response: "+response.data);
@@ -75,7 +75,7 @@ export const DisputeResult = ()=>{
                 console.log("User Id",userId);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/reject-kyc`,{userId, reason, battleId})
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId, reason, battleId})
 
             if(response.data){
                 console.log("Response: "+response.data);
