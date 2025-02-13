@@ -11,6 +11,7 @@ interface Dispute {
   proofs: { player: string; filename: string;  path: string ; reason: string }[]; // Screenshot uploads
   resolved: boolean;
   winner: string | null; // Final decision
+  timestamp: Date;
 }
 
 interface IBattle extends Document {
@@ -59,6 +60,7 @@ const BattleSchema: Schema = new Schema({
     proofs: [{ player: String, filename: String, path: String, reason : String }],
     resolved: { type: Boolean, default: false },
     winner: { type: String, default: null },
+    timestamp: { type: Date, default: Date.now },
   },
 });
 

@@ -261,6 +261,8 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
             proofs: [{ player: playerId as string, filename: req.file.filename, path: req.file.path , reason : "" }],
             resolved: false,
             winner: null,
+            timestamp: new Date(),
+            
           };
         } else {
           // Prevent duplicate uploads by the same player
