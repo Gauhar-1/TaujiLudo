@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { API_URL } from "../utils/url"
 import axios from "axios"
 import { useUserContext } from "../hooks/UserContext"
+import { socket } from "../components/homePage"
+import { useNavigate } from "react-router-dom"
 
 export const DisputeResult = ()=>{
 
@@ -16,9 +18,11 @@ export const DisputeResult = ()=>{
         player2Name : "",
         player1 : "",
         player2 : "",
+        status : "",
         dispute : {
             players : [],
             resolved : false,
+            winner : "",
             proofs : [{
                 filename: "",
                 _id : {},
@@ -32,6 +36,7 @@ export const DisputeResult = ()=>{
     const [ rejectClicked2, setRejectClicked2 ] = useState(false);
     const [ viewClicked2, setViewClicked2 ] = useState(false);
     const [ reason, setReason ] = useState("");
+    const navigate = useNavigate();
 
     useEffect(()=>{
         const handle = async()=>{
@@ -51,6 +56,12 @@ export const DisputeResult = ()=>{
         }
 
         handle();
+
+          // Polling every 5 seconds
+    const interval = setInterval(handle, 5000);
+
+    // Cleanup on component unmount
+    return () => clearInterval(interval);
     },[battleId])
 
     const handleVerify = async()=>{
@@ -64,9 +75,6 @@ export const DisputeResult = ()=>{
             if(!response.data){
                 console.log("Response: "+response.data);
             }
-
-            setBattle(response.data.battle);
-
         }
         catch(err){
             console.log("Error: "+ err);
@@ -83,22 +91,29 @@ export const DisputeResult = ()=>{
             if(!response.data){
                 console.log("Response: "+response.data);
             }
-            setBattle(response.data.battle);
-
         }
         catch(err){
             console.log("Error: "+ err);
         }
     }
 
-
-    
+    const deleteBattle = () => {
+        socket.emit("deleteBattle", battle._id);
+        console.log("Battleid: "+ battle._id);
+      };
     return (
         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
                     <div className="text-3xl font-serif">Battle</div>
                     <div className="bg-white  rounded-md shadow-md pb-4">
                         <div className="bg-gray-100 rounded-t-md">
-                            <div className=" font-semibold my-4 py-3 px-4 text-blue-700 border-b-2">View dispute</div>
+                            <div className="flex justify-between font-semibold my-4 py-3 px-4 text-blue-700 border-b-2">
+                                <div>View dispute</div>
+                            <button className="text-center font-mono bg-red-600 text-white py-2 px-4 text-xs rounded-md" onClick={() => {
+                            setBattleId(battle._id);
+                            deleteBattle();
+                            navigate('/admin/disputeBattle')
+                        } }>Delete</button>
+                            </div>
                         </div>
                         <div className="p-4">
                             <div className="flex">
@@ -127,6 +142,10 @@ export const DisputeResult = ()=>{
                                 <div className="p-2 w-60 border">{battle.dispute.players[0] }</div>
                             </div>
                         <div className="flex">
+                                <div className="p-2 w-28 border">status </div>
+                                <div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "wiiner" : "loser" }</div>
+                            </div>
+                        <div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>
                                 <div className="p-2 w-60 border">
                                     <div className="bg-green-300 w-11 p-1 rounded-md" onClick={()=>{
@@ -140,7 +159,7 @@ export const DisputeResult = ()=>{
                                 </div>
                             </div>
                            {!rejectClicked && <div className="flex text-center">
-                                { battle.dispute.resolved && <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
+                                {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
                                     {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
@@ -163,6 +182,10 @@ export const DisputeResult = ()=>{
                         <div className="flex">
                                 <div className="p-2 w-28 border">Phone </div>
                                 <div className="p-2 w-60 border">{battle.dispute.players[1] }</div>
+                            </div>
+                            <div className="flex">
+                                <div className="p-2 w-28 border">status </div>
+                                <div className="p-2 w-60 border">{battle.dispute.winner === battle.player1 ? "loser" : "winner" }</div>
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">ScreenShot</div>

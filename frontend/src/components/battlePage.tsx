@@ -29,7 +29,7 @@ interface Battle {
 
 export const BattlePage = ()=>{ 
     const navigate = useNavigate();
-    const { battleId, userId} = useUserContext();
+    const { battleId, userId, phoneNumber} = useUserContext();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [reason, setReason] = useState<string>("");
@@ -106,7 +106,7 @@ useEffect(() => {
     const formData = new FormData();
     formData.append("image", selectedFile);
     formData.append("battleId", battle._id);
-    formData.append("playerId", userId);
+    formData.append("playerId", phoneNumber);
 
     try {
       await axios.post(`${API_URL}/api/auth/battles/inBattle/uploads`, formData, {
