@@ -269,7 +269,7 @@ export const uploadScreenShot = async(req: any, res: any, next: any)=>{
             return res.status(400).json({ error: "You have already uploaded a screenshot" });
           }
     
-          battle.dispute.players.push(playerId);
+          battle.dispute.players.push(phoneNumber);
           battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason : "" });
     
           // If both players upload screenshots, mark as disputed
