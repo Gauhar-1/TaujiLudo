@@ -367,10 +367,7 @@ export const getReferal = async(req: any, res:any)=>{
 
     profile.referalLink = referralLink;
     await profile.save()
-    
-    const referalCount = profile.referrals?.length || 0;
-
-    res.json(referralLink, referalCount );
+    res.json({ referralLink });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   } 
