@@ -190,7 +190,7 @@ export const ProfilePage = ()=>{
             <div className="m-5 bg-gray-600 rounded-xl flex flex-col hover:bg-gray-700 ">
                 <div className="flex">
                 <img src="../../profile.png" alt=""  className="h-32  p-3"/>
-                <div className="text-white text-3xl font-serif mx-6 my-10" >{name}</div>
+                <div className="text-white text-xl w-32 font-serif mx-6 my-10" >{name}</div>
                 <div onClick={()=>{
                    setEditClicked(true);
                 }}>

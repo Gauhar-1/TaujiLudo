@@ -20,6 +20,7 @@ export const ReferPage = ()=>{
             const { referalLink , referalCount } = response.data[0];
             setReferalLink(referalLink);
             setReferals(referalCount);
+            console.log("Referal Count : "+ referalCount)
         }
 
         handleReferal();

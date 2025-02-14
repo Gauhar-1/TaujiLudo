@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import {  useNavigate, useSearchParams } from "react-router-dom";
+import {  useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
@@ -20,6 +20,37 @@ export const LoginPage = () => {
 
   // Validate OTP (assuming 6-digit OTP)
   const isOtpValid = (otp: string) => /^\d{6}$/.test(otp);
+
+
+    const location = useLocation();
+  
+  
+     // Check Auth on Mount
+     useEffect(() => {
+      const checkAuth = async () => {
+     
+        try {
+          const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+  
+          if (response.data.success) {
+            const userData = response.data.user;
+            setUserId(userData.userId);
+            setName(userData.name);
+            setPhoneNumber(userData.phoneNumber);
+            setLogin(true);
+             // Navigate only if coming from login page
+             if (location.pathname === "/") {
+                navigate("/winCash");
+              }
+          }
+        } catch (err) {
+          console.log("User not logged in");
+          // setLogin(false);
+        }
+      };
+  
+      checkAuth();
+    }, [location.pathname]);
 
   useEffect(() => {
     const refCode = searchParams.get("ref");

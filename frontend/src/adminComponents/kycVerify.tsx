@@ -23,7 +23,7 @@ export const KycVerification = ()=>{
     const [ backViewClicked, setBackViewClicked ] = useState(false);
     const [ reason, setReason ] = useState("");
 
-    const { phoneNumber, userId } = useUserContext();
+    const { phoneNumber, userId, setUserId } = useUserContext();
 
     const navigate = useNavigate();
     // const navigate = useLocation();
@@ -40,12 +40,13 @@ export const KycVerification = ()=>{
             }
             console.log(response.data)
 
-            const { name ,  email, kycDetails, filename, path } = response.data[0];
+            const { name ,  email, kycDetails, filename, path, userId } = response.data[0];
 
 
             setKycDetails(kycDetails);
             setUserName(name);
             setEmail(email  || "N/A");
+            setUserId(userId)
             kycDetails.filename = filename;
             kycDetails.path = path;
             console.log("profile fetched successfully");

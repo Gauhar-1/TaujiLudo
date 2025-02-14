@@ -365,11 +365,12 @@ export const getReferal = async(req: any, res:any)=>{
 
     const referralLink = `https://taujiludo.in/?ref=${profile.Referal}`;
 
-    const referalCount = profile.referrals?.length || 0;
-
     profile.referalLink = referralLink;
     await profile.save()
-    res.json({ referralLink, referalCount });
+    
+    const referalCount = profile.referrals?.length || 0;
+
+    res.json(referralLink, referalCount );
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   } 

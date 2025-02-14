@@ -153,7 +153,7 @@ export const AdminSideBar = ( props : any)=>{
                 <div className="font-mono">Notifications</div>
               </div>
               <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/home');
+                navigate('/profile');
                 props.setSidebarClicked(false);
                 setAdminClicked(false);
               }}>
