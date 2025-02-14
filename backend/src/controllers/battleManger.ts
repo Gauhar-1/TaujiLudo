@@ -350,7 +350,9 @@ export const battleLost = async(req: any, res: any, next: any)=>{
 
 
    // 🏆 Update battle status based on conditions
-   updateBattleStatus(battle);
+   if(battle.dispute.proofs[0].clicked && battle.dispute.proofs[1].clicked){
+       updateBattleStatus(battle);
+   }
 
    await battle.save();
    res.json("Loser assigned Successfully");
