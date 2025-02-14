@@ -6,6 +6,7 @@ import { API_URL } from "../utils/url";
 export const ReferPage = ()=>{
     const divRef = useRef<HTMLDivElement>(null);
     const [referalLink, setReferalLink] = useState("");
+    const [referals, setReferals] = useState("");
     const { phoneNumber } = useUserContext();
 
     useEffect(() => {
@@ -16,8 +17,9 @@ export const ReferPage = ()=>{
                 return console.log("Response Not found");
             }
 
-            const { referalLink } = response.data[0];
+            const { referalLink , referalCount } = response.data[0];
             setReferalLink(referalLink);
+            setReferals(referalCount);
         }
 
         handleReferal();
@@ -43,7 +45,7 @@ export const ReferPage = ()=>{
                     <div className="flex p-1 justify-center">
                         <div className="flex flex-col gap-3 text-center py-2 px-3 border-r ">
                             <div className="text-sm font-semibold rounded-md">Referred Players</div>
-                            <div className="text-xs font-semibold">0</div>
+                            <div className="text-xs font-semibold">{referals}</div>
                         </div>
                         <div className="flex flex-col gap-3 text-center py-2 px-3 border-l ">
                             <div className="text-sm font-semibold">Referral Earning</div>

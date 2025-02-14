@@ -18,7 +18,10 @@ export const GameHistory =()=>{
         "ludoCode": "",
         "winner": null,
         "createdAt": "",
-        "__v": 0
+        "__v": 0,
+        dispute :{
+            winner : ""
+        }
     }]);
 
     const { userId } = useUserContext() ;
@@ -66,7 +69,7 @@ export const GameHistory =()=>{
     <div className="flex  gap-1">
         <div className="font-mono text-sm text-purple-500">Winner:</div>
         <div className="flex gap-2">
-     <div className="font-bold text-xs">{battle.winner}</div>
+     <div className="font-bold text-xs">{battle.dispute.winner === battle.player1 ? battle.player1Name : battle.player2Name}</div>
         </div>
     </div>
    </div>
