@@ -365,7 +365,7 @@ export const getReferal = async(req: any, res:any)=>{
 
     const referralLink = `https://taujiludo.in/?ref=${profile.Referal}`;
 
-    const referalCount = profile.referrals.length;
+    const referalCount = profile.referrals?.length || 0;
 
     profile.referalLink = referralLink;
     await profile.save()

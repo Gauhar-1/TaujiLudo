@@ -6,7 +6,7 @@ import { API_URL } from "../utils/url";
 export const ReferPage = ()=>{
     const divRef = useRef<HTMLDivElement>(null);
     const [referalLink, setReferalLink] = useState("");
-    const [referals, setReferals] = useState("");
+    const [referals, setReferals] = useState(0);
     const { phoneNumber } = useUserContext();
 
     useEffect(() => {
