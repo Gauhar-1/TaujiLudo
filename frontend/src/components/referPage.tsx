@@ -17,10 +17,9 @@ export const ReferPage = ()=>{
                 return console.log("Response Not found");
             }
 
-            const { referalLink , referalCount } = response.data[0];
+            const { referalLink , referrals } = response.data[0];
             setReferalLink(referalLink);
-            setReferals(referalCount);
-            console.log("Referal Count : "+ referalCount)
+            setReferals(referrals.length);
         }
 
         handleReferal();
