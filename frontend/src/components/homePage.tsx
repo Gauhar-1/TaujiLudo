@@ -136,7 +136,7 @@ export const HomePage = () => {
 
   const createBattle = () => {
     if (!amount) {
-      alert("Please provide both amount and LudoCode.");
+      alert("Please provide both amount");
       return;
     }
     if(amount%50 !== 0){
@@ -148,7 +148,13 @@ export const HomePage = () => {
       userId, 
       amount,
     };
-    socket.emit("createBattle", battleData);
+    socket.emit("createBattle", battleData, (response: { status: number; message: any; battleData: any; }) => {
+      if (response.status === 400) {
+          alert(response.message); // Show error message
+      } else if (response.status === 200) {
+          console.log("Battle Created:", response.battleData); // Log battle data
+      }
+  });
     console.log("Battle Created:", battleData);
     
   };

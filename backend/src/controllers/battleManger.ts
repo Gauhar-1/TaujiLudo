@@ -1,27 +1,53 @@
 import { de } from "@faker-js/faker/.";
 import { io } from "../app";
 import Battle from "../models/Battle";
+import Profile from "../models/Profile";
 
 const date =  Date.now()
-export const createBattle = async(req: any, res: any, next: any)=>{
+export const createBattle = async (req: any, res: any, next: any) => {
+    try {
+        const { userId, amount, ludoCode, name } = req.body;
 
-    const { userId, amount, ludoCode, name } = req.body;
-    const battle = new Battle({ 
-        player1 : userId,
-         amount,
-         ludoCode,
-         player1Name : name,
-         prize: amount + (amount-(amount*0.05)),
-         status: "pending" 
+        // Fetch active battles of the player
+        const playerBattles = await Battle.find({
+            $or: [{ player1: userId }, { player2: userId }]
+        }).sort({ createdAt: 1 });
+
+        // Check if player already has two battles
+        if (playerBattles.length = 2) {
+                return res.status(200).json({ message: "You cannot create more than 2 battles" });
+        }
+
+        // Proceed to create a new battle if constraints are met
+        const battle = new Battle({ 
+            player1: userId,
+            amount,
+            ludoCode,
+            player1Name: name,
+            prize: amount + (amount - (amount * 0.05)),
+            status: "pending" 
         });
-    await battle.save();
-    io.emit("battleCreated", battle);
-    if(!battle){
-        console.log("battle not created");
-    }
-    res.status(201).json(battle);  
 
-}
+        const profile = await Profile.findById(userId);
+
+        profile?.battles.push({
+            battleId : battle._id,
+            timestamp : battle.createdAt,
+             status :  battle.status    
+         })
+
+        await battle.save();
+        await profile?.save();
+        io.emit("battleCreated", battle);
+        console.log("✅ New battle created:", battle._id);
+
+        res.status(201).json(battle);
+    } catch (error) {
+        console.error("❌ Error creating battle:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 
 export const pendingBattle = async(req: any , res: any, next: any)=>{
 
@@ -141,7 +167,7 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
 }
 
 export const manageRequest = async(req: any, res: any)=>{
-    const { battleId,event, details } = req.body;
+    const { battleId,event, details, userId } = req.body;
 
     if(!event || !details){
         console.log("feilds Missing: " + event + " " + details  );
@@ -168,6 +194,7 @@ export const manageRequest = async(req: any, res: any)=>{
         if(!battle){
             console.log("battle not found");
         }
+        
     
         return res.status(200).json(battle);
     }
@@ -181,9 +208,24 @@ export const manageRequest = async(req: any, res: any)=>{
         console.log("battle not found");
     }
 
+     // Fetch active battles of the player
+     const playerBattles = await Battle.find({
+        $or: [{ player1: userId }, { player2: userId }]
+    }).sort({ createdAt: 1 });
+
+      if (playerBattles.length == 2) {
+        // Find if one battle is "in-progress"
+        const inProgressBattle = playerBattles.find(battle => battle.status === "in-progress");
+        const pendingBattle = playerBattles.find(battle => battle.status === "pending");
+
+        // If there is an "in-progress" battle and a "pending" battle, delete the "pending" one
+        if (inProgressBattle && pendingBattle) {
+            await Battle.findByIdAndDelete(pendingBattle._id);
+            console.log(`⚠️ Pending battle ${pendingBattle._id} deleted since another battle is in progress`);
+        } 
+    }
     res.status(200).json(battle);
 }
-
 export const handleLudoCode = async(req: any, res: any)=>{
     const { battleId , ludoCode, event, details } = req.body;
 

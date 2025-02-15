@@ -21,6 +21,12 @@ const ProfileSchema = new mongoose.Schema({
     reason: { type: String, default: null },
     createdAt: { type: Date, default: Date.now },
   },
+  battles : [ {
+    battleId: { type: String, default: null },
+    timestamp: { type: Date, default: null },
+    status: { type: String, default: null },
+    default : null
+  },],
   gameLost: { type: Number, required: true, default: 0 },
   BattlePlayed: { type: Number, required: true, default: 0 },
   Referal: { type: String, required: true },
