@@ -267,8 +267,14 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
         battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" });
       }
   
+      // ✅ Check if both players have clicked
+      const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
+      const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
+      
       // ✅ Update status only after adding proofs
-      updateBattleStatus(battle);
+      if (player1Clicked && player2Clicked) {
+          updateBattleStatus(battle); // Update status only when both clicked
+      }
       await battle.save();
   
       console.log(`✅ Screenshot uploaded & battle status updated: ${battle.status}`);
@@ -309,8 +315,14 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
         battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
       }
   
-      // ✅ Update status after cancel action
-      updateBattleStatus(battle);
+       // ✅ Check if both players have clicked
+       const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
+       const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
+       
+       // ✅ Update status only after adding proofs
+       if (player1Clicked && player2Clicked) {
+           updateBattleStatus(battle); // Update status only when both clicked
+       }
       await battle.save();
   
       console.log(`✅ Battle cancelation recorded & status updated ${battle.status}`);
@@ -350,9 +362,14 @@ export const battleLost = async(req: any, res: any, next: any)=>{
 
 
    // 🏆 Update battle status based on conditions
-   if(battle.dispute.proofs[0].clicked && battle.dispute.proofs[1].clicked){
-       updateBattleStatus(battle);
-   }
+    // ✅ Check if both players have clicked
+    const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
+    const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
+    
+    // ✅ Update status only after adding proofs
+    if (player1Clicked && player2Clicked) {
+        updateBattleStatus(battle); // Update status only when both clicked
+    }
 
    await battle.save();
    res.json("Loser assigned Successfully");
