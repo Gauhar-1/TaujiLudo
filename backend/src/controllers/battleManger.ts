@@ -14,8 +14,8 @@ export const createBattle = async (req: any, res: any, next: any) => {
         }).sort({ createdAt: 1 });
 
         // Check if player already has two battles
-        if (playerBattles.length = 2) {
-                return res.status(200).json({ message: "You cannot create more than 2 battles" });
+        if (playerBattles.length === 2) {
+                return res.status(400).json({ message: "You cannot create more than 2 battles" });
         }
 
         // Proceed to create a new battle if constraints are met
@@ -30,14 +30,17 @@ export const createBattle = async (req: any, res: any, next: any) => {
 
         const profile = await Profile.findById(userId);
 
-        profile?.battles.push({
-            battleId : battle._id,
-            timestamp : battle.createdAt,
-             status :  battle.status    
-         })
+        if(profile){
+            profile.battles.push({
+                battleId : battle._id,
+                timestamp : battle.createdAt,
+                 status :  battle.status    
+             })
+             await profile.save();
+        }
+
 
         await battle.save();
-        await profile?.save();
         io.emit("battleCreated", battle);
         console.log("✅ New battle created:", battle._id);
 
