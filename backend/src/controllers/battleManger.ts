@@ -15,7 +15,8 @@ export const createBattle = async (req: any, res: any, next: any) => {
 
         // Check if player already has two battles
         if (playerBattles.length === 2) {
-                return res.status(400).json({ message: "You cannot create more than 2 battles" });
+            io.emit("battleCreated",{  message: "You cannot create more than 2 battles"} );
+                return ;
         }
 
         // Proceed to create a new battle if constraints are met
