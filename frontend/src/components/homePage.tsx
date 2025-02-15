@@ -150,7 +150,9 @@ export const HomePage = () => {
     };
     socket.emit("createBattle", battleData, (response: {  message: any; battleData: any; }) => {
           alert(response.message); // Show error message
-          console.log("Battle Created:", response.battleData); // Log battle data
+          if (response.battleData) {
+            console.log("Battle Created:", response.battleData); // Log battle data
+        }
   });
   };
 
