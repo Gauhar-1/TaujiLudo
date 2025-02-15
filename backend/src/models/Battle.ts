@@ -52,7 +52,7 @@ const BattleSchema: Schema = new Schema({
   // ✅ Event history tracking
   history: [
     {
-      event: { type: String, enum: ["opponent_found", "player_entered", "opponent_entered", "opponent_canceled","ludoCode_set"], required: true },
+      event: { type: String, enum: ["opponent_found", "player_entered", "opponent_entered", "opponent_canceled","ludoCode_set"]},
       timestamp: { type: Date, default: Date.now },
       details: { type: String },
     },
