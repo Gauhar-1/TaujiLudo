@@ -22,9 +22,9 @@ const ProfileSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
   },
   battles : [ {
-    battleId: { type: String, default: null },
+    battleId: {  type: mongoose.Schema.Types.ObjectId, ref: "Battle"  },
     timestamp: { type: Date, default: null },
-    status: { type: String, default: null },
+    status: { type: String, enum: ["pending", "in-progress", "completed"], default: "pending" },
   },],
   gameLost: { type: Number, required: true, default: 0 },
   BattlePlayed: { type: Number, required: true, default: 0 },

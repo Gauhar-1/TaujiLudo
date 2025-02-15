@@ -3,7 +3,7 @@ import { io } from "../app";
 import Battle from "../models/Battle";
 import Profile from "../models/Profile";
 
-const date =  Date.now()
+const date =  new Date()
 export const createBattle = async (battleData: { userId: any; amount: any; ludoCode: any; name: any; }, callback: any) => {
     try {
         const { userId, amount, ludoCode, name } = battleData;
@@ -15,7 +15,8 @@ export const createBattle = async (battleData: { userId: any; amount: any; ludoC
 
         // Check if player already has two battles
         if (playerBattles.length === 2) {
-                return callback({ message: "You cannot create more than 2 battles", battleData: null });
+            console.log("⚠️ Cannot create more than 2 battles");
+                return callback({ status: 400, message: "You cannot create more than 2 battles", battleData: null });
             }
         
 
@@ -31,26 +32,24 @@ export const createBattle = async (battleData: { userId: any; amount: any; ludoC
         
         await battle.save();
         
-        const profile = await Profile.findById(userId);
-        
-        if(profile){
-            profile.battles.push({
-                battleId : battle._id,
-                timestamp : battle.createdAt,
-                status :  battle.status    
-            })
-            await profile.save();
-        }
-        
+        // ✅ Ensure battle is not duplicated in profile
+    await Profile.findByIdAndUpdate(
+        userId,
+        {
+          $addToSet: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
+        },
+        { new: true, upsert: true }
+      );
         
         io.emit("battleCreated", battle);
         console.log("✅ New battle created:", battle._id);
 
-        return callback({ message: "Battle created successfully", battleData: battle });
+        return callback({ status: 200, message: "Battle created successfully", battleData: battle });
+
 
     } catch (error) {
         console.error("❌ Error creating battle:", error);
-        return callback({ message: "Internal server error", battleData: null });
+        return callback({ status: 500, message: "Internal server error", battleData: null });
     }
 };
 
