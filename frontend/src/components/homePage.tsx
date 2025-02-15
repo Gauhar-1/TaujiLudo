@@ -148,15 +148,10 @@ export const HomePage = () => {
       userId, 
       amount,
     };
-    socket.emit("createBattle", battleData, (response: { status: number; message: any; battleData: any; }) => {
-      if (response.status === 400) {
+    socket.emit("createBattle", battleData, (response: {  message: any; battleData: any; }) => {
           alert(response.message); // Show error message
-      } else if (response.status === 200) {
           console.log("Battle Created:", response.battleData); // Log battle data
-      }
   });
-    console.log("Battle Created:", battleData);
-    
   };
 
   
