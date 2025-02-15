@@ -149,14 +149,16 @@ export const HomePage = () => {
       amount,
     };
     
-    socket.emit("createBattle", battleData, (response: { status: number; message: string; battleData: any }) => {
-      alert(response.message); // Show message (success or error)
-      
-      if (response.status === 200 && response.battleData) {
-          console.log("✅ Battle Created:", response.battleData); // Log successful battle creation
-      } else {
-          console.warn("⚠️ Battle creation failed:", response.message);
-      }
+    // Send request to server
+  socket.emit("createBattle", battleData, (response: { status: number; message: string; battleData?: any }) => {
+    if (response.status === 400) {
+      alert(response.message); // Show error message if battle creation fails
+    } else if (response.status === 200) {
+      console.log("✅ Battle Created:", response.battleData);
+      alert("Battle created successfully!");
+    } else {
+      alert("Something went wrong. Please try again.");
+    }
   });
   
   };

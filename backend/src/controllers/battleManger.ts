@@ -4,54 +4,75 @@ import Battle from "../models/Battle";
 import Profile from "../models/Profile";
 
 const date =  new Date()
-export const createBattle = async (battleData: { userId: any; amount: any; ludoCode: any; name: any; }, callback: any) => {
+export const createBattle = async (
+    battleData: { userId: any; amount: any; ludoCode: any; name: any },
+    callback: any
+  ) => {
     try {
-        const { userId, amount, ludoCode, name } = battleData;
-
-        // Fetch active battles of the player
-        const playerBattles = await Battle.find({
-            $or: [{ player1: userId }, { player2: userId }]
-        }).sort({ createdAt: 1 });
-
-        // Check if player already has two battles
-        if (playerBattles.length === 2) {
-            console.log("⚠️ Cannot create more than 2 battles");
-                return callback({ status: 400, message: "You cannot create more than 2 battles", battleData: null });
-            }
-        
-
-        // Proceed to create a new battle if constraints are met
-        const battle = new Battle({ 
-            player1: userId,
-            amount,
-            ludoCode,
-            player1Name: name,
-            prize: amount + (amount - (amount * 0.05)),
-            status: "pending" 
-        });
-        
-        await battle.save();
-        
-        // ✅ Ensure battle is not duplicated in profile
-    await Profile.findByIdAndUpdate(
-        userId,
-        {
-          $addToSet: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
-        },
-        { new: true, upsert: true }
-      );
-        
-        io.emit("battleCreated", battle);
-        console.log("✅ New battle created:", battle._id);
-
-        return callback({ status: 200, message: "Battle created successfully", battleData: battle });
-
-
-    } catch (error) {
-        console.error("❌ Error creating battle:", error);
-        return callback({ status: 500, message: "Internal server error", battleData: null });
+      const { userId, amount, ludoCode, name } = battleData;
+  
+      // Fetch active battles of the player
+      const playerBattles = await Battle.find({
+        $or: [{ player1: userId }, { player2: userId }],
+      }).sort({ createdAt: 1 });
+  
+      // ✅ If 2 battles exist, check if there's a pending battle to remove
+      if (playerBattles.length === 2) {
+        const pendingBattle = playerBattles.find((battle: any) => battle.status === "pending");
+        const inProgressBattle = playerBattles.find((battle: any) => battle.status === "in-progress");
+  
+        if (!inProgressBattle) {
+          console.log("⚠️ Cannot create more than 2 battles");
+          return callback({ status: 400, message: "You cannot create more than 2 battles", battleData: null });
+        }
+  
+        if (pendingBattle) {
+          await Battle.findByIdAndDelete(pendingBattle._id);
+          console.log(`🗑️ Deleted pending battle: ${pendingBattle._id}`);
+        }
+      }
+  
+      // ✅ Create a new battle
+      const battle = new Battle({
+        player1: userId,
+        amount,
+        ludoCode,
+        player1Name: name,
+        prize: amount + (amount - amount * 0.05),
+        status: "pending",
+      });
+  
+      // 🔎 Debugging Log
+      console.log("🔍 Saving battle:", battle);
+  
+      await battle.save();
+  
+      // ✅ Ensure battle is not duplicated in profile
+      try {
+        const updatedProfile = await Profile.findByIdAndUpdate(
+          userId,
+          {
+            $addToSet: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
+          },
+          { new: true, upsert: true }
+        );
+  
+        console.log("✅ Profile updated:", updatedProfile);
+      } catch (profileError : any) {
+        console.error("❌ Error updating profile:", profileError.stack);
+      }
+  
+      io.emit("battleCreated", battle);
+      console.log("✅ New battle created:", battle._id);
+  
+      return callback({ status: 200, message: "Battle created successfully", battleData: battle });
+  
+    } catch (error : any) {
+      console.error("❌ Error creating battle:", error.stack);
+      return callback({ status: 500, message: "Internal server error", battleData: null });
     }
-};
+  };
+  
 
 
 export const pendingBattle = async(req: any , res: any, next: any)=>{
