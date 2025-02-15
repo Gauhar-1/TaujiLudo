@@ -313,7 +313,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
       updateBattleStatus(battle);
       await battle.save();
   
-      console.log(`✅ Battle cancelation recorded & status updated: ${battle.status}`);
+      console.log(`✅ Battle cancelation recorded & status updated ${battle.status}`);
       res.status(200).json({ message: "Battle canceled successfully", battle });
   
     } catch (err) {
