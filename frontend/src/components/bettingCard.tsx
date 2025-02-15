@@ -44,6 +44,7 @@ export const BettingCard = (props : any)=>{
                 event,
                 details,
                 battleId :props.battle._id,
+                userId
             });
 
             if(!response.data){

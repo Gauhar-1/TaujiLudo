@@ -52,6 +52,16 @@ return battleIdValue;
 
 });
 
+const reasons = [
+  "No room code",
+  "Not joined",
+  "Not Playing",
+  "Don't want to play",
+  "Opponent Abusing",
+  "Game not started",
+  "Others"
+];
+
 useEffect(() => {
     const storedBattleId = localStorage.getItem("battleId");
     const battleIdValue = storedBattleId && typeof(storedBattleId) === typeof(String)? storedBattleId : Id || "";
@@ -332,27 +342,16 @@ const uploadScreenshot = async () => {
                 }}>X</div>
                 </div>
                 <div className="grid grid-cols-2 mt-2 ml-4 gap-2">
-                    <div className="text-xs font-thin  bg-green-600 text-white text-center p-1 rounded-md" onClick={()=>{
-                        setReason("No room code")
-                    }}>No room code</div>
-                    <div className="text-xs bg-green-600 text-white text-center p-1 rounded-md" onClick={()=>{
-                        setReason("Not joined")
-                    }}>Not joined</div>
-                    <div className="text-xs bg-green-600 text-white text-center p-1 rounded-md" onClick={()=>{
-                        setReason("Not Playing")
-                    }}>Not Playing</div>
-                    <div className="text-xs bg-green-600 text-white text-center p-1 rounded-md" onClick={()=>{
-                        setReason("Don't want to play")
-                    }}>Don't want to play</div>
-                    <div className="text-xs bg-green-600 text-white text-center p-1 rounded-md" onClick={()=>{
-                        setReason("Opponent Abusing")
-                    }}>Opponent Abusing</div>
-                    <div className="text-xs bg-green-600 text-white text-center p-1 rounded-md" onClick={()=>{
-                        setReason("Game not started")
-                    }}>Game not started</div>
-                    <div className="text-xs bg-green-600 text-white text-center p-1 rounded-md" onClick={()=>{
-                        setReason("Others")
-                    }}>Others</div>
+                {reasons.map((value) => (
+            <div
+                key={value}
+                className={`text-xs text-white text-center p-1 rounded-md cursor-pointer 
+                    ${reason === value ? "bg-blue-600" : "bg-green-600"}`}
+                onClick={() => setReason(value)}
+            >
+                {reason}
+            </div>
+        ))}
                 </div>
                 <div className="text-center bg-blue-600 mt-4 rounded-lg p-2 text-white" onClick={()=>{
                    canceledBattle();
