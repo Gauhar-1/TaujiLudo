@@ -18,18 +18,8 @@ export const createBattle = async (
   
       // ✅ If 2 battles exist, check if there's a pending battle to remove
       if (playerBattles.length === 2) {
-        const pendingBattle = playerBattles.find((battle: any) => battle.status === "pending");
-        const inProgressBattle = playerBattles.find((battle: any) => battle.status === "in-progress");
-  
-        if (!inProgressBattle) {
           console.log("⚠️ Cannot create more than 2 battles");
           return callback({ status: 400, message: "You cannot create more than 2 battles", battleData: null });
-        }
-  
-        if (pendingBattle) {
-          await Battle.findByIdAndDelete(pendingBattle._id);
-          console.log(`🗑️ Deleted pending battle: ${pendingBattle._id}`);
-        }
       }
   
       // ✅ Create a new battle
@@ -52,7 +42,7 @@ export const createBattle = async (
         const updatedProfile = await Profile.findByIdAndUpdate(
           userId,
           {
-            $addToSet: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
+            $push: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
           },
           { new: true, upsert: true }
         );
