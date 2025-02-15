@@ -4,9 +4,9 @@ import Battle from "../models/Battle";
 import Profile from "../models/Profile";
 
 const date =  Date.now()
-export const createBattle = async (req: any, res: any, next: any) => {
+export const createBattle = async (battleData: { userId: any; amount: any; ludoCode: any; name: any; }, callback: any) => {
     try {
-        const { userId, amount, ludoCode, name } = req.body;
+        const { userId, amount, ludoCode, name } = battleData;
 
         // Fetch active battles of the player
         const playerBattles = await Battle.find({
@@ -15,9 +15,9 @@ export const createBattle = async (req: any, res: any, next: any) => {
 
         // Check if player already has two battles
         if (playerBattles.length === 2) {
-            io.emit("battleCreated",{  message: "You cannot create more than 2 battles"} );
-                return ;
-        }
+                return callback({ message: "You cannot create more than 2 battles", battleData: null });
+            }
+        
 
         // Proceed to create a new battle if constraints are met
         const battle = new Battle({ 
@@ -28,27 +28,29 @@ export const createBattle = async (req: any, res: any, next: any) => {
             prize: amount + (amount - (amount * 0.05)),
             status: "pending" 
         });
-
+        
+        await battle.save();
+        
         const profile = await Profile.findById(userId);
-
+        
         if(profile){
             profile.battles.push({
                 battleId : battle._id,
                 timestamp : battle.createdAt,
-                 status :  battle.status    
-             })
-             await profile.save();
+                status :  battle.status    
+            })
+            await profile.save();
         }
-
-
-        await battle.save();
+        
+        
         io.emit("battleCreated", battle);
         console.log("✅ New battle created:", battle._id);
 
-        res.status(201).json(battle);
+        return callback({ message: "Battle created successfully", battleData: battle });
+
     } catch (error) {
         console.error("❌ Error creating battle:", error);
-        res.status(500).json({ message: "Internal server error" });
+        return callback({ message: "Internal server error", battleData: null });
     }
 };
 
