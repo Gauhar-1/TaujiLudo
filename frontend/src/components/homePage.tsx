@@ -6,6 +6,7 @@ import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
 import { io } from "socket.io-client";
 import { RunningBattle } from "./runningBattleCard";
+import { toast } from "react-toastify";
 
 
 
@@ -41,6 +42,7 @@ export const HomePage = () => {
   
   const [onGoingB, setOnGoingB] = useState([]);
   const [pendingB, setPendingB] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Centralized LocalStorage Setter
   const updateLocalStorage = (key: string, value: any) => {
@@ -136,31 +138,33 @@ export const HomePage = () => {
 
   const createBattle = () => {
     if (!amount) {
-      alert("Please provide both amount");
+      toast.warning("⚠️ Please enter an amount.");
       return;
     }
-    if(amount%50 !== 0){
-      alert("Amount shpould be multiple of 50");
+
+    if (amount % 50 !== 0) {
+      toast.warning("⚠️ Amount should be a multiple of 50.");
       return;
     }
-    const battleData = {
-      name, 
-      userId, 
-      amount,
-    };
-    
-    // Send request to server
-  socket.emit("createBattle", battleData, (response: { status: number; message: string; battleData?: any }) => {
-    if (response.status === 400) {
-      alert(response.message); // Show error message if battle creation fails
-    } else if (response.status === 200) {
-      console.log("✅ Battle Created:", response.battleData);
-      alert("Battle created successfully!");
-    } else {
-      alert("Something went wrong. Please try again.");
-    }
-  });
-  
+
+    const battleData = { name, userId, amount };
+
+    setLoading(true); // Disable button while processing
+
+    socket.emit("createBattle", battleData, (response: { status: number; message: string; battleData?: any }) => {
+      setLoading(false); // Re-enable button
+
+      if (response.status === 400) {
+        toast.warning(response.message); // Show error message
+      } else if (response.status === 200) {
+        toast.success("✅ Battle created successfully!");
+        console.log("✅ Battle Created:", response.battleData);
+
+        // Optionally update UI here, e.g., add battle to state
+      } else {
+        toast.error("❌ Something went wrong. Please try again.");
+      }
+    });
   };
 
   
@@ -186,6 +190,7 @@ export const HomePage = () => {
                                 />
                                     <button
                                         className="bg-green-600 w-16 rounded p-2 font-bold"
+                                        disabled={loading}
                                         onClick={() => {
                                           createBattle();
                                         }}
