@@ -253,13 +253,14 @@ export const manageRequest = async (req: any, res: any) => {
       const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
       const pendingBattle = playerBattles.find((b) => b.status === "pending");
 
-      if (event === "opponent_found" && pendingBattle) {
+      if (event === "opponent_entered" && pendingBattle) {
         const isPlayer1 = pendingBattle.player1.toString() === userId;
         const isPlayer2 = pendingBattle.player2?.toString() === userId;
 
         if (isPlayer1 || isPlayer2) {
           await Battle.findByIdAndDelete(pendingBattle._id);
           console.log(`⚠️ Pending battle ${pendingBattle._id} deleted (opponent found)`);
+
         }
       }
     }
