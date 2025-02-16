@@ -149,7 +149,7 @@ export const HomePage = () => {
 
     const battleData = { name, userId, amount };
 
-    setLoading(true); // Disable button while processing
+    // setLoading(true); // Disable button while processing
 
     socket.emit("createBattle", battleData, (response: { status: number; message: string; battleData?: any }) => {
       setLoading(false); // Re-enable button
