@@ -188,66 +188,89 @@ export const joinBattle= async(req: any, res: any, next: any)=>{
 
 }
 
-export const manageRequest = async(req: any, res: any)=>{
-    const { battleId,event, details, userId } = req.body;
+export const manageRequest = async (req: any, res: any) => {
+  try {
+    const { battleId, event, details, userId } = req.body;
 
-    if(!event || !details){
-        console.log("feilds Missing: " + event + " " + details  );
+    if (!event || !details) {
+      console.log("⚠️ Fields Missing: " + event + " " + details);
+      return res.status(400).json({ message: "Missing event or details" });
     }
 
-    if(event === "opponent_canceled"){
-        const battle = await Battle.findByIdAndUpdate(battleId,
-            { $set: { history: {} } } // Set profile to an empty object
-        );
+    let battle;
 
-        if(!battle){
-            console.log("battle not found");
-        }
-    
-        return res.status(200).json(battle);
-    }
-    else if(event === "opponent_entered"){
-        const battle = await Battle.findByIdAndUpdate(battleId,
-            {  status: "in-progress",
-               $push: { history: { event, timestamp: new Date(), details } },
-             } 
-        );
+    if (event === "opponent_canceled") {
+      battle = await Battle.findByIdAndUpdate(
+        battleId,
+        { $set: { history: {} } }, // Reset history
+        { new: true }
+      );
 
-        if(!battle){
-            console.log("battle not found");
-        }
-        
-    
-        return res.status(200).json(battle);
-    }
+      if (!battle) {
+        console.log("⚠️ Battle not found");
+        return res.status(404).json({ message: "Battle not found" });
+      }
 
-    const battle = await Battle.findByIdAndUpdate(battleId,
+      return res.status(200).json(battle);
+    } 
+    else if (event === "opponent_entered") {
+      battle = await Battle.findByIdAndUpdate(
+        battleId,
         {
-            $push: { history: { event, timestamp: new Date(), details } },
-        });
+          status: "in-progress",
+          $push: { history: { event, timestamp: new Date(), details } },
+        },
+        { new: true }
+      );
 
-    if(!battle){
-        console.log("battle not found");
+      if (!battle) {
+        console.log("⚠️ Battle not found");
+        return res.status(404).json({ message: "Battle not found" });
+      }
+
+      return res.status(200).json(battle);
     }
 
-     // Fetch active battles of the player
-     const playerBattles = await Battle.find({
-        $or: [{ player1: userId }, { player2: userId }]
+    // ✅ Push event to battle history
+    battle = await Battle.findByIdAndUpdate(
+      battleId,
+      { $push: { history: { event, timestamp: new Date(), details } } },
+      { new: true }
+    );
+
+    if (!battle) {
+      console.log("⚠️ Battle not found");
+      return res.status(404).json({ message: "Battle not found" });
+    }
+
+    // ✅ Fetch active battles of the player
+    const playerBattles = await Battle.find({
+      $or: [{ player1: userId }, { player2: userId }],
     }).sort({ createdAt: 1 });
 
-      if (playerBattles.length == 2) {
-        // Find if one battle is "in-progress"
-        const inProgressBattle = playerBattles.find(battle => battle.status === "in-progress");
-        const pendingBattle = playerBattles.find(battle => battle.status === "pending");
+    if (playerBattles.length === 2) {
+      // ✅ Identify "pending" and "in-progress" battles
+      const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
+      const pendingBattle = playerBattles.find((b) => b.status === "pending");
 
-        // If there is an "in-progress" battle and a "pending" battle, delete the "pending" one
-        if (inProgressBattle && pendingBattle) {
-            await Battle.findByIdAndDelete(pendingBattle._id);
-            console.log(`⚠️ Pending battle ${pendingBattle._id} deleted since another battle is in progress`);
-        } 
+      if (event === "opponent_found" && pendingBattle) {
+        const isPlayer1 = pendingBattle.player1.toString() === userId;
+        const isPlayer2 = pendingBattle.player2?.toString() === userId;
+
+        if (isPlayer1 || isPlayer2) {
+          await Battle.findByIdAndDelete(pendingBattle._id);
+          console.log(`⚠️ Pending battle ${pendingBattle._id} deleted (opponent found)`);
+        }
+      }
     }
-    res.status(200).json(battle);
-}
+
+    return res.status(200).json(battle);
+  } catch (error) {
+    console.error("❌ Error in manageRequest:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const handleLudoCode = async(req: any, res: any)=>{
     const { battleId , ludoCode, event, details } = req.body;
 
