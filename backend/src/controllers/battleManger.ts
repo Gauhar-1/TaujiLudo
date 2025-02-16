@@ -5,63 +5,69 @@ import Profile from "../models/Profile";
 
 const date =  new Date()
 export const createBattle = async (
-    battleData: { userId: any; amount: any; ludoCode: any; name: any },
-    callback: any
-  ) => {
-    try {
-      const { userId, amount, ludoCode, name } = battleData;
-  
-      // Fetch active battles of the player
-      const playerBattles = await Battle.find({
-        $or: [{ player1: userId }, { player2: userId }],
-      }).sort({ createdAt: 1 });
-  
-      // ✅ If 2 battles exist, check if there's a pending battle to remove
-      if (playerBattles.length === 2) {
-          console.log("⚠️ Cannot create more than 2 battles");
-          return callback({ status: 400, message: "You cannot create more than 2 battles", battleData: null });
-      }
-  
-      // ✅ Create a new battle
-      const battle = new Battle({
-        player1: userId,
-        amount,
-        ludoCode,
-        player1Name: name,
-        prize: amount + (amount - amount * 0.05),
-        status: "pending",
+  battleData: { userId: any; amount: any; ludoCode: any; name: any },
+  callback: any
+) => {
+  try {
+    const { userId, amount, ludoCode, name } = battleData;
+
+    // ✅ Fetch only active (pending/in-progress) battles of the player
+    const activeBattles = await Battle.find({
+      $or: [{ player1: userId }, { player2: userId }],
+      status: { $in: ["pending", "in-progress"] }, // ✅ Only check active battles
+    });
+
+    // ✅ If user already has 2 active battles, block new creation
+    if (activeBattles.length >= 2) {
+      console.log("⚠️ Cannot create more than 2 active battles");
+      return callback({
+        status: 400,
+        message: "You already have 2 active battles. Finish or leave one to create a new one.",
+        battleData: null,
       });
-  
-      // 🔎 Debugging Log
-      console.log("🔍 Saving battle:", battle);
-  
-      await battle.save();
-  
-      // ✅ Ensure battle is not duplicated in profile
-      try {
-        const updatedProfile = await Profile.findByIdAndUpdate(
-          userId,
-          {
-            $push: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
-          },
-          { new: true, upsert: true }
-        );
-  
-        console.log("✅ Profile updated:", updatedProfile);
-      } catch (profileError : any) {
-        console.error("❌ Error updating profile:", profileError.stack);
-      }
-  
-      io.emit("battleCreated", battle);
-      console.log("✅ New battle created:", battle._id);
-  
-      return callback({ status: 200, message: "Battle created successfully", battleData: battle });
-  
-    } catch (error : any) {
-      console.error("❌ Error creating battle:", error.stack);
-      return callback({ status: 500, message: "Internal server error", battleData: null });
     }
-  };
+
+    // ✅ Create a new battle
+    const battle = new Battle({
+      player1: userId,
+      amount,
+      ludoCode,
+      player1Name: name,
+      prize: amount + (amount - amount * 0.05),
+      status: "pending",
+    });
+
+    // 🔎 Debugging Log
+    console.log("🔍 Saving battle:", battle);
+
+    await battle.save();
+
+    // ✅ Ensure battle is not duplicated in profile
+    try {
+      const updatedProfile = await Profile.findByIdAndUpdate(
+        userId,
+        {
+          $push: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
+        },
+        { new: true, upsert: true }
+      );
+
+      console.log("✅ Profile updated:", updatedProfile);
+    } catch (profileError: any) {
+      console.error("❌ Error updating profile:", profileError.stack);
+    }
+
+    io.emit("battleCreated", battle);
+    console.log("✅ New battle created:", battle._id);
+
+    return callback({ status: 200, message: "Battle created successfully", battleData: battle });
+
+  } catch (error: any) {
+    console.error("❌ Error creating battle:", error.stack);
+    return callback({ status: 500, message: "Internal server error", battleData: null });
+  }
+};
+
   
 
 
