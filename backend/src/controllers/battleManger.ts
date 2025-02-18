@@ -228,8 +228,6 @@ export const manageRequest = async (req: any, res: any) => {
         console.log("⚠️ Battle not found");
         return res.status(404).json({ message: "Battle not found" });
       }
-
-      return res.status(200).json(battle);
     }
 
     // ✅ Push event to battle history
@@ -244,20 +242,22 @@ export const manageRequest = async (req: any, res: any) => {
       return res.status(404).json({ message: "Battle not found" });
     }
 
-    // ✅ Fetch active battles of the player
+    // ✅ Fetch all active battles of the player
     const playerBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
     }).sort({ createdAt: 1 });
 
-    if (playerBattles.length === 2) {
-      // ✅ Identify "pending" and "in-progress" battles
-      const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
-      const pendingBattle = playerBattles.find((b) => b.status === "pending");
+    // ✅ Check if there's an "in-progress" battle
+    const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
 
-      if (inProgressBattle && pendingBattle) {
-          await Battle.findByIdAndDelete(pendingBattle._id);
-          console.log(`⚠️ Pending battle ${pendingBattle._id} deleted (opponent found)`);
+    if (inProgressBattle) {
+      // ✅ Delete all "pending" battles for the player
+      const pendingBattles = playerBattles.filter((b) => b.status === "pending");
 
+      if (pendingBattles.length > 0) {
+        const pendingBattleIds = pendingBattles.map((b) => b._id);
+        await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
+        console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId}`);
       }
     }
 
@@ -637,7 +637,13 @@ export const  determineWinner = async (req: any ,res : any) => {
         }
         await battle.save();
 
-        const playerProfile = await Profile.findById(userId);
+        const playerProfile = await Profile.findOne({userId});
+
+        if (!playerProfile) {
+          return res.status(400).json({ error: "Player profile not found" });
+      }
+            playerProfile.gameLost += 1;
+            await playerProfile.save();
 
         if(playerProfile){
           playerProfile.gameWon += 1;
@@ -647,12 +653,13 @@ export const  determineWinner = async (req: any ,res : any) => {
         const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
 
 
-        const loserProfile = await Profile.findById(loserId);
+        const loserProfile = await Profile.findOne({userId : loserId});
 
-        if(loserProfile){
-          loserProfile.gameLost += 1;
-          await loserProfile.save();
-        }
+        if (!loserProfile) {
+          return res.status(400).json({ error: "Loser profile not found" });
+      }
+            loserProfile.gameLost += 1;
+            await loserProfile.save();
 
         const referedBy = playerProfile?.referredBy;
 
@@ -699,17 +706,9 @@ export const  determineWinner = async (req: any ,res : any) => {
             console.log('Profile not found');
             return res.status(404).json({ success: false, message: 'Profile not found' });
         }
-
-        let Id;
-        if(battle.status === "completed"){
-           Id = battle.dispute?.proofs.find((proof)=>{ proof.clicked === "Won" })?.player;
-        }
-        else if(battle.status === "disputed"){
-           Id = userId;
-        }
   
         if(battle.dispute){
-            battle.dispute.proofs[0].player === Id ?
+            battle.dispute.proofs[0].player === userId ?
             battle.dispute.proofs[0].reason = reason : battle.dispute.proofs[1].reason = reason;
             battle.dispute.timestamp = new Date();
         }
