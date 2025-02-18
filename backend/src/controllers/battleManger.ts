@@ -699,9 +699,17 @@ export const  determineWinner = async (req: any ,res : any) => {
             console.log('Profile not found');
             return res.status(404).json({ success: false, message: 'Profile not found' });
         }
+
+        let Id;
+        if(battle.status === "completed"){
+           Id = battle.dispute?.proofs.find((proof)=>{ proof.clicked === "Won" })?.player;
+        }
+        else if(battle.status === "disputed"){
+           Id = userId;
+        }
   
         if(battle.dispute){
-            battle.dispute.proofs[0].player === userId ?
+            battle.dispute.proofs[0].player === Id ?
             battle.dispute.proofs[0].reason = reason : battle.dispute.proofs[1].reason = reason;
             battle.dispute.timestamp = new Date();
         }
@@ -715,8 +723,9 @@ export const  determineWinner = async (req: any ,res : any) => {
         //     console.log('notification not found');
         //     return res.status(404).json({ success: false, message: 'notification  not found' });
         // }
-  
-        res.status(200).json({ success: true, message: 'Kyc Rejected and notification sent', battle });
+
+
+        res.status(200).json({ success: true, message: 'Battle Rejected ', battle });
     } catch (err : any) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Kyc rejection failed', error: err.message });
