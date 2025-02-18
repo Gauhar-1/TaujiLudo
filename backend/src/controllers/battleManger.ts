@@ -315,256 +315,251 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
   };
   
 
-  export const uploadScreenShot = async (req: any, res: any, next: any) => {
-
+export const uploadScreenShot = async (req: any, res: any, next: any) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const { battleId, playerId, phoneNumber } = req.body;
-  
-      if (!battleId) return res.status(400).json({ error: "battleId is required" });
-  
-      if (!req.file) return res.status(400).json({ error: "File is required" });
-  
-      const battle = await Battle.findById(battleId);
-      if (!battle) return res.status(404).json({ error: "Battle not found" });
-  
-      if (![battle.player1, battle.player2].includes(playerId)) {
-        return res.status(403).json({ error: "You are not part of this battle" });
-      }
-  
-      console.log(`🖼️ Uploading Screenshot for Battle ${battleId} by ${playerId}`);
-  
-      // Initialize dispute if missing
-      if (!battle.dispute) {
-        battle.dispute = {
-          players: [phoneNumber],
-          proofs: [{ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" }],
-          resolved: false,
-          winner: null,
-          timestamp: new Date(),
-        };
-      } else {
-        const alreadyUploaded = battle.dispute.proofs.some(proof => proof.player === playerId);
-        if (alreadyUploaded) {
-          return res.status(400).json({ error: "You have already uploaded a screenshot" });
+        const { battleId, playerId, phoneNumber } = req.body;
+
+        if (!battleId) return res.status(400).json({ error: "battleId is required" });
+        if (!req.file) return res.status(400).json({ error: "File is required" });
+
+        const battle = await Battle.findById(battleId).session(session);
+        if (!battle) return res.status(404).json({ error: "Battle not found" });
+
+        if (![battle.player1, battle.player2].includes(playerId)) {
+            return res.status(403).json({ error: "You are not part of this battle" });
         }
-  
-        battle.dispute.players.push(phoneNumber);
-        battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" });
-      }
 
-      await battle.save({ session });
-  
-      // ✅ Check if both players have clicked
-      const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
-      const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
-      
-      // ✅ Update status only after adding proofs
-      if (player1Clicked && player2Clicked) {
-          updateBattleStatus(battle); // Update status only when both clicked
+        console.log(`🖼️ Uploading Screenshot for Battle ${battleId} by ${playerId}`);
 
-         if(battle.status === "completed"){
-          const playerProfile = await Profile.findOne({ phoneNumber });
+        // Initialize dispute if missing
+        if (!battle.dispute) {
+            battle.dispute = {
+                players: [phoneNumber],
+                proofs: [{ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" }],
+                resolved: false,
+                winner: null,
+                timestamp: new Date(),
+            };
+        } else {
+            const alreadyUploaded = battle.dispute.proofs.some(proof => proof.player === playerId);
+            if (alreadyUploaded) {
+                return res.status(400).json({ error: "You have already uploaded a screenshot" });
+            }
 
-          if(playerProfile){
-            playerProfile.gameWon += 1;
-            await playerProfile.save({ session });
-          }
-  
-          const loserId = playerId === battle.player1 ? battle.player2 : battle.player1;
-  
-  
-          const loserProfile = await Profile.findById(loserId);
-  
-          if(loserProfile){
-            loserProfile.gameLost += 1;
-            await loserProfile.save({ session });
-          }
+            battle.dispute.players = [...new Set([...battle.dispute.players, phoneNumber])]; // Prevent duplicates
+            battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" });
+        }
 
-          const referedBy = playerProfile?.referredBy;
-  
-          if(referedBy){
-            const referedByProfile = await Profile.findOne({ phoneNumber : referedBy });
-    
-            if(referedByProfile){
-            } // Find the referral by phone number
-            const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
-        
-            if (referral) {
-              referral.referalEarning += Number(battle.amount * 0.02);
-              await referedByProfile?.save({ session });
-          }
-          }
-         }
-      }
-      
-      await session.commitTransaction();
+        await battle.save({ session });
+
+        // ✅ Check if both players have clicked
+        const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
+        const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
+
+        // ✅ Update status only after adding proofs
+        if (player1Clicked && player2Clicked) {
+            let status = await updateBattleStatus(battle); // Await the status update
+
+            if (status === "completed") {
+                const winnerProfile = await Profile.findOne({ phoneNumber }).session(session);
+                if (winnerProfile) {
+                    winnerProfile.gameWon += 1;
+                    await winnerProfile.save({ session });
+                }
+
+                const loserId = playerId === battle.player1 ? battle.player2 : battle.player1;
+                const loserProfile = await Profile.findById(loserId).session(session);
+
+                if (loserProfile) {
+                    loserProfile.gameLost += 1;
+                    await loserProfile.save({ session });
+                }
+
+                // Process referral earnings
+                if (winnerProfile?.referredBy) {
+                    const referredByProfile = await Profile.findOne({ phoneNumber: winnerProfile.referredBy }).session(session);
+                    if (referredByProfile) {
+                        const referral = referredByProfile.referrals.find(ref => ref.phoneNumber === winnerProfile.phoneNumber);
+                        if (referral) {
+                            referral.referalEarning += Number(battle.amount * 0.02);
+                            await referredByProfile.save({ session });
+                        }
+                    }
+                }
+            }
+        }
+
+        await session.commitTransaction();
         session.endSession();
-  
-      console.log(`✅ Screenshot uploaded & battle status updated: ${battle.status}`);
-      res.status(200).json({ message: "Screenshot uploaded successfully", battle });
-  
+
+        console.log(`✅ Screenshot uploaded & battle status updated: ${battle.status}`);
+        res.status(200).json({ message: "Screenshot uploaded successfully", battle });
+
     } catch (err) {
-      console.error("❌ Error in uploadScreenShot:", err);
-      next(err); // Pass the error to the next middleware
+        await session.abortTransaction(); // Rollback changes if there's an error
+        session.endSession();
+        console.error("❌ Error in uploadScreenShot:", err);
+        next(err);
     }
-  };
+};
+
   
 
-  export const canceledBattle = async (req: any, res: any, next: any) => {
+  export const battleLost = async (req: any, res: any, next: any) => {
     try {
-      const { reason, battleId, userId, phoneNumber } = req.body;
-  
-      if (!battleId) return res.status(400).json({ error: "battleId is required" });
-      if (!reason) return res.status(400).json({ error: "Reason is required" });
-  
-      const battle = await Battle.findById(battleId);
-      if (!battle) return res.status(404).json({ error: "Battle not found" });
-  
-      console.log(`🚨 Player ${userId} requested battle cancelation for ${battleId}`);
-  
-      if (!battle.dispute) {
-        battle.dispute = {
-          players: [phoneNumber],
-          proofs: [{ player: userId, filename: "", path: "", reason, clicked: "Canceled" }],
-          resolved: false,
-          winner: null,
-          timestamp: new Date(),
-        };
-      } else {
-        const alreadyCanceled = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Canceled");
-        if (alreadyCanceled) return res.status(400).json({ error: "You have already canceled the battle" });
-  
-        battle.dispute.players.push(phoneNumber);
-        battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
-      }
-      await battle.save();
-  
-       // ✅ Check if both players have clicked
-       const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
-       const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
-       
-       // ✅ Update status only after adding proofs
-       if (player1Clicked && player2Clicked) {
-         updateBattleStatus(battle); // Update status only when both clicked
-       }
-      
-  
-      console.log(`✅ Battle cancelation recorded & status updated ${battle.status}`);
-      res.status(200).json({ message: "Battle canceled successfully", battle });
-  
-    } catch (err) {
-      console.error("❌ Error in canceledBattle:", err);
-      next(err);
-    }
-  };
-  
+        const { battleId, userId } = req.body;
 
-export const battleLost = async(req: any, res: any, next: any)=>{
-    const { battleId, userId } = req.body;
+        if (!battleId) return res.status(400).json({ error: "battleId is required" });
+        if (!userId) return res.status(400).json({ error: "UserId is required" });
+
+        const battle = await Battle.findById(battleId);
+        if (!battle) return res.status(404).json({ error: "Battle not found" });
+
+        if (!battle.dispute) {
+            battle.dispute = {
+                players: [userId],
+                proofs: [{ player: userId, filename: "", path: "", reason: "", clicked: "Lost" }],
+                resolved: false,
+                winner: null,
+                timestamp: new Date(),
+            };
+        } else {
+            // Ensure player doesn't declare lost twice
+            const alreadyLost = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Lost");
+            if (alreadyLost) return res.status(400).json({ error: "You have already marked yourself as lost" });
+
+            battle.dispute.players = [...new Set([...battle.dispute.players, userId])]; // Ensure uniqueness
+            battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason: "", clicked: "Lost" });
+        }
+
+        await battle.save();
+
+        // ✅ Check if both players have clicked
+        const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
+        const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
+
+        // ✅ Update status only after adding proofs
+        if (player1Clicked && player2Clicked) {
+            let status = await updateBattleStatus(battle);
+
+            if (status === "completed") {
+                const winnerId = userId === battle.player1 ? battle.player2 : battle.player1;
+
+                const winnerProfile = await Profile.findById(winnerId);
+                if (winnerProfile) {
+                    winnerProfile.gameWon += 1;
+                    await winnerProfile.save();
+                }
+
+                const loserProfile = await Profile.findById(userId);
+                if (loserProfile) {
+                    loserProfile.gameLost += 1;
+                    await loserProfile.save();
+                }
+
+                // Process referral earnings
+                if (winnerProfile?.referredBy) {
+                    const referredByProfile = await Profile.findOne({ phoneNumber: winnerProfile.referredBy });
+                    if (referredByProfile) {
+                        const referral = referredByProfile.referrals.find(ref => ref.phoneNumber === winnerProfile.phoneNumber);
+                        if (referral) {
+                            referral.referalEarning += Number(battle.amount * 0.02);
+                            await referredByProfile.save();
+                        }
+                    }
+                }
+            }
+        }
+
+        res.json({ message: "Loser assigned successfully", battle });
+
+    } catch (err) {
+        console.error("❌ Error in battleLost:", err);
+        next(err);
+    }
+};
+
+
+export const canceledBattle = async (req: any, res: any, next: any) => {
+  try {
+    const { reason, battleId, userId, phoneNumber } = req.body;
 
     if (!battleId) return res.status(400).json({ error: "battleId is required" });
-    if (!userId) return res.status(400).json({ error: "UserId is required" });
+    if (!reason) return res.status(400).json({ error: "Reason is required" });
 
     const battle = await Battle.findById(battleId);
-   if (!battle) return res.status(404).json({ error: "Battle not found" });
+    if (!battle) return res.status(404).json({ error: "Battle not found" });
 
-   if (!battle.dispute) {
-    battle.dispute = {
-        players: [userId],
-        proofs: [{ player: userId, filename: "", path: "", reason: "", clicked: "Lost" }],
+    console.log(`🚨 Player ${userId} requested battle cancelation for ${battleId}`);
+
+    if (!battle.dispute) {
+      battle.dispute = {
+        players: [phoneNumber],
+        proofs: [{ player: userId, filename: "", path: "", reason, clicked: "Canceled" }],
         resolved: false,
         winner: null,
         timestamp: new Date(),
-    };
-} else {
-    // Ensure player doesn't declare lost twice
-    const alreadyLost = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Lost");
-    if (alreadyLost) return res.status(400).json({ error: "You have already marked yourself as lost" });
+      };
+    } else {
+      const alreadyCanceled = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Canceled");
+      if (alreadyCanceled) return res.status(400).json({ error: "You have already canceled the battle" });
 
-    battle.dispute.players.push(userId);
-    battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason: "", clicked: "Lost" });
-}
-
-await battle.save();
-
-   // 🏆 Update battle status based on conditions
-    // ✅ Check if both players have clicked
-    const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
-    const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
-    
-    // ✅ Update status only after adding proofs
-    if (player1Clicked && player2Clicked) {
-       updateBattleStatus(battle); // Update status only when both clicked
-
-      if(battle.status === "completed"){
-        const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
-
-       const playerProfile = await Profile.findById(loserId);
-
-       if(playerProfile){
-        playerProfile.gameWon += 1;
-        await playerProfile.save();
-      }
-
-      const loserProfile = await Profile.findById(userId);
-
-      if(loserProfile){
-        loserProfile.gameLost += 1;
-        await loserProfile.save();
-      }
-
-       const referedBy = playerProfile?.referredBy;
-
-       if(referedBy){
-         const referedByProfile = await Profile.findOne({ phoneNumber : referedBy });
- 
-         if(referedByProfile){
-         } // Find the referral by phone number
-         const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
-     
-         if (!referral) {
-           return res.status(404).json({ message: "Referral not found" });
-         }
-     
-         // Update the referral earning
-         referral.referalEarning += Number(battle.amount * 0.02);
-     
-         // Save the updated profile
-         await referedByProfile?.save();
-       }
-      }
+      battle.dispute.players.push(phoneNumber);
+      battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
     }
+    await battle.save();
 
-   res.json("Loser assigned Successfully");
-}
+     // ✅ Check if both players have clicked
+     const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
+     const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
+     
+     // ✅ Update status only after adding proofs
+     if (player1Clicked && player2Clicked) {
+       updateBattleStatus(battle); // Update status only when both clicked
+     }
+    
 
-// 🔥 Status Update Logic
-const updateBattleStatus = (battle: any) => {
-    const player1Action = battle.player1 
-    ? battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player1)?.clicked || "None" 
-    : "None";
+    console.log(`✅ Battle cancelation recorded & status updated ${battle.status}`);
+    res.status(200).json({ message: "Battle canceled successfully", battle });
 
-const player2Action = battle.player2 
-    ? battle.dispute?.proofs.find((proof: { player: any; }) => proof.player === battle.player2)?.clicked || "None" 
-    : "None";
-
-
-    const statusMap: { [key: string]: string } = {
-        "Won-Canceled": "disputed",
-        "Lost-Canceled": "disputed",
-        "Canceled-Lost": "disputed",
-        "Lost-Lost": "disputed",
-        "Canceled-Canceled": "canceled",
-        "Won-Lost": "completed",
-        "Lost-Won": "completed",
-        "Canceled-Won": "disputed",
-    };
-
-    const statusKey = `${player1Action || "None"}-${player2Action || "None"}`;
-    battle.status = statusMap[statusKey] || "disputed";
+  } catch (err) {
+    console.error("❌ Error in canceledBattle:", err);
+    next(err);
+  }
 };
+
+
+const updateBattleStatus = async (battle: any) => {
+  const player1Action = battle.player1 
+      ? battle.dispute?.proofs.find((proof: { player: any }) => proof.player === battle.player1)?.clicked || "None" 
+      : "None";
+
+  const player2Action = battle.player2 
+      ? battle.dispute?.proofs.find((proof: { player: any }) => proof.player === battle.player2)?.clicked || "None" 
+      : "None";
+
+  const statusMap: { [key: string]: string } = {
+      "Won-Canceled": "disputed",
+      "Lost-Canceled": "disputed",
+      "Canceled-Lost": "disputed",
+      "Lost-Lost": "disputed",
+      "Canceled-Canceled": "canceled",
+      "Won-Lost": "completed",
+      "Lost-Won": "completed",
+      "Canceled-Won": "disputed",
+  };
+
+  const statusKey = `${player1Action}-${player2Action}`;
+  battle.status = statusMap[statusKey] || "disputed";
+
+  await battle.save(); // ✅ Save changes to the database
+  console.log(`🏆 Battle ${battle._id} status updated to: ${battle.status}`);
+
+  return battle.status; // Return updated status for further logic
+};
+
 
 export const completeBattle = async(req: any, res: any)=>{
     const { winner, screenShot , id} = req.body;
