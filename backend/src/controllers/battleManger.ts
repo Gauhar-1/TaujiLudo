@@ -349,6 +349,8 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
         battle.dispute.players.push(phoneNumber);
         battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" });
       }
+
+      await battle.save();
   
       // ✅ Check if both players have clicked
       const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
@@ -385,19 +387,14 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
             } // Find the referral by phone number
             const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
         
-            if (!referral) {
-              return res.status(404).json({ message: "Referral not found" });
-            }
-        
-            // Update the referral earning
-            referral.referalEarning += Number(battle.amount * 0.02);
-        
-            // Save the updated profile
-            await referedByProfile?.save();
+            if (referral) {
+              referral.referalEarning += Number(battle.amount * 0.02);
+              await referedByProfile?.save();
+          }
           }
          }
       }
-      await battle.save();
+      
   
       console.log(`✅ Screenshot uploaded & battle status updated: ${battle.status}`);
       res.status(200).json({ message: "Screenshot uploaded successfully", battle });
@@ -436,6 +433,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
         battle.dispute.players.push(phoneNumber);
         battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
       }
+      await battle.save();
   
        // ✅ Check if both players have clicked
        const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
@@ -445,7 +443,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
        if (player1Clicked && player2Clicked) {
            updateBattleStatus(battle); // Update status only when both clicked
        }
-      await battle.save();
+      
   
       console.log(`✅ Battle cancelation recorded & status updated ${battle.status}`);
       res.status(200).json({ message: "Battle canceled successfully", battle });
@@ -483,6 +481,7 @@ export const battleLost = async(req: any, res: any, next: any)=>{
     battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason: "", clicked: "Lost" });
 }
 
+await battle.save();
 
    // 🏆 Update battle status based on conditions
     // ✅ Check if both players have clicked
@@ -533,7 +532,6 @@ export const battleLost = async(req: any, res: any, next: any)=>{
       }
     }
 
-   await battle.save();
    res.json("Loser assigned Successfully");
 }
 
