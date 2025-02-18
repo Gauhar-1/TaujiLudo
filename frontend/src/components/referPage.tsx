@@ -7,6 +7,7 @@ export const ReferPage = ()=>{
     const divRef = useRef<HTMLDivElement>(null);
     const [referalLink, setReferalLink] = useState("");
     const [referals, setReferals] = useState(0);
+    const [earnings, setEarnings] = useState(0);
     const { phoneNumber } = useUserContext();
 
     useEffect(() => {
@@ -17,9 +18,10 @@ export const ReferPage = ()=>{
                 return console.log("Response Not found");
             }
 
-            const { referalLink , referrals } = response.data[0];
+            const { referalLink , referrals, totalUserReferalEarning } = response.data[0];
             setReferalLink(referalLink);
             setReferals(referrals.length);
+            setEarnings(totalUserReferalEarning);
         }
 
         handleReferal();
@@ -49,7 +51,7 @@ export const ReferPage = ()=>{
                         </div>
                         <div className="flex flex-col gap-3 text-center py-2 px-3 border-l ">
                             <div className="text-sm font-semibold">Referral Earning</div>
-                            <div className="text-xs font-semibold">0</div>
+                            <div className="text-xs font-semibold">{earnings}</div>
                         </div>
                     </div>
                 </div>

@@ -37,10 +37,10 @@ export const createBattle = async (
       status: "pending",
     });
 
-    // 🔎 Debugging Log
     console.log("🔍 Saving battle:", battle);
 
     await battle.save();
+    
 
     // ✅ Ensure battle is not duplicated in profile
     try {
@@ -550,6 +550,29 @@ export const  determineWinner = async (req: any ,res : any) => {
             battle.winner = "decided";
         }
         await battle.save();
+
+        const playerProfile = await Profile.findById(userId);
+
+        const referedBy = playerProfile?.referredBy;
+
+        if(referedBy){
+          const referedByProfile = await Profile.findOne({ phoneNumber : referedBy });
+  
+          if(referedByProfile){
+          } // Find the referral by phone number
+          const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
+      
+          if (!referral) {
+            return res.status(404).json({ message: "Referral not found" });
+          }
+      
+          // Update the referral earning
+          referral.referalEarning += Number(battle.amount * 0.02);
+      
+          // Save the updated profile
+          await referedByProfile?.save();
+        }
+         
   
         res.status(200).json({ success: true, message: 'Winner determined successfully', battle });
     } catch (err : any) {
