@@ -361,6 +361,21 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
          if(status === "completed"){
           const playerProfile = await Profile.findOne({ phoneNumber });
 
+          if(playerProfile){
+            playerProfile.gameWon += 1;
+            await playerProfile.save();
+          }
+  
+          const loserId = playerId === battle.player1 ? battle.player2 : battle.player1;
+  
+  
+          const loserProfile = await Profile.findById(playerId);
+  
+          if(loserProfile){
+            loserProfile.gameLost += 1;
+            await loserProfile.save();
+          }
+
           const referedBy = playerProfile?.referredBy;
   
           if(referedBy){
@@ -479,6 +494,21 @@ export const battleLost = async(req: any, res: any, next: any)=>{
 
       if(status === "completed"){
        const playerProfile = await Profile.findById(userId);
+
+       if(playerProfile){
+        playerProfile.gameWon += 1;
+        await playerProfile.save();
+      }
+
+      const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
+
+
+      const loserProfile = await Profile.findById(userId);
+
+      if(loserProfile){
+        loserProfile.gameLost += 1;
+        await loserProfile.save();
+      }
 
        const referedBy = playerProfile?.referredBy;
 
@@ -601,6 +631,21 @@ export const  determineWinner = async (req: any ,res : any) => {
         await battle.save();
 
         const playerProfile = await Profile.findById(userId);
+
+        if(playerProfile){
+          playerProfile.gameWon += 1;
+          await playerProfile.save();
+        }
+
+        const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
+
+
+        const loserProfile = await Profile.findById(userId);
+
+        if(loserProfile){
+          loserProfile.gameLost += 1;
+          await loserProfile.save();
+        }
 
         const referedBy = playerProfile?.referredBy;
 
