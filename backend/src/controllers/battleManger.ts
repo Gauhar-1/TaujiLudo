@@ -360,7 +360,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
 
         // ✅ Update status only after adding proofs
         if (player1Clicked && player2Clicked) {
-            let status = await updateBattleStatus(battle); // Await the status update
+            let status =  await updateBattleStatus(battle); // Await the status update
 
             if (status === "completed") {
                 const winnerProfile = await Profile.findOne({ phoneNumber }).session(session);
@@ -372,7 +372,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
                     await winnerProfile.save({ session });
 
                 const loserId = playerId === battle.player1 ? battle.player2 : battle.player1;
-                const loserProfile = await Profile.findById(loserId).session(session);
+                const loserProfile = await Profile.findOne({userId: loserId}).session(session);
 
                 if (!loserProfile) {
                   return res.status(400).json({ error: "Player profile not found" });
@@ -451,7 +451,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
             if (status === "completed") {
                 const winnerId = userId === battle.player1 ? battle.player2 : battle.player1;
 
-                const winnerProfile = await Profile.findById(winnerId);
+                const winnerProfile = await Profile.findOne({userId: winnerId});
                 if (!winnerProfile) {
                   return res.status(400).json({ error: "Player profile not found" });
               }
@@ -460,7 +460,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
 
 
 
-                const loserProfile = await Profile.findById(userId);
+                const loserProfile = await Profile.findOne({userId});
 
                 if (!loserProfile) {
                   return res.status(400).json({ error: "Player profile not found" });
@@ -526,7 +526,7 @@ export const canceledBattle = async (req: any, res: any, next: any) => {
      
      // ✅ Update status only after adding proofs
      if (player1Clicked && player2Clicked) {
-       updateBattleStatus(battle); // Update status only when both clicked
+        await updateBattleStatus(battle); // Update status only when both clicked
      }
     
 
