@@ -375,7 +375,7 @@ export const getReferal = async(req: any, res:any)=>{
 
 export const getReferalEarning = async(req: any, res: any )=>{
   try {
-    const { userId, amount } = req.params;
+    const { userId, amount } = req.body;
 
     // Find the user and sum up referral earnings
     const profile = await Profile.findOne({userId});
