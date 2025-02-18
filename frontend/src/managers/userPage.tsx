@@ -40,6 +40,7 @@ import { PaymentSettings } from "../adminComponents/paymentSettings";
 import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
 import { Notifications } from "../components/notification";
+import { RedeemEarnings } from "../components/redeemEarning";
 
 
 export const UserPage = ()=>{
@@ -76,6 +77,7 @@ export const UserPage = ()=>{
            <Route path="/gameHistory" element={<GameHistory />}></Route>
            <Route path="/winCash" element={<WinCashPage/>}></Route>
            <Route path="/notification" element={<Notifications/>}></Route>
+           <Route path="/referalEarning" element={<RedeemEarnings/>}></Route>
            <Route path="/admin" element={<AdminPage />}>
                   <Route index element={<DashBoard />}></Route>
                   <Route path="allPlayers" element={<AllPlayers />}></Route>

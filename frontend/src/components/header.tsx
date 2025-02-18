@@ -64,7 +64,9 @@ export const Header = ()=>{
          </div>
          <div className="bg-green-900 flex flex-row gap-1 rounded-md h-8 w-20">
          <img src="../../moneyBag.png" alt=""  className="h-5 m-1" />
-         <div className="text-xs  text-white ">Earning :- 0</div>
+         <div className="text-xs  text-white " onClick={()=>{
+          navigate('/referalEarning');
+         }}>Earning :- 0</div>
          </div>
        </div>
    </div>}
