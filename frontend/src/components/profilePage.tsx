@@ -238,14 +238,14 @@ export const ProfilePage = ()=>{
                     <div className="">
                         <div className="relative bg-gray-100 h-32 w-20 rounded-md  hover:bg-green-500">
                         <img src="../../cash.png" alt="" className="size-8 absolute left-7 top-4"/>
-                        <div className="font-bold text-black absolute left-8 top-20">0</div>
+                        <div className="font-bold text-black absolute left-8 top-20">{cashWon}</div>
                         </div>
                         <div className="font-thin text-xs text-center p-2">cash won</div>
                     </div>
                     <div>
                     <div className="bg-gray-100 h-32 w-20 rounded-md  relative hover:bg-green-500">
                         <img src="../../battle.png" alt="" className="size-8 absolute left-7 top-4"/>
-                        <div className="font-bold text-black absolute left-8 top-20">0</div>
+                        <div className="font-bold text-black absolute left-8 top-20">{battlePlayed}</div>
                     </div>
                     <div className="font-thin text-xs text-center p-2">Battle Played</div>
                     </div>
