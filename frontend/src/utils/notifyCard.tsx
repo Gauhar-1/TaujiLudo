@@ -20,7 +20,7 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
       ) :  <div className="w-full overflow-auto break-words">
       {notification.dispute?.proofs?.[1]?.player === userId 
   ? notification.dispute?.proofs?.[1]?.reason 
-  : notification.dispute?.proofs?.[0]?.reason || "No reason provided"}
+  : notification.dispute?.proofs?.[0]?.reason }
 
     </div>}
             <div className="flex justify-end text-gray-500">
