@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 export const BattleResult = ()=>{
 
-    const { battleId, userId , setBattleId, setUserId} = useUserContext();
+    const { battleId, id , setBattleId, setUserId} = useUserContext();
     const [ battle, setBattle ] = useState({
         _id: "",
         amount: 0,
@@ -63,7 +63,7 @@ export const BattleResult = ()=>{
                 console.log("Battle Id", battleId);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`,{ battleId, userId })
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`,{ battleId, userId : id })
 
             if(!response.data){
                 console.log("Response: "+response.data);
@@ -75,11 +75,11 @@ export const BattleResult = ()=>{
     }
     const handleReject = async()=>{
         try{
-            if(userId){
-                console.log("User Id",userId);
+            if(id){
+                console.log("User Id",id);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId, reason, battleId})
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId : id, reason, battleId})
 
             if(!response.data){
                 console.log("Response: "+response.data);

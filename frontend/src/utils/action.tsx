@@ -107,7 +107,7 @@ export const DeleteBattle = (props : any)=>{
 export const ViewResult = ( props : any)=>{
 
     const navigate = useNavigate();
-    const { setBattleId } = useUserContext();
+    const { setBattleId, id } = useUserContext();
 
   return (
     <div className="bg-green-300 p-2 rounded-lg font-bold" onClick={()=>{

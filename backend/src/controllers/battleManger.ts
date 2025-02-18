@@ -364,21 +364,25 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
 
             if (status === "completed") {
                 const winnerProfile = await Profile.findOne({ phoneNumber }).session(session);
-                if (winnerProfile) {
+
+                if (!winnerProfile) {
+                  return res.status(400).json({ error: "Player profile not found" });
+              }
                     winnerProfile.gameWon += 1;
                     await winnerProfile.save({ session });
-                }
 
                 const loserId = playerId === battle.player1 ? battle.player2 : battle.player1;
                 const loserProfile = await Profile.findById(loserId).session(session);
 
-                if (loserProfile) {
+                if (!loserProfile) {
+                  return res.status(400).json({ error: "Player profile not found" });
+              }
+
                     loserProfile.gameLost += 1;
                     await loserProfile.save({ session });
-                }
 
                 // Process referral earnings
-                if (winnerProfile?.referredBy) {
+                if (winnerProfile.referredBy) {
                     const referredByProfile = await Profile.findOne({ phoneNumber: winnerProfile.referredBy }).session(session);
                     if (referredByProfile) {
                         const referral = referredByProfile.referrals.find(ref => ref.phoneNumber === winnerProfile.phoneNumber);
@@ -448,19 +452,24 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
                 const winnerId = userId === battle.player1 ? battle.player2 : battle.player1;
 
                 const winnerProfile = await Profile.findById(winnerId);
-                if (winnerProfile) {
+                if (!winnerProfile) {
+                  return res.status(400).json({ error: "Player profile not found" });
+              }
                     winnerProfile.gameWon += 1;
                     await winnerProfile.save();
-                }
+
+
 
                 const loserProfile = await Profile.findById(userId);
-                if (loserProfile) {
+
+                if (!loserProfile) {
+                  return res.status(400).json({ error: "Player profile not found" });
+              }
                     loserProfile.gameLost += 1;
                     await loserProfile.save();
-                }
 
                 // Process referral earnings
-                if (winnerProfile?.referredBy) {
+                if (winnerProfile.referredBy) {
                     const referredByProfile = await Profile.findOne({ phoneNumber: winnerProfile.referredBy });
                     if (referredByProfile) {
                         const referral = referredByProfile.referrals.find(ref => ref.phoneNumber === winnerProfile.phoneNumber);
