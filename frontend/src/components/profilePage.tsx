@@ -18,6 +18,9 @@ export const ProfilePage = ()=>{
     const [ state , setState ] = useState("")
     const [ documentNumber , setDocumentNumber ] = useState("")
     const [ kycStatus , setKycStatus ] = useState("")
+    const [ earnings , setEarnings ] = useState(0)
+    const [ cashWon , setCashWon ] = useState(0)
+    const [ battlePlayed , setBattlePlayed ] = useState(0)
 
   
     // Get phoneNumber from location state or fallback
@@ -38,13 +41,16 @@ export const ProfilePage = ()=>{
           );
   
           if (response.data) {
-            const {phoneNumber, name, email, userId, kycDetails } = response.data[0];
+            const {phoneNumber, name, email, userId, kycDetails, totalUserReferalEarning, gameWon, cashWon, gameLost } = response.data[0];
             setName(name );
             setEmail(email );
             setPhoneNumber(phoneNumber);
             setName(name);
             setUserId(userId);
             setKycStatus(kycDetails.status);
+            setEarnings(totalUserReferalEarning);
+            setCashWon(cashWon);
+            setBattlePlayed(gameWon + gameLost);
             console.log("Profile fetched successfully.");
           } else {
             console.warn("Failed to fetch profile.");
@@ -246,7 +252,7 @@ export const ProfilePage = ()=>{
                     <div>
                     <div className="bg-gray-100 h-32 w-20 rounded-md  relative hover:bg-green-500">
                         <img src="../../referal.png" alt="" className="size-8 absolute left-7 top-4"/>
-                        <div className="font-bold text-black absolute left-8 top-20">0</div>
+                        <div className="font-bold text-black absolute left-8 top-20">{earnings}</div>
                     </div>
                     <div className="font-thin text-xs text-center py-2">Referal Earnings</div>
                     </div>

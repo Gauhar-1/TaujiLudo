@@ -9,7 +9,7 @@ import Admin from "../models/Admin";
 import Profile from "../models/Profile";
 
 export const depositAmount = async (req : any,res : any,next: any) => {
-    const { userId,image,wallet, amount, paymentMethod, upiId } = req.body;
+    const { userId,image,wallet, amount, paymentMethod, upiId, phoneNumber } = req.body;
     
 
     // Validate file upload
@@ -36,6 +36,7 @@ export const depositAmount = async (req : any,res : any,next: any) => {
         // Save transaction in the database
         const transaction = await Transaction.create({
             userId,
+            phoneNumber,
             type: 'deposit',
             amount : parseFloat(amount),
             wallet: parseFloat(wallet),
@@ -72,7 +73,7 @@ export const depositAmount = async (req : any,res : any,next: any) => {
  };
 
  export const withdrawAmount = async (req: any, res: any) => {
-    const { userId,wallet, amount, paymentMethod, destinationDetails} = req.body;
+    const { userId,wallet, amount, paymentMethod, destinationDetails, phoneNumber} = req.body;
 
     if (!req.body.userId || !mongoose.isValidObjectId(req.body.userId)) {
         return res.status(400).json({ message: 'Invalid or missing userId' });
@@ -92,6 +93,7 @@ export const depositAmount = async (req : any,res : any,next: any) => {
         // Deduct tokens and log the withdrawal request
         const transaction = await Transaction.create({
             userId,
+            phoneNumber,
             type: 'withdraw',
             amount,
             wallet,

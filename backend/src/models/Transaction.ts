@@ -5,6 +5,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 const TransactionSchema: Schema = new Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
     name : { type : String, default: null},
+    phoneNumber : { type : String, default: null},
     type: { type: String, enum: ['deposit', 'withdraw'], required: true },
     amount: { type: Number, required: true },
     wallet: { type: Number },

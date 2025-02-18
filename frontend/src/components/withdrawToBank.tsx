@@ -11,13 +11,14 @@ export const  WithdrawToBank = ()=>{
    const [accountNumber , setAccountNumber] = useState("");
    const [message, setMessage] = useState("");
    const [balanceLess, setBalanceLess] = useState(false);
-   const { userId,amount } = useUserContext();
+   const { userId,amount, phoneNumber } = useUserContext();
 
 
    const handleWithdraw = async () => {
       try {
          await axios.post(`${API_URL}/api/auth/withdraw`, {
               userId,
+              phoneNumber,
               amount : token,
               wallet : amount - token,
               paymentMethod: 'bank',

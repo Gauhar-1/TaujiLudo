@@ -10,13 +10,14 @@ export const  WithdrawToUPI = ()=>{
     const [upiId, setUpiId] = useState("");
     const [message, setMessage] = useState("");
     const [balanceLess, setBalanceLess] = useState(false);
-    const { userId , amount } = useUserContext();
+    const { userId , amount, phoneNumber } = useUserContext();
 
     const handleWithdraw = async () => {
 
         try {
           const response = await axios.post(`${API_URL}/api/auth/withdraw`, {
                 userId,
+                phoneNumber,
                 amount : token,
                 wallet : amount - token,
                 paymentMethod: 'upi',

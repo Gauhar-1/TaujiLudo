@@ -15,6 +15,7 @@ interface Column {
 const columns: readonly Column[] = [
   { id: "no", label: "#" },
   { id: "orderId", label: "Transaction ID", minWidth: 220 },
+  { id: "mobile", label: "Mobile No.", minWidth: 220 },
   { id: "type", label: "Type", minWidth: 170 },
   { id: "paymentMethod", label: "Method", minWidth: 170 },
   { id: "status", label: "Status", minWidth: 170 },
@@ -26,6 +27,7 @@ const columns: readonly Column[] = [
 interface Data {
   no: number;
   orderId: string;
+  mobile: string;
   paymentMethod: string;
   type: string;
   status: string;
@@ -37,6 +39,7 @@ interface Data {
 function createData(
   no: number,
   orderId: string,
+  mobile: string,
   paymentMethod: string,
   type: string,
   status : string,
@@ -47,6 +50,7 @@ function createData(
   return {
     no,
     orderId,
+    mobile,
     paymentMethod,
     type,
     amount,
@@ -75,6 +79,7 @@ export const StickyTable: React.FC = () => {
           return createData(
             index + 1,
             profile._id,
+            profile.phoneNumber,
             profile.paymentMethod ,
             profile.type,
             profile.status,
@@ -130,6 +135,7 @@ export const StickyTable: React.FC = () => {
     const query = searchQuery.toLowerCase();
     return (
       row.orderId.toLowerCase().includes(query) ||
+      row.mobile.toLowerCase().includes(query) ||
       row.wallet.toString().toLowerCase().includes(query) ||
       row.paymentMethod.toLowerCase().includes(query) ||
       row.type.toLowerCase().includes(query) ||
