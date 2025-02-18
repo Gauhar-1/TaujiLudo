@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 export const BattleResult = ()=>{
 
-    const { battleId, id , setBattleId, setUserId} = useUserContext();
+    const { battleId, id ,setId, setBattleId } = useUserContext();
     const [ battle, setBattle ] = useState({
         _id: "",
         amount: 0,
@@ -63,10 +63,10 @@ export const BattleResult = ()=>{
                 console.log("Battle Id", battleId);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`,{ battleId, userId : id })
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`, { battleId, userId : id })
 
             if(!response.data){
-                console.log("Response: "+response.data);
+                console.log("Response: " + response.data);
             }
         }
         catch(err){
@@ -141,17 +141,18 @@ export const BattleResult = ()=>{
                             </div>
                            {!rejectClicked && <div className="flex text-center">
                                 <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    {battle.dispute.proofs[0].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                    { setId(battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?._id as string);
                                         setBattleId(battle._id);
                                         handleVerify();
                                 }}}>Approve</div>
                                 <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
+                                    setId(battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?._id as string);
                                     setRejectClicked(true);
                                 }}>Reject</div>
                             </div>}
                         </div>
                         { viewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.dispute.proofs[0].player === battle.player1 ? battle.dispute.proofs[0].filename : battle.dispute.proofs[1].filename}`} alt="" className="rounded-lg" />
+                            <img src={`${API_URL}/uploads/${battle.dispute.proofs.find((proof)=>{ proof.filename })?.filename}`} alt="" className="rounded-lg" />
                         </div> }
                     </div>
                     {rejectClicked && <div className="bg-gray-400 p-10 absolute top-56 rounded-md shadow-lg w-80 m-6">
@@ -165,7 +166,7 @@ export const BattleResult = ()=>{
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
                                 setRejectClicked(false);
                                 {
-                                    setUserId(battle.dispute.winner)
+                                    setId(battle.dispute.winner)
                                     setBattleId(battle._id);
                                     handleReject();
                                     navigate('/admin/completeBattle')
