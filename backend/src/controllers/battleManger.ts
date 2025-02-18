@@ -356,7 +356,31 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
       
       // ✅ Update status only after adding proofs
       if (player1Clicked && player2Clicked) {
-          updateBattleStatus(battle); // Update status only when both clicked
+         let status = updateBattleStatus(battle); // Update status only when both clicked
+
+         if(status === "completed"){
+          const playerProfile = await Profile.findOne({ phoneNumber });
+
+          const referedBy = playerProfile?.referredBy;
+  
+          if(referedBy){
+            const referedByProfile = await Profile.findOne({ phoneNumber : referedBy });
+    
+            if(referedByProfile){
+            } // Find the referral by phone number
+            const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
+        
+            if (!referral) {
+              return res.status(404).json({ message: "Referral not found" });
+            }
+        
+            // Update the referral earning
+            referral.referalEarning += Number(battle.amount * 0.02);
+        
+            // Save the updated profile
+            await referedByProfile?.save();
+          }
+         }
       }
       await battle.save();
   
@@ -451,7 +475,31 @@ export const battleLost = async(req: any, res: any, next: any)=>{
     
     // ✅ Update status only after adding proofs
     if (player1Clicked && player2Clicked) {
-        updateBattleStatus(battle); // Update status only when both clicked
+      let status = updateBattleStatus(battle); // Update status only when both clicked
+
+      if(status === "completed"){
+       const playerProfile = await Profile.findById(userId);
+
+       const referedBy = playerProfile?.referredBy;
+
+       if(referedBy){
+         const referedByProfile = await Profile.findOne({ phoneNumber : referedBy });
+ 
+         if(referedByProfile){
+         } // Find the referral by phone number
+         const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
+     
+         if (!referral) {
+           return res.status(404).json({ message: "Referral not found" });
+         }
+     
+         // Update the referral earning
+         referral.referalEarning += Number(battle.amount * 0.02);
+     
+         // Save the updated profile
+         await referedByProfile?.save();
+       }
+      }
     }
 
    await battle.save();
@@ -482,6 +530,7 @@ const player2Action = battle.player2
 
     const statusKey = `${player1Action || "None"}-${player2Action || "None"}`;
     battle.status = statusMap[statusKey] || "disputed";
+    return  statusMap[statusKey] || "disputed";
 };
 
 export const completeBattle = async(req: any, res: any)=>{
