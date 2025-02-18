@@ -388,13 +388,15 @@ export const getReferalEarning = async(req: any, res: any )=>{
     // Calculate total referral earnings
     const totalEarnings = profile.referrals.reduce((sum, referral) => sum + (referral.referalEarning || 0), 0);
 
-    if(amount< totalEarnings){
+    if(amount as number < totalEarnings ){
       profile.totalUserReferalEarning = totalEarnings;
+      await profile.save();
       return res.status(204).json({ message: "Insufficient Earning Amount"});
     }
 
     profile.amount += totalEarnings
     profile.totalUserReferalEarning -= totalEarnings
+    await profile.save();
     return res.status(200).json({ totalReferralEarnings: totalEarnings });
 } catch (error) {
     console.error("Error fetching referral earnings:", error);

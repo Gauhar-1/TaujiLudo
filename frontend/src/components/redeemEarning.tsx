@@ -14,13 +14,13 @@ export const  RedeemEarnings = ()=>{
     const handleWithdraw = async () => {
 
         try {
-          const response = await axios.post(`${API_URL}/api/auth/redeemEarning`, {
+          const response = await axios.post(`${API_URL}/api/auth/redeemEarnings`, {
                 userId,
                 amount : token,
             } , { withCredentials: true } );
 
-            const { status , message } = response.data;
-            if(status === 204){
+            const { message } = response.data;
+            if(message){
                 setMessage(message);
                 setBalanceLess(true);
                 return;
