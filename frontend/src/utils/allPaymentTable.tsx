@@ -4,7 +4,7 @@ import axios from "axios";
 import { API_URL } from "./url";
 
 interface Column {
-  id: "no" | "paymentId"| "userId"  | "amount" | "type" | "status" |"joinedAt" ;
+  id: "no" | "paymentId"| "userId" | "phoneNumber"  | "amount" | "type" | "status" |"joinedAt" ;
   label: string;
   minWidth?: number;
   align?: "right";
@@ -15,6 +15,7 @@ const columns: readonly Column[] = [
   { id: "no", label: "#" },
   { id: "paymentId", label: "Payment ID", minWidth: 220 },
   { id: "userId", label: "User ID", minWidth: 220 },
+  { id: "phoneNumber", label: "Mobile No.", minWidth: 220 },
   { id: "amount", label: "Amount", minWidth: 120,  },
   { id: "type", label: "Type", minWidth: 120,  },
   { id: "status", label: "Status", minWidth: 120,  },
@@ -25,6 +26,7 @@ interface Data {
   no: number;
   paymentId: string;
   userId: string;
+  phoneNumber: string;
   amount: number;
   type: string;
   status: string;
@@ -35,6 +37,7 @@ function createData(
     no: number,
     paymentId: string,
     userId: string,
+    phoneNumber: string,
     amount: number,
     type: string,
     status: string,
@@ -44,6 +47,7 @@ function createData(
     no,
     paymentId,
     userId,
+    phoneNumber,
     amount,
     type,
     status,
@@ -70,6 +74,7 @@ export const StickyTable: React.FC = () => {
             index + 1,
             profile._id,
             profile.userId,
+            profile.phoneNumber || "N/A",
             profile.amount || "",
             profile.type,
             profile.status,
@@ -123,6 +128,7 @@ export const StickyTable: React.FC = () => {
     return (
       row.paymentId.toLowerCase().includes(query) ||
       row.userId.toLowerCase().includes(query) ||
+      row.phoneNumber.toLowerCase().includes(query) ||
       row.amount.toString().toLowerCase().includes(query) ||
       row.type.toLowerCase().includes(query) ||
       row.status.toLowerCase().includes(query) ||
