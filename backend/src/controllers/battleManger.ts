@@ -255,7 +255,7 @@ export const manageRequest = async (req: any, res: any) => {
       const pendingBattle = playerBattles.find((b) => b.status === "pending");
 
       if (inProgressBattle && pendingBattle) {
-          await Battle.findByIdAndDelete(pendingBattle._id as string);
+          await Battle.findByIdAndDelete(pendingBattle._id);
           console.log(`⚠️ Pending battle ${pendingBattle._id} deleted (opponent found)`);
 
       }
@@ -362,9 +362,9 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
       
       // ✅ Update status only after adding proofs
       if (player1Clicked && player2Clicked) {
-         let status = await updateBattleStatus(battle); // Update status only when both clicked
+          updateBattleStatus(battle); // Update status only when both clicked
 
-         if(status === "completed"){
+         if(battle.status === "completed"){
           const playerProfile = await Profile.findOne({ phoneNumber });
 
           if(playerProfile){
@@ -447,7 +447,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
        
        // ✅ Update status only after adding proofs
        if (player1Clicked && player2Clicked) {
-        await updateBattleStatus(battle); // Update status only when both clicked
+         updateBattleStatus(battle); // Update status only when both clicked
        }
       
   
@@ -496,9 +496,9 @@ await battle.save();
     
     // ✅ Update status only after adding proofs
     if (player1Clicked && player2Clicked) {
-      let status = await updateBattleStatus(battle); // Update status only when both clicked
+       updateBattleStatus(battle); // Update status only when both clicked
 
-      if(status === "completed"){
+      if(battle.status === "completed"){
         const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
 
        const playerProfile = await Profile.findById(loserId);
@@ -564,7 +564,6 @@ const player2Action = battle.player2
 
     const statusKey = `${player1Action || "None"}-${player2Action || "None"}`;
     battle.status = statusMap[statusKey] || "disputed";
-    return  statusMap[statusKey] || "disputed";
 };
 
 export const completeBattle = async(req: any, res: any)=>{
