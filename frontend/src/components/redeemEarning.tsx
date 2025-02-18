@@ -17,7 +17,7 @@ export const  RedeemEarnings = ()=>{
           const response = await axios.post(`${API_URL}/api/auth/redeemEarnings`, {
                 userId,
                 amount : token,
-            } , { withCredentials: true } );
+            } ,  );
 
             const { message } = response.data;
             if(message){

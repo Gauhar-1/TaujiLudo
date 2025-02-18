@@ -28,7 +28,6 @@ export const Notifications = ()=>{
           // 🔵 Fetch Notifications
           const response = await axios.get(`${API_URL}/api/auth/notifications`, {
             params: { userId },
-            withCredentials: true, // Ensure cookies are sent
           });
     
           let notifications = response.data?.map((n: any) => ({
@@ -39,7 +38,6 @@ export const Notifications = ()=>{
     
           // 🔵 Fetch Profiles
           const profileResponse = await axios.get(`${API_URL}/api/auth/getProfiles`, {
-            withCredentials: true,
           });
     
           let profiles = profileResponse.data?.map((p: any) => ({
@@ -50,7 +48,6 @@ export const Notifications = ()=>{
     
           // 🔵 Fetch Battles
           const battleResponse = await axios.get(`${API_URL}/api/auth/battles/battleHistory`, { params : {userId},
-            withCredentials: true,
           });
     
           let battles = battleResponse.data?.map((b: any) => ({

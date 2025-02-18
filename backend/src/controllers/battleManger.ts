@@ -493,17 +493,16 @@ await battle.save();
       let status = updateBattleStatus(battle); // Update status only when both clicked
 
       if(status === "completed"){
-       const playerProfile = await Profile.findById(userId);
+        const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
+
+       const playerProfile = await Profile.findById(loserId);
 
        if(playerProfile){
         playerProfile.gameWon += 1;
         await playerProfile.save();
       }
 
-      const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
-
-
-      const loserProfile = await Profile.findById(loserId);
+      const loserProfile = await Profile.findById(userId);
 
       if(loserProfile){
         loserProfile.gameLost += 1;
@@ -655,15 +654,14 @@ export const  determineWinner = async (req: any ,res : any) => {
           } // Find the referral by phone number
           const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
       
-          if (!referral) {
-            return res.status(404).json({ message: "Referral not found" });
+          if (referral) {
+            // Update the referral earning
+            referral.referalEarning += Number(battle.amount * 0.02);
+        
+            // Save the updated profile
+            await referedByProfile?.save();
           }
       
-          // Update the referral earning
-          referral.referalEarning += Number(battle.amount * 0.02);
-      
-          // Save the updated profile
-          await referedByProfile?.save();
         }
          
   
