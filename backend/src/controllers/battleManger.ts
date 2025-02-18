@@ -461,6 +461,7 @@ export const battleLost = async(req: any, res: any, next: any)=>{
     const { battleId, userId } = req.body;
 
     if (!battleId) return res.status(400).json({ error: "battleId is required" });
+    if (!userId) return res.status(400).json({ error: "UserId is required" });
 
     const battle = await Battle.findById(battleId);
    if (!battle) return res.status(404).json({ error: "Battle not found" });
