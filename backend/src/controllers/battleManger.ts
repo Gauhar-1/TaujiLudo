@@ -2,6 +2,7 @@ import { de } from "@faker-js/faker/.";
 import { io } from "../app";
 import Battle from "../models/Battle";
 import Profile from "../models/Profile";
+import mongoose from "mongoose";
 
 const date =  new Date()
 export const createBattle = async (
@@ -315,6 +316,9 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
   
 
   export const uploadScreenShot = async (req: any, res: any, next: any) => {
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
       const { battleId, playerId, phoneNumber } = req.body;
   
@@ -350,7 +354,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
         battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" });
       }
 
-      await battle.save();
+      await battle.save({ session });
   
       // ✅ Check if both players have clicked
       const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
@@ -358,14 +362,14 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
       
       // ✅ Update status only after adding proofs
       if (player1Clicked && player2Clicked) {
-         let status = updateBattleStatus(battle); // Update status only when both clicked
+         let status = await updateBattleStatus(battle); // Update status only when both clicked
 
          if(status === "completed"){
           const playerProfile = await Profile.findOne({ phoneNumber });
 
           if(playerProfile){
             playerProfile.gameWon += 1;
-            await playerProfile.save();
+            await playerProfile.save({ session });
           }
   
           const loserId = playerId === battle.player1 ? battle.player2 : battle.player1;
@@ -375,7 +379,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
   
           if(loserProfile){
             loserProfile.gameLost += 1;
-            await loserProfile.save();
+            await loserProfile.save({ session });
           }
 
           const referedBy = playerProfile?.referredBy;
@@ -389,12 +393,14 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
         
             if (referral) {
               referral.referalEarning += Number(battle.amount * 0.02);
-              await referedByProfile?.save();
+              await referedByProfile?.save({ session });
           }
           }
          }
       }
       
+      await session.commitTransaction();
+        session.endSession();
   
       console.log(`✅ Screenshot uploaded & battle status updated: ${battle.status}`);
       res.status(200).json({ message: "Screenshot uploaded successfully", battle });
@@ -441,7 +447,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
        
        // ✅ Update status only after adding proofs
        if (player1Clicked && player2Clicked) {
-           updateBattleStatus(battle); // Update status only when both clicked
+        await updateBattleStatus(battle); // Update status only when both clicked
        }
       
   
@@ -490,7 +496,7 @@ await battle.save();
     
     // ✅ Update status only after adding proofs
     if (player1Clicked && player2Clicked) {
-      let status = updateBattleStatus(battle); // Update status only when both clicked
+      let status = await updateBattleStatus(battle); // Update status only when both clicked
 
       if(status === "completed"){
         const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
