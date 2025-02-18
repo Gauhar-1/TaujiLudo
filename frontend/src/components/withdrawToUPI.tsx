@@ -22,7 +22,7 @@ export const  WithdrawToUPI = ()=>{
                 wallet : amount - token,
                 paymentMethod: 'upi',
                 destinationDetails : upiId
-            } , { withCredentials: true } );
+            }  );
 
             const { success , message } = response.data;
             if(success === false){
