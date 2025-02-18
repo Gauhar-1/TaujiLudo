@@ -5,12 +5,13 @@ import { API_URL } from "./url";
 
 export const Transaction = (props : any)=>{
     const navigate = useNavigate();
-    const { setId } =useUserContext();
+    const { setId , setPhoneNumber } =useUserContext();
 
 
 
     return <div className="bg-blue-500 rounded-md w-8 p-1" onClick={()=>{
         setId(props.userId);
+        setPhoneNumber(props.phoneNumber);
         navigate('transaction');
     }}>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="size-6">
@@ -20,7 +21,7 @@ export const Transaction = (props : any)=>{
 }
 export const KycView = (props : any)=>{
     const navigate = useNavigate();
-    const {  setPhoneNumber } =useUserContext();
+    const {  setPhoneNumber } = useUserContext();
 
 
 

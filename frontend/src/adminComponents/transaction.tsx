@@ -6,28 +6,26 @@ import { API_URL } from "../utils/url"
 
 export const TransactionHistory = ()=>{
     const [ username, setUserName ] = useState("");
-    const [ phoneNumber, setPhoneNumber ] = useState("");
     const [ email, setEmail ] = useState("");
 
-    const { userId } = useUserContext();
+    const { userId, phoneNumber } = useUserContext();
     
     useEffect(()=>{
         const handle = async()=>{
             if(userId){
                 console.log("UserId: " + userId);
             }
-            try{const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { userId }});
+            try{const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { phoneNumber }});
 
             if(!response.data){
                  return console.log("response not found" , response.data);
             }
             console.log(response.data)
 
-            const { name , phoneNumber , email } = response.data[0];
+            const { name , email } = response.data[0];
 
 
             setUserName(name);
-            setPhoneNumber(phoneNumber || "N/A");
             setEmail(email  || "N/A");
             console.log("profile fetched successfully");
             }

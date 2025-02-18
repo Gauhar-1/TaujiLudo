@@ -90,7 +90,7 @@ export const StickyTable: React.FC = () => {
             profile.gameLost ,
             date,
             <div className="flex gap-2">
-              <Transaction userId={profile.userId}></Transaction>
+              <Transaction phoneNumber={profile.phoneNumber} userId={profile.userId} ></Transaction>
               <Accept></Accept>
               <Blockplayer userId={profile.userId}></Blockplayer>
               </div>

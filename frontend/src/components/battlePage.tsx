@@ -346,10 +346,10 @@ const uploadScreenshot = async () => {
             <div
                 key={value}
                 className={`text-xs text-white text-center p-1 rounded-md cursor-pointer 
-                    ${reason === value ? "bg-blue-600" : "bg-green-600"}`}
+                    ${value === reason ? "bg-blue-600" : "bg-green-600"}`}
                 onClick={() => setReason(value)}
             >
-                {reason}
+                {value}
             </div>
         ))}
                 </div>
