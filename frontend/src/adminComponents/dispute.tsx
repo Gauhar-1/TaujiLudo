@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"
 
 export const DisputeResult = ()=>{
 
-    const { battleId , userId, setUserId, setBattleId} = useUserContext();
+    const { battleId , id, setId, setBattleId} = useUserContext();
     const [ battle, setBattle ] = useState({
         _id: "",
         amount: 0,
@@ -72,7 +72,7 @@ export const DisputeResult = ()=>{
                 console.log("Battle Id", battleId);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`,{ battleId, userId })
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/approve`,{ battleId, userId : id })
 
             if(!response.data){
                 console.log("Response: "+response.data);
@@ -84,11 +84,11 @@ export const DisputeResult = ()=>{
     }
     const handleReject = async()=>{
         try{
-            if(userId){
-                console.log("User Id",userId);
+            if(id){
+                console.log("User Id",id);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId, reason, battleId})
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId : id, reason, battleId})
 
             if(!response.data){
                 console.log("Response: "+response.data);
@@ -168,7 +168,7 @@ export const DisputeResult = ()=>{
                             </div>}
                            {!rejectClicked && <div className="flex text-center">
                                 {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    {battle.dispute.proofs[0].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                    {battle.dispute.proofs[0].player === battle.player2 ? setId(battle.player2) : setId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
                                         navigate('/admin/disputeBattle')
@@ -218,7 +218,7 @@ export const DisputeResult = ()=>{
                             </div>}
                            {!rejectClicked2 && <div className="flex text-center">
                                 {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    {battle.dispute.proofs[0].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                    {battle.dispute.proofs[0].player === battle.player2 ? setId(battle.player2) : setId(battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
                                 }}}>Approve</div>}
@@ -243,7 +243,7 @@ export const DisputeResult = ()=>{
       ></textarea>
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
                                 setRejectClicked(false);
-                                {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                {battle.dispute.proofs[1].player === battle.player2 ? setId(battle.player2) : setId(battle.player1);
                                     setBattleId(battle._id);
                                     handleReject();
                             }}}>sent</div>
@@ -262,7 +262,7 @@ export const DisputeResult = ()=>{
       }}></textarea>
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
                                 setRejectClicked2(false);
-                                {battle.dispute.proofs[1].player === battle.player2 ? setUserId(battle.player2) : setUserId(battle.player1);
+                                {battle.dispute.proofs[1].player === battle.player2 ? setId(battle.player2) : setId(battle.player1);
                                     setBattleId(battle._id);
                                     handleReject();
                             }}}>sent</div>
