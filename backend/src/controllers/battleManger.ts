@@ -369,7 +369,7 @@ export const inProgressBattle = async (req: any, res: any, next: any) => {
           const loserId = playerId === battle.player1 ? battle.player2 : battle.player1;
   
   
-          const loserProfile = await Profile.findById(playerId);
+          const loserProfile = await Profile.findById(loserId);
   
           if(loserProfile){
             loserProfile.gameLost += 1;
@@ -504,7 +504,7 @@ export const battleLost = async(req: any, res: any, next: any)=>{
       const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
 
 
-      const loserProfile = await Profile.findById(userId);
+      const loserProfile = await Profile.findById(loserId);
 
       if(loserProfile){
         loserProfile.gameLost += 1;
@@ -641,7 +641,7 @@ export const  determineWinner = async (req: any ,res : any) => {
         const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
 
 
-        const loserProfile = await Profile.findById(userId);
+        const loserProfile = await Profile.findById(loserId);
 
         if(loserProfile){
           loserProfile.gameLost += 1;
