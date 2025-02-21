@@ -648,22 +648,18 @@ export const  determineWinner = async (req: any ,res : any) => {
       }
         const referedBy = playerProfile?.referredBy;
 
-        if(referedBy){
-          const referedByProfile = await Profile.findOne({ phoneNumber : referedBy });
-  
-          if(referedByProfile){
-          } // Find the referral by phone number
-          const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === playerProfile.phoneNumber);
-      
-          if (referral) {
-            // Update the referral earning
-            referral.referalEarning += battle.amount * 0.02;
+        if (referedBy) {
+          const referedByProfile = await Profile.findOne({ phoneNumber: referedBy });
         
-            // Save the updated profile
-            await referedByProfile?.save();
+          if (referedByProfile) {
+            const referral = referedByProfile.referrals.find(ref => ref.phoneNumber === playerProfile.phoneNumber);
+            if (referral) {
+              referral.referalEarning += battle.amount * 0.02;
+              await referedByProfile.save();
+            }
           }
-      
         }
+        
          
   
         res.status(200).json({ success: true, message: 'Winner determined successfully', battle });
