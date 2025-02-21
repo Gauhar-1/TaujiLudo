@@ -25,7 +25,7 @@ export const Header = ()=>{
                 console.log("Failed to update Amount")
                 console.log(response.data);
               }
-              setAmount(response.data.amount);
+              setAmount(response.data.profile.amount);
             }
             catch(err){
                console.log("Error" + err);
