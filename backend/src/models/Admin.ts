@@ -50,7 +50,7 @@ const AdminSchema: Schema = new Schema({
         content : { type:String, default: null },
       },
     createdAt: { type: Date, default: Date.now },
-    Admins: { type: [String], default: ["7002926251"] },
+    Admins: { type: [String], default: ["7002926251", "9784889319", "8769422366"] },
 });
 
 export default mongoose.model<IAdmin>("Admin", AdminSchema);
