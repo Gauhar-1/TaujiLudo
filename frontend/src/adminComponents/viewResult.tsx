@@ -177,7 +177,7 @@ export const BattleResult = ()=>{
       className={`p-2 w-1/2 border rounded-lg text-white m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" : "bg-green-400"}`}
       onClick={() => {
         if (!battle.winner) {
-          setId(checkPlayer("Reject"));
+            setId(battle.dispute.proofs.find((proof) => proof.clicked === "Won")?.player as string);
           setBattleId(battle._id);
           handleVerify();
         }
@@ -190,7 +190,7 @@ export const BattleResult = ()=>{
       className={`p-2 w-1/2 border rounded-lg text-white m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" : "bg-red-400"}`}
       onClick={() => {
         if (!battle.winner) {
-          setId(battle.dispute.proofs.find((proof) => proof.clicked === "Won")?._id as string);
+          setId(battle.dispute.proofs.find((proof) => proof.clicked === "Won")?.player as string);
           setRejectClicked(true);
         }
       }}
