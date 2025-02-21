@@ -1,9 +1,33 @@
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { API_URL } from "../utils/url";
 
 export const SideBar = (props : any)=>{
     const navigate = useNavigate();
-    const { setAdminClicked } = useUserContext();
+    const { setAdminClicked, phoneNumber } = useUserContext();
+
+
+    const [isAdmin, setIsAdmin] = useState(false);
+  
+    useEffect(() => {
+      const checkAdmin = async () => {
+        try {
+          const response = await axios.get(`${API_URL}/api/admin/check-admin/${phoneNumber}`);
+          setIsAdmin(response.data.isAdmin);
+        } catch (error) {
+          console.error("Error checking admin:", error);
+          setIsAdmin(false);
+        }
+      };
+  
+      if (phoneNumber) {
+        checkAdmin();
+      }
+    }, [phoneNumber]);
+  
+
     return (
         <div className="bg-gray-300 fixed min-h-screen min-w-64  z-50 flex flex-col">
           <div className="flex justify-between">
@@ -89,7 +113,7 @@ export const SideBar = (props : any)=>{
 
                 <div className="font-mono">Support</div>
               </div>
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
+              { isAdmin &&<div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
                 navigate('/admin');
                 props.setSidebarClicked(false);
                 setAdminClicked(true)
@@ -99,7 +123,7 @@ export const SideBar = (props : any)=>{
 </svg>
 
                 <div className="font-mono">Admin</div>
-              </div>
+              </div>}
             </div>
           </div>
           </div>
