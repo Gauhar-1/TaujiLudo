@@ -234,7 +234,8 @@ export const updateAmount = async(req:any, res:any, next:any)=>{
   }
 
   try{
-          const profile = await Profile.findOne({ phoneNumber });
+          const profile = await Profile.findOne({ phoneNumber }, 
+            { new: true });
 
           if(!profile){
             return res.status(404).json({ success: false, message: 'profile not found' })

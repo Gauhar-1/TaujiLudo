@@ -628,31 +628,24 @@ export const  determineWinner = async (req: any ,res : any) => {
         }
         await battle.save();
 
-        const playerProfile = await Profile.findOne({userId});
+        const playerProfile = await Profile.findOneAndUpdate({userId},{
+          $inc: { amount: battle.prize , gameWon: 1 } ,
+        });
 
         if (!playerProfile) {
           return res.status(400).json({ error: "Player profile not found" });
       }
-            // playerProfile.gameLost += 1;
-            // await playerProfile.save();
-
-        if(playerProfile){
-          playerProfile.gameWon += 1;
-          playerProfile.amount += battle.prize;
-          await playerProfile.save();
-        }
 
         const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
 
 
-        const loserProfile = await Profile.findOne({userId : loserId});
+        const loserProfile = await Profile.findOne({userId : loserId},{
+          $inc: {  gameLost: 1 } ,
+        });
 
         if (!loserProfile) {
           return res.status(400).json({ error: "Loser profile not found" });
       }
-            loserProfile.gameLost += 1;
-            await loserProfile.save();
-
         const referedBy = playerProfile?.referredBy;
 
         if(referedBy){

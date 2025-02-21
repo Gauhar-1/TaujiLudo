@@ -29,7 +29,7 @@ export const NotifyCard = (props : any)=>{
                 </div>
                 <div className="px-4 font-serif text-sm  ">
                     <div className="flex gap-2">
-                    <div className="text-white">Manish</div>
+                    <div className="text-white">A Player</div>
                     {/* {props.notifications.type <div className="text-green-300 pt-1">has joined!!</div>} */}
                     <div className={` ${props.notification.type === "deposit" ? "text-green-400": "text-red-500"} `}>has {props.notification.type === "deposit" ? "deposited": "withdrawed"}!!</div>
                     </div>
