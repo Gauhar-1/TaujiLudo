@@ -4,6 +4,7 @@ import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
 import { socket } from "./homePage";
 import {  useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const BettingCard = (props : any)=>{
     // const navigate = useNavigate();
@@ -12,10 +13,6 @@ export const BettingCard = (props : any)=>{
     const { setBattleId, name  } = useUserContext();
 
     const navigate = useNavigate();
-    import { toast } from "react-toastify";
-    import "react-toastify/dist/ReactToastify.css";
-    import axios from "axios";
-    
     const joinBattle = async () => {
       try {
         const response = await axios.post(`${API_URL}/api/auth/battles/join`, {
