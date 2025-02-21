@@ -124,25 +124,32 @@ socket.on("createBattle", async (battleData, callback) => {
 
 
   // 🗑️ Handle battle deletion
-  socket.on("deleteBattle", async (battleId, callback) => {
-    try {
-      const battle = await Battle.findByIdAndDelete(battleId);
-      if (!battle) {
-        return callback({ status: 400, message: "Battle not found" });
-      }
-
-      io.emit("battleDeleted", battleId);
-      return callback({ status: 200, message: "Battle deleted successfully" });
-
-    } catch (error) {
-      console.error("❌ Error deleting battle:", error);
-      return callback({ status: 500, message: "Internal server error" });
+socket.on("deleteBattle", async (battleId, callback) => {
+  try {
+    // 🔍 Find the battle before deleting to get necessary details
+    const battle = await Battle.findById(battleId);
+    if (!battle) {
+      return callback({ status: 400, message: "Battle not found" });
     }
-  });
 
-  socket.on("disconnect", () => {
-    console.log("A user disconnected:", socket.id);
-  });
-};
+    // ✅ Refund battle entry fee to player1 (since battle isn't completed)
+    await Profile.findOneAndUpdate(
+      { userId: battle.player1 },
+      { $inc: { amount: battle.amount } }, // Refund the entry fee
+      { new: true }
+    );
+
+    // 🗑️ Delete the battle
+    await Battle.findByIdAndDelete(battleId);
+
+    io.emit("battleDeleted", battleId);
+    return callback({ status: 200, message: "Battle deleted successfully, entry fee refunded" });
+
+  } catch (error) {
+    console.error("❌ Error deleting battle:", error);
+    return callback({ status: 500, message: "Internal server error" });
+  }
+});
+}
 
 export default socketManager;
