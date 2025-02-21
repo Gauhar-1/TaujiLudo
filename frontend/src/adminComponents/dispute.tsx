@@ -167,13 +167,13 @@ export const DisputeResult = ()=>{
                                 </div>
                             </div>}
                            {!rejectClicked && <div className="flex text-center">
-                                {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
+                                {  <div className={`p-2 w-1/2 border text-white rounded-lg m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" :  "bg-green-400"}`} onClick={()=>{
                                     {setId( battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
                                         navigate('/admin/disputeBattle')
                                 }}}>Approve</div>}
-                                <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
+                                <div className={`p-2 w-1/2 border text-white rounded-lg m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" :  "bg-red-400"}`} onClick={()=>{
                                     setRejectClicked(true);
                                 }}>Reject</div>
                             </div>}
@@ -217,12 +217,12 @@ export const DisputeResult = ()=>{
                                 </div>
                             </div>}
                            {!rejectClicked2 && <div className="flex text-center">
-                                {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
+                                {  <div className={`p-2 w-1/2 border text-white rounded-lg m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" :  "bg-green-400"}`} onClick={()=>{
                                     {setId(battle.player2);
                                         setBattleId(battle._id);
                                         handleVerify();
                                 }}}>Approve</div>}
-                                <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
+                                <div className={`p-2 w-1/2 border bg-red-400 text-white rounded-lg m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" : "bg-red-400"}`} onClick={()=>{
                                     setRejectClicked2(true);
                                 }}>Reject</div>
                             </div>}
