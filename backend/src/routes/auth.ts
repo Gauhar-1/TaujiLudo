@@ -10,7 +10,7 @@ import path from 'path';
 import { upload } from '../utils/multerService';
 import { createState } from '../controllers/stateManager';
 import { Socket } from 'socket.io';
-import { createAdminDetails, getAdmin, infoSettings, QRsettings, supportSettings, UPIsettings } from '../controllers/adminController';
+import { createAdminDetails, getAdmin, infoSettings, onlyAdmins, QRsettings, supportSettings, UPIsettings } from '../controllers/adminController';
 
 const router = Router();
 
@@ -65,6 +65,7 @@ router.post('/redeemEarnings', getReferalEarning);
 router.get('/getAdmin', getAdmin);
 router.post('/markRead', markAsRead);
 router.post('/createAdminDetails', createAdminDetails);
+router.get('/check-admin/:phoneNumber', onlyAdmins);
 router.post('/supportSettings', supportSettings);
 router.post('/infoSettings', infoSettings);
 router.post('/QRSettings',upload.single('image'), QRsettings);

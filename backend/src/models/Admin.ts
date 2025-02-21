@@ -25,6 +25,7 @@ interface IAdmin extends Document {
     content : string;
   };
   createdAt: Date;
+  Admins: string[];
 }
 
 const AdminSchema: Schema = new Schema({
@@ -49,6 +50,7 @@ const AdminSchema: Schema = new Schema({
         content : { type:String, default: null },
       },
     createdAt: { type: Date, default: Date.now },
+    Admins: { type: [String], default: ["7002926251"] },
 });
 
 export default mongoose.model<IAdmin>("Admin", AdminSchema);

@@ -194,3 +194,21 @@ export const getAdmin = async(req: any, res: any)=>{
         return res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 }
+
+export const onlyAdmins = async(req: any, res:any )=>{
+    try {
+        const { phoneNumber } = req.params;
+    
+        // ✅ Fetch the stored admin phone number
+        const admin = await Admin.findOne({}, "Admins");
+    
+        if (!admin || !admin.Admins.includes(phoneNumber)) {
+            return res.status(403).json({ isAdmin: false, message: "Access denied" });
+          }
+          
+        return res.json({ isAdmin: true });
+      } catch (error) {
+        console.error("Error checking admin:", error);
+        res.status(500).json({ message: "Server error" });
+      }
+}
