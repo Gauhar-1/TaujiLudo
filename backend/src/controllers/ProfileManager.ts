@@ -227,7 +227,7 @@ export const unBlockPlayer = async(req: any, res: any, next: any)=>{
 }
 
 export const updateAmount = async (req: any, res: any, next: any) => {
-  const { phoneNumber } = req.body; // Changed to req.body for update
+  const { phoneNumber } = req.query; // Changed to req.body for update
 
   if (!phoneNumber ) {
     return res.status(400).json({ success: false, message: "Missing required fields: phoneNumber " });
