@@ -244,7 +244,7 @@ export const updateAmount = async (req: any, res: any, next: any) => {
     const totalEarnings = profile.referrals.reduce((sum, referral) => sum + (referral.referalEarning || 0), 0);
 
     // Set total earnings
-    profile.totalUserReferalEarning += totalEarnings;
+    profile.totalUserReferalEarning += Math.floor(totalEarnings);
 
     // Reset each referral's earnings to 0 (using a loop instead of .map())
     profile.referrals.forEach(referral => {
