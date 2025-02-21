@@ -167,6 +167,22 @@ export const HomePage = () => {
     });
   };
 
+  useEffect(() => {
+    // ✅ Listen for battle updates
+    socket.on("battleUpdated", (updatedBattle: any) => {
+      if (updatedBattle.status === "in-progress") {
+        setPendingB((prevBattles) =>
+          prevBattles.filter((b : any) => b.player1 !== updatedBattle.player1 || b.amount !== updatedBattle.amount)
+        );
+      }
+    });
+  
+    return () => {
+      socket.off("battleUpdated");
+    };
+  }, []);
+  
+
   
 
 

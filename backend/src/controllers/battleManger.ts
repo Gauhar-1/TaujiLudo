@@ -214,7 +214,7 @@ export const manageRequest = async (req: any, res: any) => {
 
       return res.status(200).json(battle);
     } 
-    
+
    // ✅ Handle opponent entered event and push history in one step
    battle = await Battle.findByIdAndUpdate(
     battleId,
@@ -252,7 +252,7 @@ export const manageRequest = async (req: any, res: any) => {
    }
     }
 
-    return res.status(200).json(battle);
+    return res.status(200).json(battle, pendingBattle);
   } catch (error) {
     console.error("❌ Error in manageRequest:", error);
     return res.status(500).json({ message: "Internal server error" });
