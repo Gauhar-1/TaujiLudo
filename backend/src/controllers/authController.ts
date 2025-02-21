@@ -183,11 +183,27 @@ export const autoLogin = async (req: any, res: any) => {
 };
 
 export const logOut = async (req: any, res: any) => {
+    // ✅ Clear all authentication cookies
     res.clearCookie("token", {
         httpOnly: true,
-        secure: true, // ✅ Required for HTTPS
+        secure: true, 
         sameSite: "None",
+        expires: new Date(0), // Expire immediately
     });
 
-    res.json({ success: true, message: "Logged out successfully" });
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: true, 
+        sameSite: "None",
+        expires: new Date(0),
+    });
+
+    res.clearCookie("sessionId", {
+        httpOnly: true,
+        secure: true, 
+        sameSite: "None",
+        expires: new Date(0),
+    });
+
+    res.status(200).json({ success: true, message: "Logged out successfully. All cookies cleared." });
 };

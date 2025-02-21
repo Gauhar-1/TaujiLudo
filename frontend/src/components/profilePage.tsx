@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
+import { toast } from "react-toastify";
 
 export const ProfilePage = ()=>{
 
@@ -109,18 +110,20 @@ export const ProfilePage = ()=>{
       }
     };
 
-    const handleLogOut = async()=>{
-      try{
-           const response = await axios.post(`${API_URL}/api/auth/logout`);
-
-           if(!response.data.success){
-             console.log("Reponse false");
-           }
+    const handleLogOut = async () => {
+      try {
+        const response = await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+    
+        if (response.data.success) {
+          toast.success("Logged out successfully!", { position: "top-right" });
+        } else {
+          toast.error("Logout failed. Please try again.", { position: "top-right" });
+        }
+      } catch (err) {
+        console.error("Logout Error:", err);
+        toast.error("Something went wrong. Try again!", { position: "top-right" });
       }
-      catch(err){
-        console.error(err);
-      }
-    }
+    };
 
     
 
