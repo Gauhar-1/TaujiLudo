@@ -171,17 +171,35 @@ export const BattleResult = ()=>{
                                     }}>{ viewClicked ? "back" : "view"}</div>
                                 </div>
                             </div>
-                           {!rejectClicked && <div className="flex text-center">
-                                <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    { setId(checkPlayer("Reject"))
-                                        setBattleId(battle._id);
-                                        handleVerify();
-                                }}}>Approve</div>
-                                <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
-                                    setId(battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?._id as string);
-                                    setRejectClicked(true);
-                                }}>Reject</div>
-                            </div>}
+                            {!rejectClicked && (
+  <div className="flex text-center">
+    <div
+      className={`p-2 w-1/2 border rounded-lg text-white m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" : "bg-green-400"}`}
+      onClick={() => {
+        if (!battle.winner) {
+          setId(checkPlayer("Reject"));
+          setBattleId(battle._id);
+          handleVerify();
+        }
+      }}
+    >
+      Approve
+    </div>
+    
+    <div
+      className={`p-2 w-1/2 border rounded-lg text-white m-2 ${battle.winner ? "bg-gray-400 cursor-not-allowed" : "bg-red-400"}`}
+      onClick={() => {
+        if (!battle.winner) {
+          setId(battle.dispute.proofs.find((proof) => proof.clicked === "Won")?._id as string);
+          setRejectClicked(true);
+        }
+      }}
+    >
+      Reject
+    </div>
+  </div>
+)}
+
                         </div>
                         { viewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
                             <img src={`${API_URL}/uploads/${checkPlayer("image")}`} alt="" className="rounded-lg" />
