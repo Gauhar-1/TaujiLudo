@@ -14,7 +14,7 @@ export const SideBar = (props : any)=>{
     useEffect(() => {
       const checkAdmin = async () => {
         try {
-          const response = await axios.get(`${API_URL}/api/admin/check-admin/${phoneNumber}`);
+          const response = await axios.get(`${API_URL}/api/admin/check-admin`, {params : { phoneNumber }});
           setIsAdmin(response.data.isAdmin);
         } catch (error) {
           console.error("Error checking admin:", error);

@@ -65,7 +65,7 @@ router.post('/redeemEarnings', getReferalEarning);
 router.get('/getAdmin', getAdmin);
 router.post('/markRead', markAsRead);
 router.post('/createAdminDetails', createAdminDetails);
-router.get('/check-admin/:phoneNumber', onlyAdmins);
+router.get('/check-admin', onlyAdmins);
 router.post('/supportSettings', supportSettings);
 router.post('/infoSettings', infoSettings);
 router.post('/QRSettings',upload.single('image'), QRsettings);
