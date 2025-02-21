@@ -226,28 +226,29 @@ export const unBlockPlayer = async(req: any, res: any, next: any)=>{
   }
 }
 
-export const updateAmount = async(req:any, res:any, next:any)=>{
-  const { phoneNumber } = req.query;
+export const updateAmount = async (req: any, res: any, next: any) => {
+  const { phoneNumber } = req.body; // Changed to req.body for update
 
-  if(!phoneNumber){
-    console.log("missing fields" + phoneNumber  );
+  if (!phoneNumber ) {
+    return res.status(400).json({ success: false, message: "Missing required fields: phoneNumber " });
   }
 
-  try{
-          const profile = await Profile.findOne({ phoneNumber }, 
-            { new: true });
+  try {
+    const profile = await Profile.findOne(
+      { phoneNumber }
+    );
 
-          if(!profile){
-            return res.status(404).json({ success: false, message: 'profile not found' })
-          }
-          res.status(200).json(profile)
-  }
-  catch(error){
-    console.error( "Update Amount: " +error);
-    res.status(500).json("Amount update feel: "+ error);
-  }
+    if (!profile) {
+      return res.status(404).json({ success: false, message: "Profile not found" });
+    }
 
-}
+    res.status(200).json({ success: true, message: "Amount updated successfully", profile });
+  } catch (error: any) {
+    console.error("Update Amount Error:", error);
+    res.status(500).json({ success: false, message: "Amount update failed", error: error.message });
+  }
+};
+
 export const completeKYC = async(req: any, res: any, next: any)=>{
 
     const { userId, Name ,DOB, state,  documentNumber  }  = req.body;
