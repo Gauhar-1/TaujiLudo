@@ -90,6 +90,38 @@ export const BattleResult = ()=>{
         }
     }
 
+    const checkPlayer = ( clicked : string)=>{
+
+        if(clicked === "image"){
+            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === "Won");
+
+            const ImageName = winningProof
+              ? (winningProof.filename)
+              : "";
+            
+            return ImageName;
+        }
+
+        else if ( clicked === "Reject"){
+            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === clicked);
+
+            const winnerName = winningProof
+              ? (winningProof.player === battle.player1 ? battle.player1 : battle.player2)
+              : "No winner determined";
+            
+            return winnerName;
+        }
+
+        const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === clicked);
+
+        const winnerName = winningProof
+          ? (winningProof.player === battle.player1 ? battle.player1Name : battle.player2Name)
+          : "No winner determined";
+        
+        return winnerName;
+        
+    }
+
     
     return (
         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
@@ -116,11 +148,11 @@ export const BattleResult = ()=>{
                         <div className="p-4">
                         <div className="flex">
                                 <div className="p-2 w-28 border">Winner</div>
-                                <div className="p-2 w-60 border">{battle.winner === battle.player1 ? battle.player1Name : battle.player2Name }</div>
+                                <div className="p-2 w-60 border">{checkPlayer("Won")}</div>
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">Loser</div>
-                                <div className="p-2 w-60 border">{battle.winner === battle.player2 ? battle.player2Name : battle.player1Name }</div>
+                                <div className="p-2 w-60 border">{checkPlayer("Lost")}</div>
                             </div>
                         <div className="flex">
                                 <div className="p-2 w-28 border">Status</div>
@@ -152,10 +184,11 @@ export const BattleResult = ()=>{
                             </div>}
                         </div>
                         { viewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.dispute.proofs.find((proof)=>{ proof.filename })?.filename}`} alt="" className="rounded-lg" />
+                            <img src={`${API_URL}/uploads/${checkPlayer("image")}`} alt="" className="rounded-lg" />
                         </div> }
                     </div>
-                    {rejectClicked && <div className="bg-gray-400 p-10 absolute top-56 rounded-md shadow-lg w-80 m-6">
+                    {rejectClicked && <div className="bg-gray-400 px-10 py-6 absolute top-56 rounded-md shadow-lg w-80 mx-6">
+                       <div className="p-1 text-purple-700 font-bold">Send to {checkPlayer("Won")}</div>
                         <textarea
         className="w-full border border-gray-300 p-2 rounded resize-none break-words whitespace-normal"
         rows={4}
@@ -166,7 +199,7 @@ export const BattleResult = ()=>{
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
                                 setRejectClicked(false);
                                 {
-                                    setId(battle.dispute.winner)
+                                    setId(checkPlayer("Reject"))
                                     setBattleId(battle._id);
                                     handleReject();
                                     navigate('/admin/completeBattle')
