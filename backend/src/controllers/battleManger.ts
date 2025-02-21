@@ -214,51 +214,42 @@ export const manageRequest = async (req: any, res: any) => {
 
       return res.status(200).json(battle);
     } 
-    else if (event === "opponent_entered") {
-      battle = await Battle.findByIdAndUpdate(
-        battleId,
-        {
-          status: "in-progress",
-          $push: { history: { event, timestamp: new Date(), details } },
-        },
-        { new: true }
-      );
+    
+   // ✅ Handle opponent entered event and push history in one step
+   battle = await Battle.findByIdAndUpdate(
+    battleId,
+    {
+      ...(event === "opponent_entered" && { status: "in-progress" }), // Update status if opponent enters
+      $push: { history: { event, timestamp: new Date(), details } },
+    },
+    { new: true }
+  );
 
-      if (!battle) {
-        console.log("⚠️ Battle not found");
-        return res.status(404).json({ message: "Battle not found" });
-      }
-    }
-
-    // ✅ Push event to battle history
-    battle = await Battle.findByIdAndUpdate(
-      battleId,
-      { $push: { history: { event, timestamp: new Date(), details } } },
-      { new: true }
-    );
 
     if (!battle) {
       console.log("⚠️ Battle not found");
       return res.status(404).json({ message: "Battle not found" });
     }
 
-    // ✅ Fetch all active battles of the player
-    const playerBattles = await Battle.find({
+     // ✅ Fetch all active battles of the player
+     const playerBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
-    }).sort({ createdAt: 1 });
+      status: { $in: ["pending", "in-progress"] }, // Fixed syntax
+  }).sort({ createdAt: 1 });
 
     // ✅ Check if there's an "in-progress" battle
     const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
 
     if (inProgressBattle) {
-      // ✅ Delete all "pending" battles for the player
-      const pendingBattles = playerBattles.filter((b) => b.status === "pending");
+       // ✅ Delete all "pending" battles for the player
+       const pendingBattleIds = playerBattles
+       .filter((b) => b.status === "pending")
+       .map((b) => b._id);
 
-      if (pendingBattles.length > 0) {
-        const pendingBattleIds = pendingBattles.map((b) => b._id);
-        await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
-        console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId}`);
-      }
+   if (pendingBattleIds.length > 0) {
+       await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
+       console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId}`);
+   }
     }
 
     return res.status(200).json(battle);
