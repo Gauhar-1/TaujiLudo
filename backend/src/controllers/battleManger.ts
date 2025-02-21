@@ -647,7 +647,7 @@ export const determineWinner = async (req: any, res: any) => {
       const referral = referedByProfile?.referrals.find(ref => ref.phoneNumber === playerProfile.phoneNumber);
 
       if (referedByProfile && referral) {
-        referral.referalEarning += battle.prize * 0.02;
+        referral.referalEarning += battle.amount * 0.02;
         await referedByProfile.save();
       }
     }

@@ -26,7 +26,7 @@ export const  RedeemEarnings = ()=>{
                 return;
             }
             console.log('Withdrawal request submitted.');
-            navigate('/wallet');
+            navigate('/home');
         } catch (err: any) {
             if (err.response) {
                 console.log("Error Response:", err.response.data);
@@ -57,7 +57,7 @@ export const  RedeemEarnings = ()=>{
                  </div>
                  <div className="flex justify-center">
                  <div className="bg-blue-700 w-28 text-white text-center rounded-md p-1 mb-8" onClick={()=>{
-                    navigate('/withdraw')
+                    navigate('/home')
                  }}>back</div>
                  </div>
                 </div>

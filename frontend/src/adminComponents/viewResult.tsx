@@ -103,7 +103,7 @@ export const BattleResult = ()=>{
         }
 
         else if ( clicked === "Reject"){
-            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === "Won");
+            const winningProof = battle.dispute.proofs.find((proof) =>proof.clicked === "Won");
 
             const winnerName = winningProof
               ? (winningProof.player === battle.player1 ? battle.player1 : battle.player2)
