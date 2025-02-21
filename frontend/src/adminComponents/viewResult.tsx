@@ -103,7 +103,7 @@ export const BattleResult = ()=>{
         }
 
         else if ( clicked === "Reject"){
-            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === clicked);
+            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === "Won");
 
             const winnerName = winningProof
               ? (winningProof.player === battle.player1 ? battle.player1 : battle.player2)
@@ -173,7 +173,7 @@ export const BattleResult = ()=>{
                             </div>
                            {!rejectClicked && <div className="flex text-center">
                                 <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    { setId(battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?._id as string);
+                                    { setId(checkPlayer("Reject"))
                                         setBattleId(battle._id);
                                         handleVerify();
                                 }}}>Approve</div>

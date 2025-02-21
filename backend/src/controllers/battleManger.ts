@@ -604,71 +604,61 @@ export const deleteBattle = async(req: any, res: any, next: any)=>{
     res.status(200).json(battle);
 }
 
-export const  determineWinner = async (req: any ,res : any) => {
-    const { battleId , userId } = req.body;
-  
-    if (!battleId) {
-        return res.status(400).json({ success: false, message: "BattleID is required." });
-    }
-  
-    try {
-  
-        const battle = await Battle.findById(battleId);
-  
-        if (!battle) {
-            console.log('Battle not found');
-            return res.status(404).json({ success: false, message: 'Battle not found' });
-        }
-  
-        if(battle.dispute){
-            battle.dispute.winner = userId;
-            battle.dispute.resolved = true;
-            battle.status = "completed";
-            battle.winner = "decided";
-        }
-        await battle.save();
+export const determineWinner = async (req: any, res: any) => {
+  const { battleId, userId } = req.body;
 
-        const playerProfile = await Profile.findOneAndUpdate({userId},{
-          $inc: { amount: battle.prize , gameWon: 1 } ,
-        });
-
-        if (!playerProfile) {
-          return res.status(400).json({ error: "Player profile not found" });
-      }
-
-        const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
-
-
-        const loserProfile = await Profile.findOne({userId : loserId},{
-          $inc: {  gameLost: 1 } ,
-        });
-
-        if (!loserProfile) {
-          return res.status(400).json({ error: "Loser profile not found" });
-      }
-        const referedBy = playerProfile?.referredBy;
-
-        if (referedBy) {
-          const referedByProfile = await Profile.findOne({ phoneNumber: referedBy });
-        
-          if (referedByProfile) {
-            const referral = referedByProfile.referrals.find(ref => ref.phoneNumber === playerProfile.phoneNumber);
-            if (referral) {
-              referral.referalEarning += battle.amount * 0.02;
-              await referedByProfile.save();
-            }
-          }
-        }
-        
-         
-  
-        res.status(200).json({ success: true, message: 'Winner determined successfully', battle });
-    } catch (err : any) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Winner determination failed', error: err.message });
-    }
+  if (!battleId) {
+    return res.status(400).json({ success: false, message: "BattleID is required." });
   }
-  
+
+  try {
+    const battle = await Battle.findById(battleId);
+    if (!battle) {
+      return res.status(404).json({ success: false, message: "Battle not found" });
+    }
+
+    if (battle.dispute) {
+      Object.assign(battle.dispute, { winner: userId, resolved: true });
+      Object.assign(battle, { status: "completed", winner: "decided" });
+    }
+    await battle.save();
+
+    const playerProfile = await Profile.findOneAndUpdate(
+      { userId },
+      { $inc: { amount: battle.prize, gameWon: 1 } },
+      { new: true }
+    );
+    if (!playerProfile) {
+      return res.status(404).json({ success: false, message: "Player profile not found" });
+    }
+
+    const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
+    const loserProfile = await Profile.findOneAndUpdate(
+      { userId: loserId },
+      { $inc: { gameLost: 1 } },
+      { new: true }
+    );
+    if (!loserProfile) {
+      return res.status(404).json({ success: false, message: "Loser profile not found" });
+    }
+
+    if (playerProfile.referredBy) {
+      const referedByProfile = await Profile.findOne({ phoneNumber: playerProfile.referredBy });
+      const referral = referedByProfile?.referrals.find(ref => ref.phoneNumber === playerProfile.phoneNumber);
+
+      if (referedByProfile && referral) {
+        referral.referalEarning += battle.prize * 0.02;
+        await referedByProfile.save();
+      }
+    }
+
+    res.status(200).json({ success: true, message: "Winner determined successfully", battle });
+  } catch (err: any) {
+    console.error("Error in determineWinner:", err);
+    res.status(500).json({ success: false, message: "Winner determination failed", error: err.message });
+  }
+};
+
   export const  rejectDispute = async (req: any ,res : any) => {
     const { userId , battleId , reason } = req.body;
   
