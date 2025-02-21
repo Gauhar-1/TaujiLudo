@@ -242,6 +242,13 @@ export const updateAmount = async (req: any, res: any, next: any) => {
       return res.status(404).json({ success: false, message: "Profile not found" });
     }
 
+    
+    // Calculate total referral earnings
+    const totalEarnings = profile.referrals.reduce((sum, referral) => sum + (referral.referalEarning || 0), 0);
+
+    profile.totalUserReferalEarning = totalEarnings
+    await profile.save();
+
     res.status(200).json({ success: true, message: "Amount updated successfully", profile });
   } catch (error: any) {
     console.error("Update Amount Error:", error);
