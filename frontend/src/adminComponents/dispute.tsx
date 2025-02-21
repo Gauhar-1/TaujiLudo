@@ -146,7 +146,7 @@ export const DisputeResult = ()=>{
                         <div className="flex">
              <div className="p-2 w-28 border">Clicked </div>
              <div className="p-2 w-60 border">
-            {battle.dispute.proofs.find((proof)=>{proof.clicked})?.clicked  && battle.dispute.proofs.find((proof)=>{proof.clicked})?._id as String === battle.player1 }
+            {battle.dispute.proofs.find((proof)=>{ proof.player === battle.player1})?.clicked  }
         </div>
                             </div>
                         <div className="flex">
@@ -168,7 +168,7 @@ export const DisputeResult = ()=>{
                             </div>}
                            {!rejectClicked && <div className="flex text-center">
                                 {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    {setId(battle.dispute.proofs.find((proof)=>{proof.player === battle.player1})?._id as string );
+                                    {setId( battle.player1);
                                         setBattleId(battle._id);
                                         handleVerify();
                                         navigate('/admin/disputeBattle')
@@ -218,7 +218,7 @@ export const DisputeResult = ()=>{
                             </div>}
                            {!rejectClicked2 && <div className="flex text-center">
                                 {  <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={()=>{
-                                    {setId(battle.dispute.proofs.find((proof)=>{proof.player === battle.player2})?._id as string );
+                                    {setId(battle.player2);
                                         setBattleId(battle._id);
                                         handleVerify();
                                 }}}>Approve</div>}
@@ -243,7 +243,7 @@ export const DisputeResult = ()=>{
       ></textarea>
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
                                 setRejectClicked(false);
-                                { setId(battle.dispute.proofs.find((proof)=>{proof.player === battle.player1})?._id as string )
+                                { setId(battle.player1);
                                     setBattleId(battle._id);
                                     handleReject();
                             }}}>sent</div>
@@ -262,7 +262,7 @@ export const DisputeResult = ()=>{
       }}></textarea>
                             <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
                                 setRejectClicked2(false);
-                                {   setId(battle.dispute.proofs.find((proof)=>{proof.player === battle.player2})?._id as string )
+                                {   setId(battle.player2);
                                     setBattleId(battle._id);
                                     handleReject();
                             }}}>sent</div>
