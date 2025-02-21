@@ -222,6 +222,21 @@ export const manageRequest = async (req: any, res: any) => {
 
       return res.status(200).json(battle);
     } 
+    if (event === "opponent_found") {
+      // ✅ Check if the player has an "in-progress" battle
+    const activeBattle = await Battle.findOne({
+      $or: [{ player1: userId }, { player2: userId }],
+      status: "in-progress", // Restrict only if there's an active battle
+    });
+
+    if (activeBattle) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot join a new battle while another battle is in progress.",
+      });
+    }
+    } 
+
 
    // ✅ Handle opponent entered event and push history in one step
    battle = await Battle.findByIdAndUpdate(

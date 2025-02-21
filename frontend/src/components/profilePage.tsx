@@ -116,6 +116,15 @@ export const ProfilePage = ()=>{
     
         if (response.data.success) {
           toast.success("Logged out successfully!", { position: "top-right" });
+    
+          // Clear user state
+          setUserId("");
+          setName("");
+          setPhoneNumber("");
+          setLogin(false);
+    
+          // Redirect to login page
+          navigate("/");
         } else {
           toast.error("Logout failed. Please try again.", { position: "top-right" });
         }
