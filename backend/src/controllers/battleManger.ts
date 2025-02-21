@@ -221,61 +221,85 @@ export const manageRequest = async (req: any, res: any) => {
       }
 
       return res.status(200).json(battle);
-    } 
+    }
+
     if (event === "opponent_found") {
       // ✅ Check if the player has an "in-progress" battle
-    const activeBattle = await Battle.findOne({
-      $or: [{ player1: userId }, { player2: userId }],
-      status: "in-progress", // Restrict only if there's an active battle
-    });
-
-    if (activeBattle) {
-      return res.status(400).json({
-        success: false,
-        message: "You cannot join a new battle while another battle is in progress.",
+      const activeBattle = await Battle.findOne({
+        $or: [{ player1: userId }, { player2: userId }],
+        status: "in-progress", // Restrict only if there's an active battle
       });
+
+      if (activeBattle) {
+        return res.status(400).json({
+          success: false,
+          message: "You cannot join a new battle while another battle is in progress.",
+        });
+      }
+
+      // ✅ Deduct the entry fee from the opponent's profile
+      battle = await Battle.findById(battleId);
+
+      if (!battle) {
+        return res.status(404).json({ message: "Battle not found" });
+      }
+
+      const opponentId = battle.player1 === userId ? battle.player2 : battle.player1;
+
+      const opponentProfile = await Profile.findOne({userId :opponentId});
+
+      if (!opponentProfile) {
+        return res.status(404).json({ message: "Opponent profile not found" });
+      }
+
+      if (opponentProfile.amount < battle.amount) {
+        return res.status(400).json({ message: "Opponent has insufficient balance" });
+      }
+
+      // Deduct battle amount from opponent's balance
+      opponentProfile.amount -= battle.amount;
+      await opponentProfile.save();
+
+      console.log(`✅ Deducted ${battle.amount} from opponent ${opponentId}`);
     }
-    } 
 
-
-   // ✅ Handle opponent entered event and push history in one step
-   battle = await Battle.findByIdAndUpdate(
-    battleId,
-    {
-      ...(event === "opponent_entered" && { status: "in-progress" }), // Update status if opponent enters
-      $push: { history: { event, timestamp: new Date(), details } },
-    },
-    { new: true }
-  );
-
+    // ✅ Handle opponent entered event and push history in one step
+    battle = await Battle.findByIdAndUpdate(
+      battleId,
+      {
+        ...(event === "opponent_entered" && { status: "in-progress" }), // Update status if opponent enters
+        $push: { history: { event, timestamp: new Date(), details } },
+      },
+      { new: true }
+    );
 
     if (!battle) {
       console.log("⚠️ Battle not found");
       return res.status(404).json({ message: "Battle not found" });
     }
 
-     // ✅ Fetch all active battles of the player
-     const playerBattles = await Battle.find({
+    // ✅ Fetch all active battles of the player
+    const playerBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
       status: { $in: ["pending", "in-progress"] }, // Fixed syntax
-  }).sort({ createdAt: 1 });
+    }).sort({ createdAt: 1 });
 
     // ✅ Check if there's an "in-progress" battle
     const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
 
     if (inProgressBattle) {
-       // ✅ Delete all "pending" battles for the player
-       const pendingBattleIds = playerBattles
-       .filter((b) => b.status === "pending")
-       .map((b) => b._id);
+      // ✅ Delete all "pending" battles for the player
+      const pendingBattleIds = playerBattles
+        .filter((b) => b.status === "pending")
+        .map((b) => b._id);
 
-   if (pendingBattleIds.length > 0) {
-       await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
-       console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId}`);
-   }
+      if (pendingBattleIds.length > 0) {
+        await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
+        console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId}`);
+      }
     }
 
-    return res.status(200).json(battle, pendingBattle);
+    return res.status(200).json(battle);
   } catch (error) {
     console.error("❌ Error in manageRequest:", error);
     return res.status(500).json({ message: "Internal server error" });
