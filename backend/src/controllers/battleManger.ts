@@ -152,42 +152,50 @@ export const battleHistory = async (req: any, res: any, next: any) => {
 };
 
 
-export const joinBattle= async(req: any, res: any, next: any)=>{
+export const joinBattle = async (req: any, res: any, next: any) => {
+  const { battleId, userId, name } = req.body;
 
-    const {battleId, userId,name} = req.body;
+  if (!battleId || !name || !userId) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
 
-    if(!battleId || !name  || !userId){
-        console.log("feilds Missing: " + name + " " + battleId + " " + userId );
+  try {
+    // ✅ Check if the player has an "in-progress" battle
+    const activeBattle = await Battle.findOne({
+      $or: [{ player1: userId }, { player2: userId }],
+      status: "in-progress", // Restrict only if there's an active battle
+    });
+
+    if (activeBattle) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot join a new battle while another battle is in progress.",
+      });
     }
 
-    // if(event === "opponent_canceled "){
-    //     const battle = await Battle.findByIdAndUpdate(battleId,
-    //         { $set: { history: {} } } // Set profile to an empty object
-    //     );
+    // ✅ Join the battle
+    const battle = await Battle.findByIdAndUpdate(
+      battleId,
+      {
+        player2Name: name,
+        player2: userId,
+        status: "in-progress", // Change status to "in-progress"
+        createdAt: new Date(),
+      },
+      { new: true }
+    );
 
-    //     if(!battle){
-    //         console.log("battle not found");
-    //     }
-    
-    //     return res.status(200).json(battle);
-    // }
-    
-    const battle = await Battle.findByIdAndUpdate(battleId,
-        {
-            player2Name: name,
-            player2 : userId,
-            // status: "in-progress",
-            createdAt:  date,
-            // $push: { history: { event, timestamp: new Date(), details } },
-        });
-
-    if(!battle){
-        console.log("battle not found");
+    if (!battle) {
+      return res.status(404).json({ success: false, message: "Battle not found" });
     }
 
-    res.status(200).json(battle);
+    res.status(200).json({ success: true, message: "Joined battle successfully", battle });
+  } catch (error) {
+    console.error("❌ Error joining battle:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
-}
 
 export const manageRequest = async (req: any, res: any) => {
   try {

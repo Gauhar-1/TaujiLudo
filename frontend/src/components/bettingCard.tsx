@@ -12,26 +12,46 @@ export const BettingCard = (props : any)=>{
     const { setBattleId, name  } = useUserContext();
 
     const navigate = useNavigate();
-
-    const joinBattle = async()=>{
-        
-        try{
-
-           const response = await axios.post(`${API_URL}/api/auth/battles/join`, {
-                name ,
-                userId ,
-                battleId : props.battle._id,
-            });
-            if(!response.data){
-                console.log("Response not found");
-            }
-
-            // navigate('/battle');
+    import { toast } from "react-toastify";
+    import "react-toastify/dist/ReactToastify.css";
+    import axios from "axios";
+    
+    const joinBattle = async () => {
+      try {
+        const response = await axios.post(`${API_URL}/api/auth/battles/join`, {
+          name,
+          userId,
+          battleId: props.battle._id,
+        });
+    
+        if (!response.data) {
+          toast.error("No response from server. Please try again.");
+          return;
         }
-        catch(err){
-            console.log("Error :" + err);
+    
+        toast.success("Successfully joined the battle! 🎉");
+        // navigate('/battle'); // Uncomment if needed
+    
+      } catch (err: any) {
+        console.error("Error:", err);
+    
+        if (err.response) {
+          const status = err.response.status;
+          const message = err.response.data.message || "Something went wrong.";
+    
+          if (status === 400) {
+            toast.warn(message);
+          } else if (status === 404) {
+            toast.error("Battle not found.");
+          } else {
+            toast.error("Failed to join the battle. Please try again.");
+          }
+        } else {
+          toast.error("Network error. Please check your connection.");
         }
-    }
+      }
+    };
+    
 
     const deleteBattle = () => {
         socket.emit("deleteBattle", props.battle._id);
