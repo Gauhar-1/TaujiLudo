@@ -7,6 +7,7 @@ import { API_URL } from "../utils/url";
 
 export const Header = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
+  const [ earnings , setEarnings] = useState(false);
   const navigate = useNavigate();
   const { login,  phoneNumber, amount, setAmount } = useUserContext();
 
@@ -26,6 +27,7 @@ export const Header = ()=>{
                 console.log(response.data);
               }
               setAmount(response.data.profile.amount);
+              setEarnings(response.data.profile.totalUserReferalEarning);
             }
             catch(err){
                console.log("Error" + err);
@@ -66,7 +68,7 @@ export const Header = ()=>{
          <img src="../../moneyBag.png" alt=""  className="h-5 m-1" />
          <div className="text-xs  text-white " onClick={()=>{
           navigate('/referalEarning');
-         }}>Earning :- 0</div>
+         }}>Earning :- {earnings}</div>
          </div>
        </div>
    </div>}

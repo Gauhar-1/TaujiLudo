@@ -227,26 +227,30 @@ export const unBlockPlayer = async(req: any, res: any, next: any)=>{
 }
 
 export const updateAmount = async (req: any, res: any, next: any) => {
-  const { phoneNumber } = req.query; // Changed to req.body for update
+  const { phoneNumber } = req.query;
 
-  if (!phoneNumber ) {
-    return res.status(400).json({ success: false, message: "Missing required fields: phoneNumber " });
+  if (!phoneNumber) {
+    return res.status(400).json({ success: false, message: "Missing required fields: phoneNumber" });
   }
 
   try {
-    const profile = await Profile.findOne(
-      { phoneNumber }
-    );
+    const profile = await Profile.findOne({ phoneNumber });
 
     if (!profile) {
       return res.status(404).json({ success: false, message: "Profile not found" });
     }
 
-    
     // Calculate total referral earnings
     const totalEarnings = profile.referrals.reduce((sum, referral) => sum + (referral.referalEarning || 0), 0);
 
-    profile.totalUserReferalEarning = totalEarnings
+    // Set total earnings
+    profile.totalUserReferalEarning += totalEarnings;
+
+    // Reset each referral's earnings to 0 (using a loop instead of .map())
+    profile.referrals.forEach(referral => {
+      referral.referalEarning = 0;
+    });
+
     await profile.save();
 
     res.status(200).json({ success: true, message: "Amount updated successfully", profile });
@@ -255,6 +259,8 @@ export const updateAmount = async (req: any, res: any, next: any) => {
     res.status(500).json({ success: false, message: "Amount update failed", error: error.message });
   }
 };
+
+
 
 export const completeKYC = async(req: any, res: any, next: any)=>{
 
@@ -395,18 +401,15 @@ export const getReferalEarning = async(req: any, res: any )=>{
     
 
     // Calculate total referral earnings
-    const totalEarnings = profile.referrals.reduce((sum, referral) => sum + (referral.referalEarning || 0), 0);
 
-    if(amount as number > totalEarnings ){
-      profile.totalUserReferalEarning = totalEarnings;
-      await profile.save();
+    if(amount as number > profile.totalUserReferalEarning ){
       return res.status(200).json({ message: "Insufficient Earning Amount"});
     }
 
-    profile.amount += totalEarnings
-    profile.totalUserReferalEarning -= totalEarnings
+    profile.amount += profile.totalUserReferalEarning
+    profile.totalUserReferalEarning -= amount
     await profile.save();
-    return res.status(200).json({ totalReferralEarnings: totalEarnings });
+    return res.status(200).json({ totalReferralEarnings: profile.totalUserReferalEarning });
 } catch (error) {
     console.error("Error fetching referral earnings:", error);
     return res.status(500).json({ message: "Internal server error" });
