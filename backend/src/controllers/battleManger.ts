@@ -630,33 +630,32 @@ export const determineWinner = async (req: any, res: any) => {
 
     const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
 
-    // Update winner & loser in a single query
-    const updateResults = await Profile.updateMany(
-      { userId: { $in: [userId, loserId] } },
-      [
-        {
-          $set: { updatedAt: new Date() },
-        },
-        {
-          $inc: {
-            amount: { $cond: [{ $eq: ["$userId", userId] }, battle.prize, 0] },
-            gameWon: { $cond: [{ $eq: ["$userId", userId] }, 1, 0] },
-            cashWon: { $cond: [{ $eq: ["$userId", userId] }, battle.prize, 0] },
-            gameLost: { $cond: [{ $eq: ["$userId", loserId] }, 1, 0] },
-          },
-        },
-      ]
+    // Update winner profile
+    const winnerUpdate = await Profile.findOneAndUpdate(
+      { userId },
+      { $inc: { amount: battle.prize, gameWon: 1, cashWon: battle.prize } },
+      { new: true }
     );
 
-    if (!updateResults.matchedCount) {
-      return res.status(404).json({ success: false, message: "Player profiles not found" });
+    if (!winnerUpdate) {
+      return res.status(404).json({ success: false, message: "Winner profile not found" });
+    }
+
+    // Update loser profile
+    const loserUpdate = await Profile.findOneAndUpdate(
+      { userId: loserId },
+      { $inc: { gameLost: 1 } },
+      { new: true }
+    );
+
+    if (!loserUpdate) {
+      return res.status(404).json({ success: false, message: "Loser profile not found" });
     }
 
     // Handle referral earnings
-    const playerProfile = await Profile.findOne({ userId });
-    if (playerProfile?.referredBy) {
-      const referedByProfile = await Profile.findOne({ phoneNumber: playerProfile.referredBy });
-      const referral = referedByProfile?.referrals.find(ref => ref.phoneNumber === playerProfile.phoneNumber);
+    if (winnerUpdate.referredBy) {
+      const referedByProfile = await Profile.findOne({ phoneNumber: winnerUpdate.referredBy });
+      const referral = referedByProfile?.referrals.find(ref => ref.phoneNumber === winnerUpdate.phoneNumber);
 
       if (referedByProfile && referral) {
         referral.referalEarning += battle.prize * 0.02;
@@ -670,6 +669,7 @@ export const determineWinner = async (req: any, res: any) => {
     res.status(500).json({ success: false, message: "Winner determination failed", error: err.message });
   }
 };
+
 
 
   export const  rejectDispute = async (req: any ,res : any) => {
