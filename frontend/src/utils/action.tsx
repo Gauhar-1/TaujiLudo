@@ -107,12 +107,11 @@ export const DeleteBattle = (props : any)=>{
 export const ViewResult = ( props : any)=>{
 
     const navigate = useNavigate();
-    const { setBattleId, setId, userId } = useUserContext();
+    const { setBattleId } = useUserContext();
 
     
     return (
         <div className="bg-green-300 p-2 rounded-lg font-bold" onClick={()=>{
-        setId(userId)
         setBattleId(props.battleId);
        navigate('/admin/viewResult');
        
