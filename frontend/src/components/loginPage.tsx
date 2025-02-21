@@ -13,7 +13,7 @@ export const LoginPage = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
-  const { setUserId , phoneNumber, setPhoneNumber,setName, setLogin } = useUserContext();
+  const { setUserId , phoneNumber, setPhoneNumber,setName, setLogin, login } = useUserContext();
 
   // Validate phone number (basic validation)
   const isPhoneNumberValid = (phone: string) => /^(\+91)?[6-9]\d{9}$/.test(phone);
@@ -25,32 +25,33 @@ export const LoginPage = () => {
     const location = useLocation();
   
   
-     // Check Auth on Mount
-     useEffect(() => {
+    useEffect(() => {
       const checkAuth = async () => {
-     
         try {
+          if (login) return; // ⛔ Stop if logged out
+    
           const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
-  
+    
           if (response.data.success) {
             const userData = response.data.user;
             setUserId(userData.userId);
             setName(userData.name);
             setPhoneNumber(userData.phoneNumber);
             setLogin(true);
-             // Navigate only if coming from login page
-             if (location.pathname === "/") {
-                navigate("/winCash");
-              }
+    
+            // Navigate only if coming from login page
+            if (location.pathname === "/") {
+              navigate("/winCash");
+            }
           }
         } catch (err) {
           console.log("User not logged in");
-          // setLogin(false);
         }
       };
-  
+    
       checkAuth();
-    }, [location.pathname]);
+    }, [ location.pathname]); // ✅ Dependency added
+    
 
   useEffect(() => {
     const refCode = searchParams.get("ref");
