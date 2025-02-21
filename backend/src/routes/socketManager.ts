@@ -103,6 +103,18 @@ socket.on("createBattle", async (battleData, callback) => {
         return callback({ status: 404, message: "Battle not found" });
       }
 
+      // ✅ If status is "canceled", refund entry fees
+    if (status === "canceled") {
+      const refundAmount = battle.amount;
+
+      await Profile.updateMany(
+        { userId: { $in: [battle.player1, battle.player2] } },
+        { $inc: { amount: refundAmount } }
+      );
+
+      console.log(`💰 Refunded ${refundAmount} to both players.`);
+    }
+
       // ✅ If battle is now "in-progress", delete all "pending" battles for this player
       if (status === "in-progress") {
         await Battle.deleteMany({
