@@ -633,11 +633,12 @@ export const  determineWinner = async (req: any ,res : any) => {
         if (!playerProfile) {
           return res.status(400).json({ error: "Player profile not found" });
       }
-            playerProfile.gameLost += 1;
-            await playerProfile.save();
+            // playerProfile.gameLost += 1;
+            // await playerProfile.save();
 
         if(playerProfile){
           playerProfile.gameWon += 1;
+          playerProfile.amount += battle.prize;
           await playerProfile.save();
         }
 
@@ -659,11 +660,11 @@ export const  determineWinner = async (req: any ,res : any) => {
   
           if(referedByProfile){
           } // Find the referral by phone number
-          const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === referedBy);
+          const referral = referedByProfile?.referrals.find((ref) => ref.phoneNumber === playerProfile.phoneNumber);
       
           if (referral) {
             // Update the referral earning
-            referral.referalEarning += Number(battle.amount * 0.02);
+            referral.referalEarning += battle.amount * 0.02;
         
             // Save the updated profile
             await referedByProfile?.save();
