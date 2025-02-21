@@ -200,13 +200,13 @@ export const onlyAdmins = async(req: any, res:any )=>{
         const { phoneNumber } = req.query;
     
         // ✅ Fetch the stored admin phone number
-        const admin = await Admin.findOne({}, "Admins");
+        const admin = await Admin.findOne();
     
         if (!admin || !admin.Admins.includes(phoneNumber)) {
             return res.status(403).json({ isAdmin: false, message: "Access denied" });
           }
 
-        return res.json({ isAdmin: true });
+        return res.status(200).json({ isAdmin: true });
       } catch (error) {
         console.error("Error checking admin:", error);
         res.status(500).json({ message: "Server error" });
