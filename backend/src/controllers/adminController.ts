@@ -47,10 +47,11 @@ export const createAdminDetails = async (req: any, res: any) => {
                 if (field && value) {
                     filter[field] = value;
         
-                    // If field is "type" and value is "deposit" or "withdraw", sum the "amount" field
-                    if (field === "type" && (value === "deposit" || value === "withdraw")) {
-                        return await sumFieldValues(Model, "amount", filter);
-                    }
+                    // If field is "type" and we need both "deposit" and "withdraw", modify filter
+        if (field === "type" && (value === "deposit" || value === "withdraw")) {
+            filter = { ...filter, type: { $in: [value] } };
+            return await sumFieldValues(Model, "amount", filter);
+        }
                 } 
                 else if (field && !value) {
                     return await sumFieldValues(Model, field, filter);
