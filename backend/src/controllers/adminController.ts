@@ -46,7 +46,7 @@ export const createAdminDetails = async (req: any, res: any) => {
         
                            // If field is "type" and we need both "deposit" and "withdraw", modify filter
         if (field === "type" && (value === "deposit" || value === "withdraw")) {
-            filter = { ...filter, type: { $in: [value] }, status : "completed" };
+            filter = { ...filter, type: { $in: [value] }, status : { $in: ["completed"] }, };
             return await sumFieldValues(Model, "amount", filter);
         }
 
