@@ -8,16 +8,25 @@ export const createAdminDetails = async (req: any, res: any) => {
     try {
         const sumFieldValues = async (Model: any, field: string, filter: object = {}) => {
             try {
-                const result = await Model.aggregate([
-                    { $match: filter },
-                    { $group: { _id: null, total: { $sum: `$${field}` } } }
-                ]);
+                const pipeline = [];
+        
+                // Add filter condition only if it exists
+                if (Object.keys(filter).length > 0) {
+                    pipeline.push({ $match: filter });
+                }
+        
+                pipeline.push({
+                    $group: { _id: null, total: { $sum: `$${field}` } }
+                });
+        
+                const result = await Model.aggregate(pipeline);
                 return result.length > 0 ? result[0].total : 0;
             } catch (err) {
                 console.error(`Error summing ${field}:`, err);
                 return 0;
             }
         };
+        
 
         const getTotalCount = async (Model: any, field?: string, value?: any) => {
             try {
@@ -32,19 +41,28 @@ export const createAdminDetails = async (req: any, res: any) => {
             try {
                 const startOfDay = new Date();
                 startOfDay.setHours(0, 0, 0, 0);
-
+        
                 let filter: Record<string, any> = { createdAt: { $gte: startOfDay } };
-
+        
                 if (field && value) {
                     filter[field] = value;
+        
+                    // If field is "type" and value is "deposit" or "withdraw", sum the "amount" field
+                    if (field === "type" && (value === "deposit" || value === "withdraw")) {
+                        return await sumFieldValues(Model, "amount", filter);
+                    }
+                } 
+                else if (field && !value) {
+                    return await sumFieldValues(Model, field, filter);
                 }
-
-                return field ? await sumFieldValues(Model, "amount", filter) : await Model.countDocuments(filter);
+        
+                return field ? await getTotalCount(Model, field, filter) : await Model.countDocuments(filter);
             } catch (err) {
                 console.error(`Error getting today's count for ${Model.collection.name}:`, err);
                 return 0;
             }
         };
+        
 
         const getCommission = async () => {
             const [entry, prize] = await Promise.all([
@@ -80,8 +98,8 @@ export const createAdminDetails = async (req: any, res: any) => {
             getTodaysCount(Battle, "status", "canceled"),
             getCommission(),
             getTodaysCount(Transaction, "type", "deposit"),
-            getTodaysCount(Transaction, "type", "withdraw"),
-            getTodaysCount(Transaction, "prize"),
+            getTodaysCount(Transaction, "type","withdraw"),
+            getTodaysCount(Battle, "prize"),
             getTotalCount(Profile, "kycDetails.status", "pending"),
             getTotalCount(Profile, "kycDetails.status", "verified")
         ]);
