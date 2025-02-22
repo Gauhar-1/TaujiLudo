@@ -5,81 +5,121 @@ import User from "../models/User";
 import Battle from "../models/Battle";
 
 export const createAdminDetails = async (req: any, res: any) => {
-    
-    const sumFieldValues = async (Model: any, field: string, filter: any = {}) => {
-        try {
-            const result = await Model.aggregate([
-                { $match: filter },
-                { $group: { _id: null, total: { $sum: `$${field}` } } }
-            ]);
-
-            return result.length > 0 ? result[0].total : 0;
-        } catch (err) {
-            console.error("Error in sumFieldValues:", err);
-            return 0;
-        }
-    };
-
-    const getTotalCount = async (Model: any, field: string | null, value: any | null) => {
-        try {
-            const filter = field && value ? { [field]: value } : {};
-            return await Model.countDocuments(filter);
-        } catch (err) {
-            console.error("Error in getTotalCount:", err);
-            return 0;
-        }
-    };
-
-    const getTodaysCount = async (Model: any, field: string | null, value: any | null) => {
-        try {
-            const startOfDay = new Date();
-            startOfDay.setHours(0, 0, 0, 0);
-
-            if (field && value) {
-                return await Model.countDocuments({ createdAt: { $gte: startOfDay }, [field]: value });
-            } 
-            
-            if (field) {
-                return await sumFieldValues(Model, "amount", { type: field, createdAt: { $gte: startOfDay } });
+    try {
+        const sumFieldValues = async (Model: any, field: string, filter: any = {}) => {
+            try {
+                const result = await Model.aggregate([
+                    { $match: filter },
+                    { $group: { _id: null, total: { $sum: `$${field}` } } }
+                ]);
+                return result.length > 0 ? result[0].total : 0;
+            } catch (err) {
+                console.error(`Error summing ${field}:`, err);
+                return 0;
             }
+        };
 
-            return await Model.countDocuments({ createdAt: { $gte: startOfDay } });
-        } catch (err) {
-            console.error("Error in getTodaysCount:", err);
-            return 0;
-        }
-    };
+        const getTotalCount = async (Model: any, field: string | null, value: any | null) => {
+            try {
+                return await Model.countDocuments(field && value ? { [field]: value } : {});
+            } catch (err) {
+                console.error(`Error counting documents in ${Model.collection.name}:`, err);
+                return 0;
+            }
+        };
 
-    const getCommission = async () => {
-        const entry = await sumFieldValues(Battle, "amount");
-        const prize = await sumFieldValues(Battle, "prize");
-        return (2 * entry) - prize;
-    };
+        const getTodaysCount = async (Model: any, field: any, value: any | null) => {
+            try {
+                const startOfDay = new Date();
+                startOfDay.setHours(0, 0, 0, 0);
+                const filter: Record<string, any> = { createdAt: { $gte: startOfDay } };
 
-    const adminDetails = {
-        totalUsers: await getTotalCount(User, "status", "active"),
-        totalUsersWalletBalance: await sumFieldValues(Profile, "wallet"),
-        todayNewUsers: await getTodaysCount(User, "status", "active"),
-        todayBlockedUsers: await getTodaysCount(User, "status", "blocked"),
-        todayGames: await getTodaysCount(Battle, null, null),
-        allGames: await getTotalCount(Battle, null, null),
-        totalSuccessGame: await getTotalCount(Battle, "status", "completed"),
-        todayCancelGame: await getTodaysCount(Battle, "status", "canceled"),
-        totalAdminCommission: await getCommission(),
-        todayTotalDeposit: await getTodaysCount(Transaction, "deposit", null),
-        todayTotalWithdraw: await getTodaysCount(Transaction, "withdraw", null),
-        todayWonAmount: await getTodaysCount(Transaction, "prize", null),
-        totalPendingKYC: await getTotalCount(Profile, "status", "pending"),
-        totalApprovedKYC: await getTotalCount(Profile, "status", "active"),
-        createdAt: new Date()
-    };
+                if (field && value) {
+                    filter[field as string] = value; // Explicitly cast `field` as string
+                }
 
-    await Admin.create(adminDetails);
+                return field ? await sumFieldValues(Model, "amount", filter) : await Model.countDocuments(filter);
+            } catch (err) {
+                console.error(`Error getting today's count for ${Model.collection.name}:`, err);
+                return 0;
+            }
+        };
 
-    console.log("Admin details created successfully.");
+        const getCommission = async () => {
+            const [entry, prize] = await Promise.all([
+                sumFieldValues(Battle, "amount"),
+                sumFieldValues(Battle, "prize"),
+            ]);
+            return (2 * entry) - prize;
+        };
 
-    res.status(200).json("Admin details created successfully.");
+        // Run database queries in parallel
+        const [
+            totalUsers,
+            totalUsersWalletBalance,
+            todayNewUsers,
+            todayBlockedUsers,
+            todayGames,
+            allGames,
+            totalSuccessGame,
+            todayCancelGame,
+            totalAdminCommission,
+            todayTotalDeposit,
+            todayTotalWithdraw,
+            todayWonAmount,
+            totalPendingKYC,
+            totalApprovedKYC
+        ] = await Promise.all([
+            getTotalCount(User, "status", "active"),
+            sumFieldValues(Profile, "wallet"),
+            getTodaysCount(User, "status", "active"),
+            getTodaysCount(User, "status", "blocked"),
+            getTodaysCount(Battle, null, null),
+            getTotalCount(Battle, null, null),
+            getTotalCount(Battle, "status", "completed"),
+            getTodaysCount(Battle, "status", "canceled"),
+            getCommission(),
+            getTodaysCount(Transaction, "deposit", null),
+            getTodaysCount(Transaction, "withdraw", null),
+            getTodaysCount(Transaction, "prize", null),
+            getTotalCount(Profile, "status", "pending"),
+            getTotalCount(Profile, "status", "active")
+        ]);
+
+        const adminDetails = {
+            totalUsers,
+            totalUsersWalletBalance,
+            todayNewUsers,
+            todayBlockedUsers,
+            todayGames,
+            allGames,
+            totalSuccessGame,
+            todayCancelGame,
+            totalAdminCommission,
+            todayTotalDeposit,
+            todayTotalWithdraw,
+            todayWonAmount,
+            totalPendingKYC,
+            totalApprovedKYC,
+            createdAt: new Date(),
+        };
+
+        // Update if exists, otherwise create a new one
+        const updatedAdmin = await Admin.findOneAndUpdate(
+            {},  // Empty filter to match the first available document
+            adminDetails,
+            { upsert: true, new: true } // Creates if not found and returns the updated document
+        );
+
+        console.log("Admin details updated successfully.");
+        res.status(200).json({ message: "Admin details updated successfully.", data: updatedAdmin });
+
+    } catch (err) {
+        console.error("Error updating admin details:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 };
+
 
 export const supportSettings = async (req: any, res: any) => {
     try {
