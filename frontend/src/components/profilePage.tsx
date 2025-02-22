@@ -274,7 +274,6 @@ export const ProfilePage = ()=>{
                     handleLogOut();
                     setLogin(false);
                     navigate('/');
-                    sessionStorage.clear();
                 }}>Log out</div>
                 </div>
         </div>

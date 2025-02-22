@@ -41,19 +41,30 @@ export const createAdminDetails = async (req: any, res: any) => {
             try {
                 const startOfDay = new Date();
                 startOfDay.setHours(0, 0, 0, 0);
-        
                 let filter: Record<string, any> = { createdAt: { $gte: startOfDay } };
         
-                           // If field is "type" and we need both "deposit" and "withdraw", modify filter
-        if (field === "type" && (value === "deposit" || value === "withdraw")) {
-            filter = { ...filter, type: { $in: [value] }, status : { $in: ["completed"] }, };
-            return await sumFieldValues(Model, "amount", filter);
-        }
-         if (field && !value) {
+                // Sum amount separately for "deposit" and "withdraw"
+                if (field === "type" && value === "deposit") {
+                    filter.type = "deposit";
+                    filter.status = "completed";
+                    return await sumFieldValues(Model, "amount", filter);
+                } 
+                
+                if (field === "type" && value === "withdraw") {
+                    filter.type = "withdraw";
+                    filter.status = "completed";
+                    return await sumFieldValues(Model, "amount", filter);
+                }
+        
+                if (field && !value) {
                     return await sumFieldValues(Model, field, filter);
                 }
         
-                return field ? await getTotalCount(Model, field, filter) : await Model.countDocuments(filter);
+                if (field && value) {
+                    filter[field] = value;
+                }
+        
+                return field ? await Model.countDocuments(filter) : await Model.countDocuments(filter);
             } catch (err) {
                 console.error(`Error getting today's count for ${Model.collection.name}:`, err);
                 return 0;
