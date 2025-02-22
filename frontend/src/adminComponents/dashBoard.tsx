@@ -167,7 +167,7 @@ export const DashBoard = ()=>{
                 </div>
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-green-600 flex justify-between ">
                     <div className="">
-                        <div className="text-green-600 font-bold text-sm">TODAY CANCEL GAME</div>
+                        <div className="text-green-600 font-bold text-sm">TOTAL CANCEL GAME</div>
                         <div className="font-bold">{adminData?.todayCancelGame || 0}</div>
 
                     </div>
