@@ -86,9 +86,9 @@ export const createAdminDetails = async (req: any, res: any) => {
             totalApprovedKYC
         ] = await Promise.all([
             getTotalCount(User, "status", "active"),
-            sumFieldValues(Profile, "wallet"),
-            getTodaysCount(User, "status", "active"),
-            getTodaysCount(User, "status", "blocked"),
+            sumFieldValues(Profile, "amount"),
+            getTodaysCount(Profile, "status", "active"),
+            getTodaysCount(Profile, "status", "blocked"),
             getTodaysCount(Battle),
             getTotalCount(Battle),
             getTotalCount(Battle, "status", "completed"),
