@@ -207,6 +207,7 @@ export const manageRequest = async (req: any, res: any) => {
 
     let battle;
 
+    // ✅ If opponent cancels the battle, reset history and refund
     if (event === "opponent_canceled") {
       battle = await Battle.findByIdAndUpdate(
         battleId,
@@ -218,43 +219,41 @@ export const manageRequest = async (req: any, res: any) => {
         console.log("⚠️ Battle not found");
         return res.status(404).json({ message: "Battle not found" });
       }
-        // ✅ If status is "canceled", refund entry fees
-            const refundAmount = battle.amount;
-      
-            await Profile.updateMany(
-              { userId: { $in: [userId] } },
-              { $inc: { amount: refundAmount } }
-            );
-      
-            console.log(`💰 Refunded ${refundAmount} to both players.`);
+
+      // ✅ Ensure battle amount exists
+      const refundAmount = battle.amount || 0;
+
+      if (refundAmount > 0) {
+        await Profile.updateMany(
+          { userId: { $in: [battle.player1, battle.player2] } }, // Refund to both players
+          { $inc: { amount: refundAmount } }
+        );
+
+        console.log(`💰 Refunded ${refundAmount} to both players.`);
+      }
 
       return res.status(200).json(battle);
     }
 
+    // ✅ Handle opponent found (Prevent joining multiple battles)
     if (event === "opponent_found") {
-      // ✅ Check if the player has an "in-progress" battle
-      const activeBattle = await Battle.findOne({
+      const activeBattleCount = await Battle.countDocuments({
         $or: [{ player1: userId }, { player2: userId }],
-        status: "in-progress", // Restrict only if there's an active battle
-      }).countDocuments();
+        status: "in-progress",
+      });
 
-      if (activeBattle > 0) {
+      if (activeBattleCount > 0) {
         return res.status(400).json({
           success: false,
           message: "You cannot join a new battle while another battle is in progress.",
         });
       }
 
-      // ✅ Deduct the entry fee from the opponent's profile
       battle = await Battle.findById(battleId);
-
-      if (!battle) {
-        return res.status(404).json({ message: "Battle not found" });
-      }
+      if (!battle) return res.status(404).json({ message: "Battle not found" });
 
       const opponentId = battle.player1 === userId ? battle.player2 : battle.player1;
-
-      const opponentProfile = await Profile.findOne({userId :opponentId});
+      const opponentProfile = await Profile.findOne({ userId: opponentId });
 
       if (!opponentProfile) {
         return res.status(404).json({ message: "Opponent profile not found" });
@@ -264,19 +263,21 @@ export const manageRequest = async (req: any, res: any) => {
         return res.status(400).json({ message: "Opponent has insufficient balance" });
       }
 
-      // Deduct battle amount from opponent's balance
-      opponentProfile.amount -= battle.amount;
-      await opponentProfile.save();
+      // ✅ Deduct entry fee from the opponent's balance safely
+      await Profile.updateOne(
+        { userId: opponentId },
+        { $inc: { amount: -battle.amount } }
+      );
 
       console.log(`✅ Deducted ${battle.amount} from opponent ${opponentId}`);
     }
 
-    // ✅ Handle opponent entered event and push history in one step
+    // ✅ Handle opponent entered event and update history
     battle = await Battle.findByIdAndUpdate(
       battleId,
       {
         ...(event === "opponent_entered" && { status: "in-progress" }), // Update status if opponent enters
-        $push: { history: { event, timestamp: new Date(), details } },
+        $push: { history: { event, timestamp: new Date(), details: details || {} } },
       },
       { new: true }
     );
@@ -286,17 +287,16 @@ export const manageRequest = async (req: any, res: any) => {
       return res.status(404).json({ message: "Battle not found" });
     }
 
-    // ✅ Fetch all active battles of the player
+    // ✅ Fetch all active battles for the player
     const playerBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
-      status: { $in: ["pending", "in-progress"] }, // Fixed syntax
+      status: { $in: ["pending", "in-progress"] },
     }).sort({ createdAt: 1 });
 
-    // ✅ Check if there's an "in-progress" battle
+    // ✅ Remove pending battles if there’s an in-progress battle
     const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
 
     if (inProgressBattle) {
-      // ✅ Delete all "pending" battles for the player
       const pendingBattleIds = playerBattles
         .filter((b) => b.status === "pending")
         .map((b) => b._id);
