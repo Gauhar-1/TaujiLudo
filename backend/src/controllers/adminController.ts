@@ -82,8 +82,8 @@ export const createAdminDetails = async (req: any, res: any) => {
             getTodaysCount(Transaction, "type", "deposit"),
             getTodaysCount(Transaction, "type", "withdraw"),
             getTodaysCount(Transaction, "prize"),
-            getTotalCount(Profile, "status", "pending"),
-            getTotalCount(Profile, "status", "active")
+            getTotalCount(Profile, "kycDetails.status", "pending"),
+            getTotalCount(Profile, "kycDetails.status", "verified")
         ]);
 
         const adminDetails = {
