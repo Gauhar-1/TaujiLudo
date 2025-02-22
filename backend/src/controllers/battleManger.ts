@@ -163,7 +163,7 @@ export const joinBattle = async (req: any, res: any, next: any) => {
     // ✅ Check if the player has an "in-progress" battle
     const activeBattle = await Battle.findOne({
       $or: [{ player1: userId }, { player2: userId }],
-      status: "in-progress", // Restrict only if there's an active battle
+      // status: "in-progress", // Restrict only if there's an active battle
     });
 
     if (activeBattle) {
@@ -219,6 +219,15 @@ export const manageRequest = async (req: any, res: any) => {
         console.log("⚠️ Battle not found");
         return res.status(404).json({ message: "Battle not found" });
       }
+        // ✅ If status is "canceled", refund entry fees
+            const refundAmount = battle.amount;
+      
+            await Profile.updateMany(
+              { userId: { $in: [userId] } },
+              { $inc: { amount: refundAmount } }
+            );
+      
+            console.log(`💰 Refunded ${refundAmount} to both players.`);
 
       return res.status(200).json(battle);
     }
@@ -566,6 +575,17 @@ export const canceledBattle = async (req: any, res: any, next: any) => {
      if (player1Clicked && player2Clicked) {
         await updateBattleStatus(battle); // Update status only when both clicked
      }
+       // ✅ If status is "canceled", refund entry fees
+         if (battle.status === "canceled") {
+           const refundAmount = battle.amount;
+     
+           await Profile.updateMany(
+             { userId: { $in: [battle.player1, battle.player2] } },
+             { $inc: { amount: refundAmount } }
+           );
+     
+           console.log(`💰 Refunded ${refundAmount} to both players.`);
+         }
     
 
     console.log(`✅ Battle cancelation recorded & status updated ${battle.status}`);
