@@ -1,7 +1,52 @@
+import { useEffect, useState } from "react";
 import { StickyTable } from "../utils/dashBoardTable"
+import axios from "axios";
+import { API_URL } from "../utils/url";
+
+interface AdminDetails {
+    totalUsers: number;
+    totalUsersWalletBalance: number;
+    todayNewUsers: number;
+    todayBlockedUsers: number;
+    todayGames: number;
+    allGames: number;
+    totalSuccessGame: number;
+    todayCancelGame: number;
+    totalAdminCommission: number;
+    todayTotalDeposit: number;
+    todayTotalWithdraw: number;
+    todayWonAmount: number;
+    totalPendingKYC: number;
+    totalApprovedKYC: number;
+    createdAt: string;
+  }
+
 
 export const DashBoard = ()=>{
 
+    const [adminData, setAdminData] = useState<AdminDetails | null>(null);
+
+   
+    useEffect(() => {
+        const fetchAdminDetails = async () => {
+          try {
+            const response = await axios.post(`${API_URL}/api/auth/createAdminDetails`);
+            setAdminData(response.data.data);
+          } catch (err) {
+            console.error("Failed to fetch admin details.");
+          }
+        };
+    
+        // Call immediately
+        fetchAdminDetails();
+    
+        // Set interval for auto-refresh every 5 seconds
+        const interval = setInterval(fetchAdminDetails, 5000);
+    
+        // Cleanup interval when component unmounts
+        return () => clearInterval(interval);
+      }, []);
+    
 
     return (
         <div className="bg-gray-200 min-h-screen max-w-sm pt-20 px-4 pb-10">
@@ -20,7 +65,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-blue-700 flex justify-between ">
                     <div className="">
                         <div className="text-blue-600 font-bold text-sm">TOTAL USERS</div>
-                        <div className="font-bold">80</div>
+                        <div className="font-bold">{adminData?.totalUsers}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -34,7 +79,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-green-400 flex justify-between ">
                     <div className="">
                         <div className="text-green-400 font-bold text-sm">TOTAL USERS WALLET BALANCE</div>
-                        <div className="font-bold"> ₹ 1198320</div>
+                        <div className="font-bold"> ₹ {adminData?.totalUsersWalletBalance || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -49,7 +94,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-blue-300 flex justify-between ">
                     <div className="">
                         <div className="text-blue-300 font-bold text-sm">TODAY NEW USERS</div>
-                        <div className="font-bold">0</div>
+                        <div className="font-bold">{adminData?.todayNewUsers || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -63,8 +108,8 @@ export const DashBoard = ()=>{
                 </div>
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-purple-700 flex justify-between ">
                     <div className="">
-                        <div className="text-purple-600 font-bold text-sm">TOTAL BLOCKED USERS</div>
-                        <div className="font-bold">0</div>
+                        <div className="text-purple-600 font-bold text-sm">TODAY BLOCKED USERS</div>
+                        <div className="font-bold">{adminData?.todayBlockedUsers || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -79,7 +124,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-red-500 flex justify-between ">
                     <div className="">
                         <div className="text-red-500 font-bold text-sm">TODAY GAME</div>
-                        <div className="font-bold">0</div>
+                        <div className="font-bold">{adminData?.todayGames || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -94,7 +139,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-yellow-400 flex justify-between ">
                     <div className="">
                         <div className="text-yellow-400 font-bold text-sm">ALL GAME</div>
-                        <div className="font-bold">80</div>
+                        <div className="font-bold">{adminData?.allGames || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -107,8 +152,8 @@ export const DashBoard = ()=>{
                 </div>
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-blue-400 flex justify-between ">
                     <div className="">
-                        <div className="text-blue-400 font-bold text-sm">TODAY SUCCESS GAME</div>
-                        <div className="font-bold">0</div>
+                        <div className="text-blue-400 font-bold text-sm">TOTAL SUCCESS GAME</div>
+                        <div className="font-bold">{adminData?.totalSuccessGame || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -122,8 +167,8 @@ export const DashBoard = ()=>{
                 </div>
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-green-600 flex justify-between ">
                     <div className="">
-                        <div className="text-green-600 font-bold text-sm">TOTAL CANCEL GAME</div>
-                        <div className="font-bold">80</div>
+                        <div className="text-green-600 font-bold text-sm">TODAY CANCEL GAME</div>
+                        <div className="font-bold">{adminData?.todayCancelGame || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -138,7 +183,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-green-400 flex justify-between ">
                     <div className="">
                         <div className="text-green-400 font-bold text-sm">TOTAL ADMIN COMMISSION</div>
-                        <div className="font-bold">₹ 0</div>
+                        <div className="font-bold">₹ {adminData?.totalAdminCommission || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -153,7 +198,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-red-500 flex justify-between ">
                     <div className="">
                         <div className="text-red-500 font-bold text-sm">TODAY TOTAL DEPOSITE</div>
-                        <div className="font-bold">₹ 0</div>
+                        <div className="font-bold">₹ {adminData?.todayTotalDeposit || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -168,7 +213,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-yellow-500 flex justify-between ">
                     <div className="">
                         <div className="text-yellow-500 font-bold text-sm">TODAY TOTAL WITHDRAW</div>
-                        <div className="font-bold">₹ 80</div>
+                        <div className="font-bold">₹ {adminData?.todayTotalWithdraw || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -184,7 +229,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-blue-600 flex justify-between ">
                     <div className="">
                         <div className="text-blue-600 font-bold text-sm">TODAY WON AMOUNT</div>
-                        <div className="font-bold">₹ 80</div>
+                        <div className="font-bold">₹ {adminData?.todayWonAmount || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -200,7 +245,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-yellow-400 flex justify-between ">
                     <div className="">
                         <div className="text-yellow-400 font-bold text-sm">TOTAL PENDING KYC</div>
-                        <div className="font-bold"> 0</div>
+                        <div className="font-bold">{adminData?.totalPendingKYC || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
@@ -216,7 +261,7 @@ export const DashBoard = ()=>{
                 <div className="bg-white  rounded-lg p-4 border-l-4 border-blue-400 flex justify-between ">
                     <div className="">
                         <div className="text-blue-400 font-bold text-sm">TOTAL APPROVED KYC</div>
-                        <div className="font-bold"> 80</div>
+                        <div className="font-bold">{adminData?.totalApprovedKYC || 0}</div>
 
                     </div>
                     <div className="h-full pt-2">
