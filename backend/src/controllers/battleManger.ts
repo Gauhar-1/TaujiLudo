@@ -237,9 +237,9 @@ export const manageRequest = async (req: any, res: any) => {
       const activeBattle = await Battle.findOne({
         $or: [{ player1: userId }, { player2: userId }],
         status: "in-progress", // Restrict only if there's an active battle
-      });
+      }).countDocuments();
 
-      if (activeBattle) {
+      if (activeBattle > 0) {
         return res.status(400).json({
           success: false,
           message: "You cannot join a new battle while another battle is in progress.",
