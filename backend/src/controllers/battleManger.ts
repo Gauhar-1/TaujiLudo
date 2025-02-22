@@ -179,7 +179,6 @@ export const joinBattle = async (req: any, res: any, next: any) => {
       {
         player2Name: name,
         player2: userId,
-        status: "in-progress", // Change status to "in-progress"
         createdAt: new Date(),
       },
       { new: true }
