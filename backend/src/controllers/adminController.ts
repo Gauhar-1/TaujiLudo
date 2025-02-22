@@ -6,7 +6,7 @@ import Battle from "../models/Battle";
 
 export const createAdminDetails = async (req: any, res: any) => {
     try {
-        const sumFieldValues = async (Model: any, field: any, filter: any = {}) => {
+        const sumFieldValues = async (Model: any, field: string, filter: object = {}) => {
             try {
                 const result = await Model.aggregate([
                     { $match: filter },
@@ -19,23 +19,24 @@ export const createAdminDetails = async (req: any, res: any) => {
             }
         };
 
-        const getTotalCount = async (Model: any, field: any | null, value: any | null) => {
+        const getTotalCount = async (Model: any, field?: string, value?: any) => {
             try {
-                return await Model.countDocuments(field && value ? { [field]: value } : {});
+                return await Model.countDocuments(field ? { [field]: value } : {});
             } catch (err) {
                 console.error(`Error counting documents in ${Model.collection.name}:`, err);
                 return 0;
             }
         };
 
-        const getTodaysCount = async (Model: any, field: any, value: any | null) => {
+        const getTodaysCount = async (Model: any, field?: string, value?: any) => {
             try {
                 const startOfDay = new Date();
                 startOfDay.setHours(0, 0, 0, 0);
-                const filter: Record<string, any> = { createdAt: { $gte: startOfDay } };
+
+                let filter: Record<string, any> = { createdAt: { $gte: startOfDay } };
 
                 if (field && value) {
-                    filter[field as string] = value; // Explicitly cast `field` as string
+                    filter[field] = value;
                 }
 
                 return field ? await sumFieldValues(Model, "amount", filter) : await Model.countDocuments(filter);
@@ -53,7 +54,6 @@ export const createAdminDetails = async (req: any, res: any) => {
             return (2 * entry) - prize;
         };
 
-        // Run database queries in parallel
         const [
             totalUsers,
             totalUsersWalletBalance,
@@ -74,14 +74,14 @@ export const createAdminDetails = async (req: any, res: any) => {
             sumFieldValues(Profile, "wallet"),
             getTodaysCount(User, "status", "active"),
             getTodaysCount(User, "status", "blocked"),
-            getTodaysCount(Battle, null, null),
-            getTotalCount(Battle, null, null),
+            getTodaysCount(Battle),
+            getTotalCount(Battle),
             getTotalCount(Battle, "status", "completed"),
             getTodaysCount(Battle, "status", "canceled"),
             getCommission(),
-            getTodaysCount(Transaction, "deposit", null),
-            getTodaysCount(Transaction, "withdraw", null),
-            getTodaysCount(Transaction, "prize", null),
+            getTodaysCount(Transaction, "type", "deposit"),
+            getTodaysCount(Transaction, "type", "withdraw"),
+            getTodaysCount(Transaction, "prize"),
             getTotalCount(Profile, "status", "pending"),
             getTotalCount(Profile, "status", "active")
         ]);
@@ -104,11 +104,10 @@ export const createAdminDetails = async (req: any, res: any) => {
             createdAt: new Date(),
         };
 
-        // Update if exists, otherwise create a new one
         const updatedAdmin = await Admin.findOneAndUpdate(
-            {},  // Empty filter to match the first available document
+            {},
             adminDetails,
-            { upsert: true, new: true } // Creates if not found and returns the updated document
+            { upsert: true, new: true }
         );
 
         console.log("Admin details updated successfully.");
