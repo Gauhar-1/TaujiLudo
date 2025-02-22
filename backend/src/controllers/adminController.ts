@@ -6,7 +6,7 @@ import Battle from "../models/Battle";
 
 export const createAdminDetails = async (req: any, res: any) => {
     try {
-        const sumFieldValues = async (Model: any, field: string, filter: any = {}) => {
+        const sumFieldValues = async (Model: any, field: any, filter: any = {}) => {
             try {
                 const result = await Model.aggregate([
                     { $match: filter },
@@ -19,7 +19,7 @@ export const createAdminDetails = async (req: any, res: any) => {
             }
         };
 
-        const getTotalCount = async (Model: any, field: string | null, value: any | null) => {
+        const getTotalCount = async (Model: any, field: any | null, value: any | null) => {
             try {
                 return await Model.countDocuments(field && value ? { [field]: value } : {});
             } catch (err) {
