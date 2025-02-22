@@ -49,11 +49,7 @@ export const createAdminDetails = async (req: any, res: any) => {
             filter = { ...filter, type: { $in: [value] }, status : { $in: ["completed"] }, };
             return await sumFieldValues(Model, "amount", filter);
         }
-
-                if (field && value) {
-                    filter[field] = value;
-                } 
-                else if (field && !value) {
+         if (field && !value) {
                     return await sumFieldValues(Model, field, filter);
                 }
         
