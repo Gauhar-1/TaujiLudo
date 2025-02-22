@@ -1,54 +1,55 @@
-// models/Battle.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 interface IAdmin extends Document {
-  totalUsers: string;  
-  totalUsersWalletBallance: string;  
-  todayNewUsers: string; 
-  todayBlockedUsers: string;
-  todayGames: string;
-  allGames: string;
-  totalSucessGame : string;
-  todayCancelGame : string;
-  totalAdminCommission : string;
-  todayTotalDeposit: string;
-  todayTotalWithdraw: string;
-  todayWonAmount: string;
-  totalPendingKYC: string;
-  totalApprovedKYC: string;
-  paymentSetting : {
-    QR: string;
-    UPI: string;
-  };
-  adminSetting : {
-    phoneNumber : string;
-    content : string;
-  };
-  createdAt: Date;
-  Admins: string[];
+    totalUsers: number;
+    totalUsersWalletBalance: number;
+    todayNewUsers: number;
+    todayBlockedUsers: number;
+    todayGames: number;
+    allGames: number;
+    totalSuccessGame: number;
+    todayCancelGame: number;
+    totalAdminCommission: number;
+    todayTotalDeposit: number;
+    todayTotalWithdraw: number;
+    todayWonAmount: number;
+    totalPendingKYC: number;
+    totalApprovedKYC: number;
+    paymentSetting: {
+        QR: string;
+        UPI: string;
+    };
+    adminSetting: {
+        phoneNumber: string;
+        content: string;
+    };
+    createdAt: Date;
+    Admins: string[];
 }
 
 const AdminSchema: Schema = new Schema({
-    totalUsers: { type: String, requuired: true },
-    totalUsersWalletBallance: { type: String, requuired: true },
-    todayNewUsers: { type: String, requuired: true },
-    todayBlockedUsers: { type: String, default: null }, 
-    todayGames: { type: String, required: true },
-    totalSucessGame: { type: String, default: null  },
+    totalUsers: { type: Number, required: true },
+    totalUsersWalletBalance: { type: Number, required: true },
+    todayNewUsers: { type: Number, required: true },
+    todayBlockedUsers: { type: Number, default: 0 },
+    todayGames: { type: Number, required: true },
+    allGames: { type: Number, required: true },
+    totalSuccessGame: { type: Number, default: 0 },
     todayCancelGame: { type: Number, required: true },
     totalAdminCommission: { type: Number, required: true },
-    todayTotalDeposit: { type: String, default: null },
-    todayTotalWithdraw: { type: String, default: null },
-    totalPendingKYC: { type: String, default: null },
-    totalApprovedKYC: { type:String, default: null },
-    paymentSetting : {
-        QR:  { type: String, default: null },
-        UPI: { type:String, default: null },
-      },
-      adminSetting : {
-        phoneNumber : { type: String, default: null },
-        content : { type:String, default: null },
-      },
+    todayTotalDeposit: { type: Number, default: 0 },
+    todayTotalWithdraw: { type: Number, default: 0 },
+    todayWonAmount: { type: Number, default: 0 },
+    totalPendingKYC: { type: Number, default: 0 },
+    totalApprovedKYC: { type: Number, default: 0 },
+    paymentSetting: {
+        QR: { type: String, default: "" },
+        UPI: { type: String, default: "" },
+    },
+    adminSetting: {
+        phoneNumber: { type: String, default: "" },
+        content: { type: String, default: "" },
+    },
     createdAt: { type: Date, default: Date.now },
     Admins: { type: [String], default: ["7002926251", "9784889319", "8769422366"] },
 });
