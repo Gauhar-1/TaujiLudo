@@ -232,13 +232,13 @@ export const manageRequest = async (req: any, res: any) => {
     }
 
     if (event === "opponent_found") {
-      // ✅ Check if the player has an "in-progress" battle
-      const activeBattle = await Battle.countDocuments({
+      // ✅ Check if the user is in any "in-progress" battle
+      const isInProgressBattle = await Battle.exists({
         $or: [{ player1: userId }, { player2: userId }],
-        status: "in-progress", // Restrict only if there's an active battle
+        status: "in-progress",
       });
     
-      if (activeBattle > 0) {
+      if (isInProgressBattle) {
         return res.status(400).json({
           success: false,
           message: "You cannot join a new battle while another battle is in progress.",
@@ -246,7 +246,7 @@ export const manageRequest = async (req: any, res: any) => {
       }
     
       // ✅ Fetch battle details
-      battle = await Battle.findById(battleId);
+      const battle = await Battle.findById(battleId);
     
       if (!battle) {
         return res.status(404).json({ message: "Battle not found" });
