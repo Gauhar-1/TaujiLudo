@@ -27,6 +27,8 @@ interface UserContextType {
   setName: (name: string) => void;
   phoneNumber: string;
   setPhoneNumber: (phone: string) => void;
+  phone: string;
+  setPhone: (phone: string) => void;
   login: boolean;
   setLogin: (status: boolean) => void;
   opponentFound: boolean;
@@ -70,6 +72,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [event, setEvent] = useState(() => getInitialValue("event", ""));
   const [details, setDetails] = useState(() => getInitialValue("details", ""));
   const [phoneNumber, setPhoneNumber] = useState(() => getInitialValue("phoneNumber", ""));
+  const [phone, setPhone] = useState(() => getInitialValue("phone", ""));
   const [name, setName] = useState(() => getInitialValue("name", ""));
   const [battleId, setBattleId] = useState(() => getInitialValue("battleId", ""));
   const [login, setLogin] = useState(() => getInitialValue("login", false));
@@ -86,6 +89,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     updateSessionStorage("userId", userId);
     updateSessionStorage("phoneNumber", phoneNumber);
+    updateSessionStorage("phone", phone);
     updateSessionStorage("name", name);
     updateSessionStorage("battleId", battleId);
     updateSessionStorage("login", login);
@@ -101,6 +105,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [
     userId,
     phoneNumber,
+    phone,
     name,
     battleId,
     login,
@@ -123,6 +128,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUserId,
     phoneNumber,
     setPhoneNumber,
+    phone,
+    setPhone,
     name,
     setName,
     battleId,

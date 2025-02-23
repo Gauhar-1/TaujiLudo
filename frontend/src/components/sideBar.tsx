@@ -6,7 +6,7 @@ import { API_URL } from "../utils/url";
 
 export const SideBar = (props : any)=>{
     const navigate = useNavigate();
-    const { setAdminClicked, phoneNumber } = useUserContext();
+    const { setAdminClicked, phone } = useUserContext();
 
 
     const [isAdmin, setIsAdmin] = useState(false);
@@ -14,7 +14,7 @@ export const SideBar = (props : any)=>{
     useEffect(() => {
       const checkAdmin = async () => {
         try {
-          const response = await axios.get(`${API_URL}/api/auth/check-admin`, {params : { phoneNumber }});
+          const response = await axios.get(`${API_URL}/api/auth/check-admin`, {params : { phoneNumber: phone }});
           setIsAdmin(response.data.isAdmin);
         } catch (error) {
           console.error("Error checking admin:", error);
@@ -22,10 +22,10 @@ export const SideBar = (props : any)=>{
         }
       };
   
-      if (phoneNumber) {
+      if (phone) {
         checkAdmin();
       }
-    }, [phoneNumber]);
+    }, [phone]);
   
 
     return (

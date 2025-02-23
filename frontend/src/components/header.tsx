@@ -9,16 +9,16 @@ export const Header = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
   const [ earnings , setEarnings] = useState(false);
   const navigate = useNavigate();
-  const { login,  phoneNumber, amount, setAmount } = useUserContext();
+  const { login,  phone, amount, setAmount } = useUserContext();
 
   
       useEffect(()=>{
-          if ( !phoneNumber) {
-            return console.log( 'All fields are required.' + " " + phoneNumber);
+          if ( !phone) {
+            return console.log( 'All fields are required.' + " " + phone);
           }
           const updateAmount = async()=>{
             try{
-              const  response = await axios.get(`${API_URL}/api/auth/update-Amount`, { params:{ phoneNumber } });
+              const  response = await axios.get(`${API_URL}/api/auth/update-Amount`, { params:{ phoneNumber : phone } });
               if(response && response.data && response.data.success){
                 console.log("Amount updated")
               }

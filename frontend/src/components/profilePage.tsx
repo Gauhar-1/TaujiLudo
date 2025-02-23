@@ -13,7 +13,7 @@ export const ProfilePage = ()=>{
     const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
     const [email, setEmail] = useState( () => localStorage.getItem("email") ||  "@gmail.com");
     const navigate = useNavigate();
-    const { name, setName, phoneNumber, userId, setPhoneNumber , setUserId, setLogin } = useUserContext();
+    const { name, setName, phone, userId, setPhone , setUserId, setLogin } = useUserContext();
     const [ Name , setname ] = useState("")
     const [ DOB , setDOB ] = useState("")
     const [ state , setState ] = useState("")
@@ -30,22 +30,22 @@ export const ProfilePage = ()=>{
   
     useEffect(() => {
       const fetchProfile = async () => {
-        if (!phoneNumber) {
-          console.log("Phone number (Profile): "+ phoneNumber);
+        if (!phone) {
+          console.log("Phone number (Profile): "+ phone);
           return;
         }
   
         try {
           const response = await axios.get(
             `${API_URL}/api/auth/findProfile`,
-             { params :{ phoneNumber }} 
+             { params :{ phoneNumber : phone }} 
           );
   
           if (response.data) {
             const {phoneNumber, name, email, userId, kycDetails, totalUserReferalEarning, gameWon, cashWon, gameLost } = response.data[0];
             setName(name );
             setEmail(email );
-            setPhoneNumber(phoneNumber);
+            setPhone(phoneNumber);
             setName(name);
             setUserId(userId);
             setKycStatus(kycDetails.status);
@@ -65,15 +65,15 @@ export const ProfilePage = ()=>{
     }, []);
   
     const updateProfile = async () => {
-      if (!name || !phoneNumber || !email) {
-        console.error("All fields are required:", { name, phoneNumber, email });
+      if (!name || !phone || !email) {
+        console.error("All fields are required:", { name, phone, email });
         return;
       }
   
       try {
         const response = await axios.post(
           `${API_URL}/api/auth/update-Profile`,
-          { phoneNumber , name, email }
+          { phoneNumber : phone , name, email }
         );
   
         if (response.data.success) {
@@ -120,7 +120,7 @@ export const ProfilePage = ()=>{
           // Clear user state
           setUserId("");
           setName("");
-          setPhoneNumber("");
+          setPhone("");
           setLogin(false);
     
           // Redirect to login page
@@ -222,7 +222,7 @@ export const ProfilePage = ()=>{
                 <div className="grid grid-cols-10 p-1 m-1">
                     <div className="col-start-2 flex gap-1">
                     <img src="../../call-icon.png" alt="" className="h-5 pt-1 "/>
-                    <div className="text-white font-semibold text-sm">{phoneNumber}</div>
+                    <div className="text-white font-semibold text-sm">{phone}</div>
                     </div>
                     <div className="text-white font-semibold col-start-6 text-sm  ">{email}</div>
                 </div>
