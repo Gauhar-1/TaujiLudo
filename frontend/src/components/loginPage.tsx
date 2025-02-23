@@ -13,7 +13,7 @@ export const LoginPage = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
-  const { setUserId , phone, setPhone,setName, setLogin, login } = useUserContext();
+  const { setUserId , phone, setPhone, setName, setLogin, login, setPhoneNumber } = useUserContext();
 
   // Validate phone number (basic validation)
   const isPhoneNumberValid = (phone: string) => /^(\+91)?[6-9]\d{9}$/.test(phone);
@@ -37,6 +37,7 @@ export const LoginPage = () => {
             setUserId(userData.userId);
             setName(userData.name);
             setPhone(userData.phoneNumber);
+            setPhoneNumber(userData.phoneNumber);
             setLogin(true);
     
             // Navigate only if coming from login page
@@ -50,7 +51,7 @@ export const LoginPage = () => {
       };
     
       checkAuth();
-    }, [ location.pathname]); // ✅ Dependency added
+    }, [ location.pathname, login]); // ✅ Dependency added
     
 
   useEffect(() => {
