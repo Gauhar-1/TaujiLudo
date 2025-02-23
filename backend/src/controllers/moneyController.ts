@@ -89,6 +89,15 @@ export const depositAmount = async (req : any,res : any,next: any) => {
             return res.status(400).json({ success: false, message: 'Insufficient wallet balance' });
         }
         
+        const profile = await Profile.findOne({userId});
+        if (!profile) {
+            console.log("Profile not found");
+            return res.status(404).json({ success: false, message: "Profile not found" });
+        }
+
+        if(profile.kycDetails?.status !== "verified"){
+            return res.status(404).json({ success: false, message: "Please Complete your Kyc first" });
+        }
 
         // Deduct tokens and log the withdrawal request
         const transaction = await Transaction.create({
@@ -105,12 +114,6 @@ export const depositAmount = async (req : any,res : any,next: any) => {
 
         if(!transaction){
             console.log("Failed to create withdraw");
-        }
-
-        const profile = await Profile.findOne({userId});
-        if (!profile) {
-            console.log("Profile not found");
-            return res.status(404).json({ success: false, message: "Profile not found" });
         }
 
         profile.amount = wallet; // Assuming `amount` is a number
