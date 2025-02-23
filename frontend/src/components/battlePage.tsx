@@ -29,7 +29,7 @@ interface Battle {
 
 export const BattlePage = ()=>{ 
     const navigate = useNavigate();
-    const { battleId, userId, phoneNumber} = useUserContext();
+    const { battleId, userId, phone} = useUserContext();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [reason, setReason] = useState<string>("");
@@ -101,7 +101,7 @@ useEffect(() => {
         battleId: battle?._id,
         reason,
         userId,
-        phoneNumber
+        phoneNumber : phone
       });
       navigate("/home");
     } catch (err) {
@@ -120,10 +120,10 @@ const uploadScreenshot = async () => {
   formData.append("image", selectedFile);
   formData.append("battleId", battle._id);
   formData.append("playerId", userId);
-  formData.append("phoneNumber", phoneNumber);
+  formData.append("phoneNumber", phone);
   
   console.log("Uploading Screenshot...");
-  console.log("Phone Number:", phoneNumber);
+  console.log("Phone Number:", phone);
 
   try {
     const response = await axios.post(`${API_URL}/api/auth/battles/inBattle/uploads`, formData, {

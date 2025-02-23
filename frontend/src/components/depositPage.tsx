@@ -14,7 +14,7 @@ export const DepositPage = ()=>{
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const navigate = useNavigate();
 
-    const { userId, amount, phoneNumber } = useUserContext();
+    const { userId, amount, phone } = useUserContext();
 
     useEffect(()=>{
         const handleInfoBar = async()=>{
@@ -51,7 +51,7 @@ export const DepositPage = ()=>{
           formData.append("wallet", (amount + token).toString());
           formData.append("paymentMethod",'upi');
           formData.append("upiId",upiId);
-          formData.append("phoneNumber",phoneNumber);
+          formData.append("phoneNumber",phone);
   
         //   console.log("Form data:", selectedFile, userId);
         for (let pair of formData.entries()) {

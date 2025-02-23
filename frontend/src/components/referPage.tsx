@@ -8,11 +8,11 @@ export const ReferPage = ()=>{
     const [referalLink, setReferalLink] = useState("");
     const [referals, setReferals] = useState(0);
     const [earnings, setEarnings] = useState(0);
-    const { phoneNumber } = useUserContext();
+    const { phone } = useUserContext();
 
     useEffect(() => {
         const handleReferal = async()=>{
-            const response = await axios.get(`${API_URL}/api/auth/findProfile` ,{ params : { phoneNumber }});
+            const response = await axios.get(`${API_URL}/api/auth/findProfile` ,{ params : { phoneNumber : phone }});
 
             if(!response.data){
                 return console.log("Response Not found");
@@ -27,7 +27,7 @@ export const ReferPage = ()=>{
         handleReferal();
 
         
-      }, [phoneNumber]);
+      }, [phone]);
 
   const copyToClipboard = () => {
     if (divRef.current) {

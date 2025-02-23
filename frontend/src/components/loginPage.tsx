@@ -13,7 +13,7 @@ export const LoginPage = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
-  const { setUserId , phoneNumber, setPhoneNumber,setName, setLogin, login } = useUserContext();
+  const { setUserId , phone, setPhone,setName, setLogin, login } = useUserContext();
 
   // Validate phone number (basic validation)
   const isPhoneNumberValid = (phone: string) => /^(\+91)?[6-9]\d{9}$/.test(phone);
@@ -36,7 +36,7 @@ export const LoginPage = () => {
             const userData = response.data.user;
             setUserId(userData.userId);
             setName(userData.name);
-            setPhoneNumber(userData.phoneNumber);
+            setPhone(userData.phoneNumber);
             setLogin(true);
     
             // Navigate only if coming from login page
@@ -76,15 +76,15 @@ export const LoginPage = () => {
   }, [canResend, sendOtp]);
   // Send OTP handler
   const handleSendOtp = async () => {
-    if (!isPhoneNumberValid(phoneNumber)) {
-      console.log("phoneNumber: " + phoneNumber);
+    if (!isPhoneNumberValid(phone)) {
+      console.log("phoneNumber: " + phone);
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
 
     try {
       const response = await axios.post(`${API_URL}/api/auth/send-otp`, {
-        phoneNumber,
+        phoneNumber : phone,
       });
 
       if (response.data.success) {
@@ -111,7 +111,7 @@ export const LoginPage = () => {
 
     try {
       const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
-        phoneNumber,
+        phoneNumber : phone,
         otp,
         ref: referralCode
       },
@@ -123,7 +123,7 @@ export const LoginPage = () => {
         setUserId(response.data.userId);
         setName(response.data.name);
         setLogin(true);
-        setPhoneNumber(phoneNumber);
+        setPhone(phone);
         navigate("/winCash");
       } else {
         toast.error(response.data.message || "Invalid OTP.");
@@ -154,7 +154,7 @@ export const LoginPage = () => {
                 type="tel"
                 className="bg-white border border-gray-300 text-gray-700 p-2 w-full rounded-r-md focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Enter your phone number"
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={(e) => setPhone(e.target.value)}
                 
               />
             </div>
