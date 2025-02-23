@@ -59,6 +59,21 @@ const getInitialValue = <T,>(key: string, defaultValue: T): T => {
   }
   return defaultValue;
 };
+// Helper function to initialize state from sessionStorage
+const getInitialValueL = <T,>(key: string, defaultValue: T): T => {
+  const storedValue = sessionStorage.getItem(key);
+  if (storedValue !== null) {
+    try {
+      const parsedValue = JSON.parse(storedValue);
+      if (typeof parsedValue === typeof defaultValue) {
+        return parsedValue as T;
+      }
+    } catch {
+      return defaultValue; // Ignore parsing errors and return the default value
+    }
+  }
+  return defaultValue;
+};
 
 // Context creation
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -75,7 +90,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [phone, setPhone] = useState(() => getInitialValue("phone", ""));
   const [name, setName] = useState(() => getInitialValue("name", ""));
   const [battleId, setBattleId] = useState(() => getInitialValue("battleId", ""));
-  const [login, setLogin] = useState(() => getInitialValue("login", false));
+  const [login, setLogin] = useState(() => getInitialValueL("login", false));
   const [adminClicked, setAdminClicked] = useState(() => getInitialValue("adminClicked", false));
   const [opponentFound, setOpponentFound] = useState(() => getInitialValue("opponentFound", false));
   const [amount, setAmount] = useState(() => getInitialValue("amount", 0));
@@ -86,13 +101,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const updateSessionStorage = (key: string, value: any) => {
       sessionStorage.setItem(key, JSON.stringify(value));
     };
+    const updateLocalStorage = (key: string, value: any) => {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    };
 
     updateSessionStorage("userId", userId);
     updateSessionStorage("phoneNumber", phoneNumber);
     updateSessionStorage("phone", phone);
     updateSessionStorage("name", name);
     updateSessionStorage("battleId", battleId);
-    updateSessionStorage("login", login);
+    updateLocalStorage("login", login);
     updateSessionStorage("opponentFound", opponentFound);
     updateSessionStorage("amount", amount);
     updateSessionStorage("id", id);
