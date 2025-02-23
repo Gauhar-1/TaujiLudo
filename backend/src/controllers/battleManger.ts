@@ -233,43 +233,51 @@ export const manageRequest = async (req: any, res: any) => {
 
     if (event === "opponent_found") {
       // ✅ Check if the player has an "in-progress" battle
-      const activeBattle = await Battle.findOne({
+      const activeBattle = await Battle.countDocuments({
         $or: [{ player1: userId }, { player2: userId }],
         status: "in-progress", // Restrict only if there's an active battle
-      }).countDocuments();
-
+      });
+    
       if (activeBattle > 0) {
         return res.status(400).json({
           success: false,
           message: "You cannot join a new battle while another battle is in progress.",
         });
       }
-
-      // ✅ Deduct the entry fee from the opponent's profile
+    
+      // ✅ Fetch battle details
       battle = await Battle.findById(battleId);
-
+    
       if (!battle) {
         return res.status(404).json({ message: "Battle not found" });
       }
-
+    
+      // ✅ Ensure the battle sending "opponent_found" is NOT already in progress
+      if (battle.status === "in-progress") {
+        return res.status(400).json({
+          success: false,
+          message: "This battle is already in progress.",
+        });
+      }
+    
       const opponentId = battle.player1 === userId ? battle.player2 : battle.player1;
-
-      const opponentProfile = await Profile.findOne({userId :opponentId});
-
+      const opponentProfile = await Profile.findOne({ userId: opponentId });
+    
       if (!opponentProfile) {
         return res.status(404).json({ message: "Opponent profile not found" });
       }
-
+    
       if (opponentProfile.amount < battle.amount) {
         return res.status(400).json({ message: "Opponent has insufficient balance" });
       }
-
-      // Deduct battle amount from opponent's balance
+    
+      // ✅ Deduct battle amount from opponent's balance
       opponentProfile.amount -= battle.amount;
       await opponentProfile.save();
-
+    
       console.log(`✅ Deducted ${battle.amount} from opponent ${opponentId}`);
     }
+    
 
     // ✅ Handle opponent entered event and push history in one step
     battle = await Battle.findByIdAndUpdate(
