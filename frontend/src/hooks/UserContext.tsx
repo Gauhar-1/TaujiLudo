@@ -78,7 +78,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [login, setLogin] = useState(() => getInitialValue("login", false));
   const [adminClicked, setAdminClicked] = useState(() => getInitialValue("adminClicked", false));
   const [opponentFound, setOpponentFound] = useState(() => getInitialValue("opponentFound", false));
-  const [amount, setAmount] = useState(() => getInitialValue("amount", 5));
+  const [amount, setAmount] = useState(() => getInitialValue("amount", 0));
   const [profile, setProfile] = useState<Profile>(() => getInitialValue("profile", {}));
  
   // Update sessionStorage when state changes
