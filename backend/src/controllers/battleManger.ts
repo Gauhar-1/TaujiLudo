@@ -201,7 +201,7 @@ export const manageRequest = async (req: any, res: any) => {
     const { battleId, event, details, userId } = req.body;
 
     if (!event || !details) {
-      console.log("⚠️ Fields Missing: " + event + " " + details);
+      console.warn("⚠️ Missing fields:", { event, details });
       return res.status(400).json({ message: "Missing event or details" });
     }
 
@@ -210,55 +210,50 @@ export const manageRequest = async (req: any, res: any) => {
     if (event === "opponent_canceled") {
       battle = await Battle.findByIdAndUpdate(
         battleId,
-        { $set: { history: {} } }, // Reset history
+        { $set: { history: [] } }, // Reset history properly
         { new: true }
       );
 
       if (!battle) {
-        console.log("⚠️ Battle not found");
+        console.warn("⚠️ Battle not found:", { battleId });
         return res.status(404).json({ message: "Battle not found" });
       }
-        // ✅ If status is "canceled", refund entry fees
-            const refundAmount = battle.amount;
-      
-            await Profile.updateMany(
-              { userId: { $in: [userId] } },
-              { $inc: { amount: refundAmount } }
-            );
-      
-            console.log(`💰 Refunded ${refundAmount} to both players.`);
 
+      // ✅ Refund entry fees to the player who canceled
+      const refundAmount = battle.amount;
+      await Profile.updateOne({ userId }, { $inc: { amount: refundAmount } });
+
+      console.log(`💰 Refunded ${refundAmount} to user ${userId}`);
       return res.status(200).json(battle);
     }
 
     if (event === "opponent_found") {
       console.log("🔍 Checking active battles for user:", userId);
-    
+
+      // ✅ Only block if the user is in an "in-progress" battle
       const activeBattle = await Battle.findOne({
         $and: [
-          { $or: [{ player1: userId }, { player2: userId }] }, // User must be in battle
-          { status: "in-progress" }, // Battle must be in-progress
+          { $or: [{ player1: userId }, { player2: userId }] }, // Check if user is in battle
+          { status: "in-progress" }, // Battle must be "in-progress"
         ],
       });
-    
-      console.log("📌 Found active battle:", activeBattle);
-    
-      if (activeBattle !== null) {  // Ensures it's a valid battle object
+
+      console.log("📌 Active Battle Check Result:", activeBattle);
+
+      if (activeBattle) {
         return res.status(400).json({
           success: false,
           message: "You cannot join a new battle while another battle is in progress.",
         });
       }
-      
-      // ✅ Fetch battle details
-      const battle = await Battle.findById(battleId);
-    
-      console.log("🎯 Battle details:", battle);
-    
+
+      // ✅ Fetch the battle details
+      battle = await Battle.findById(battleId);
+
       if (!battle) {
         return res.status(404).json({ message: "Battle not found" });
       }
-    
+
       // ✅ Ensure the battle sending "opponent_found" is NOT already in progress
       if (battle.status === "in-progress") {
         return res.status(400).json({
@@ -266,55 +261,59 @@ export const manageRequest = async (req: any, res: any) => {
           message: "This battle is already in progress.",
         });
       }
-    
+
+      // ✅ Find opponent and check balance
       const opponentId = battle.player1 === userId ? battle.player2 : battle.player1;
       const opponentProfile = await Profile.findOne({ userId: opponentId });
-    
-      console.log("👤 Opponent Profile:", opponentProfile);
-    
+
       if (!opponentProfile) {
         return res.status(404).json({ message: "Opponent profile not found" });
       }
-    
+
       if (opponentProfile.amount < battle.amount) {
         return res.status(400).json({ message: "Opponent has insufficient balance" });
       }
-    
+
       // ✅ Deduct battle amount from opponent's balance
       opponentProfile.amount -= battle.amount;
       await opponentProfile.save();
-    
+
       console.log(`✅ Deducted ${battle.amount} from opponent ${opponentId}`);
     }
-    
-    
 
-    // ✅ Handle opponent entered event and push history in one step
-    battle = await Battle.findByIdAndUpdate(
-      battleId,
-      {
-        ...(event === "opponent_entered" && { status: "in-progress" }), // Update status if opponent enters
-        $push: { history: { event, timestamp: new Date(), details } },
-      },
-      { new: true }
-    );
+    // ✅ Handle "opponent_entered" event & push history
+    if (event === "opponent_entered") {
+      battle = await Battle.findByIdAndUpdate(
+        battleId,
+        {
+          status: "in-progress",
+          $push: { history: { event, timestamp: new Date(), details } },
+        },
+        { new: true }
+      );
+    } else {
+      battle = await Battle.findByIdAndUpdate(
+        battleId,
+        {
+          $push: { history: { event, timestamp: new Date(), details } },
+        },
+        { new: true }
+      );
+    }
 
     if (!battle) {
-      console.log("⚠️ Battle not found");
+      console.warn("⚠️ Battle not found:", { battleId });
       return res.status(404).json({ message: "Battle not found" });
     }
 
     // ✅ Fetch all active battles of the player
     const playerBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
-      status: { $in: ["pending", "in-progress"] }, // Fixed syntax
+      status: { $in: ["pending", "in-progress"] },
     }).sort({ createdAt: 1 });
 
-    // ✅ Check if there's an "in-progress" battle
-    const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
-
-    if (inProgressBattle) {
-      // ✅ Delete all "pending" battles for the player
+    // ✅ Delete "pending" battles if there's an "in-progress" one
+    if (playerBattles.some((b) => b.status === "in-progress")) {
       const pendingBattleIds = playerBattles
         .filter((b) => b.status === "pending")
         .map((b) => b._id);
@@ -331,6 +330,7 @@ export const manageRequest = async (req: any, res: any) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 export const handleLudoCode = async(req: any, res: any)=>{
     const { battleId , ludoCode, event, details } = req.body;
