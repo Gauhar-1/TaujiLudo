@@ -232,13 +232,17 @@ export const manageRequest = async (req: any, res: any) => {
     }
 
     if (event === "opponent_found") {
+      console.log("🔍 Checking active battles for user:", userId);
+    
       // ✅ Check if the user is in any "in-progress" battle
-      const isInProgressBattle = await Battle.exists({
+      const activeBattle = await Battle.findOne({
         $or: [{ player1: userId }, { player2: userId }],
         status: "in-progress",
       });
     
-      if (isInProgressBattle) {
+      console.log("📌 Found active battle:", activeBattle);
+    
+      if (activeBattle) {
         return res.status(400).json({
           success: false,
           message: "You cannot join a new battle while another battle is in progress.",
@@ -247,6 +251,8 @@ export const manageRequest = async (req: any, res: any) => {
     
       // ✅ Fetch battle details
       const battle = await Battle.findById(battleId);
+    
+      console.log("🎯 Battle details:", battle);
     
       if (!battle) {
         return res.status(404).json({ message: "Battle not found" });
@@ -263,6 +269,8 @@ export const manageRequest = async (req: any, res: any) => {
       const opponentId = battle.player1 === userId ? battle.player2 : battle.player1;
       const opponentProfile = await Profile.findOne({ userId: opponentId });
     
+      console.log("👤 Opponent Profile:", opponentProfile);
+    
       if (!opponentProfile) {
         return res.status(404).json({ message: "Opponent profile not found" });
       }
@@ -277,6 +285,7 @@ export const manageRequest = async (req: any, res: any) => {
     
       console.log(`✅ Deducted ${battle.amount} from opponent ${opponentId}`);
     }
+    
     
 
     // ✅ Handle opponent entered event and push history in one step
