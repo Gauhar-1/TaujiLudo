@@ -10,7 +10,7 @@ export const  WithdrawToUPI = ()=>{
     const [upiId, setUpiId] = useState("");
     const [message, setMessage] = useState("");
     const [balanceLess, setBalanceLess] = useState(false);
-    const { userId , amount, phone } = useUserContext();
+    const { userId , amount, phone, setAmount } = useUserContext();
 
     const handleWithdraw = async () => {
 
@@ -30,6 +30,7 @@ export const  WithdrawToUPI = ()=>{
                 setBalanceLess(true);
                 return;
             }
+            setAmount(amount - token)
             console.log('Withdrawal request submitted.');
             navigate('/wallet');
         } catch (err: any) {

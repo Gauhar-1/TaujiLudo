@@ -107,6 +107,15 @@ export const depositAmount = async (req : any,res : any,next: any) => {
             console.log("Failed to create withdraw");
         }
 
+        const profile = await Profile.findOne({userId});
+        if (!profile) {
+            console.log("Profile not found");
+            return res.status(404).json({ success: false, message: "Profile not found" });
+        }
+
+        profile.amount = wallet; // Assuming `amount` is a number
+        await profile.save();
+        
         await createNotification(
             userId, 
             'withdrawal', 
@@ -166,8 +175,10 @@ export const verifyPayment = async (req: any, res: any) => {
             return res.status(400).json({ success: false, message: "Invalid wallet amount" });
         }
 
-        profile.amount = transaction.wallet; // Assuming `amount` is a number
-        await profile.save();
+        if(transaction.type === "deposit"){
+            profile.amount = transaction.wallet; // Assuming `amount` is a number
+            await profile.save();
+        }
 
         console.log(`Tokens added to user ${transaction.userId}: ${transaction.amount}`);
 

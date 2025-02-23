@@ -35,9 +35,7 @@ export const Header = ()=>{
       
             }
       
-          if (amount > 0) { 
             updateAmount();
-          }
         },[]);
 
    return (
