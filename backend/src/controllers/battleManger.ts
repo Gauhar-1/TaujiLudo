@@ -232,20 +232,19 @@ export const manageRequest = async (req: any, res: any) => {
     }
 
     if (event === "opponent_found") {
-      // ✅ Strictly check if the player is in THIS battle and it's "in-progress"
-      const activeBattle = await Battle.findOne({
-        _id: battleId, // Must match the given battle
-        $or: [{ player1: userId }, { player2: userId }], // User must be in the battle
-        status: "in-progress", // Only restrict if battle is already active
-      });
+     // ✅ Strictly check if the player is in THIS battle and it's "in-progress"
+const activeBattle = await Battle.findOne({
+  $or: [{ player1: userId }, { player2: userId }], // User must be in a battle
+  status: "in-progress", // Battle must be ongoing
+});
 
-      if (activeBattle) {
-        console.log(`🚫 User ${userId} cannot join a new battle while battle ${battleId} is in progress.`);
-        return res.status(400).json({
-          success: false,
-          message: "You cannot join a new battle while another battle is in progress.",
-        });
-      }
+if (activeBattle) {
+  console.log(`🚫 User ${userId} cannot join a new battle while battle ${activeBattle._id} is in progress.`);
+  return res.status(400).json({
+    success: false,
+    message: "You cannot join a new battle while another battle is in progress.",
+  });
+}
 
       // ✅ Deduct the entry fee from the opponent's profile
       battle = await Battle.findById(battleId);

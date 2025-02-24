@@ -61,7 +61,7 @@ const getInitialValue = <T,>(key: string, defaultValue: T): T => {
 };
 // Helper function to initialize state from sessionStorage
 const getInitialValueL = <T,>(key: string, defaultValue: T): T => {
-  const storedValue = sessionStorage.getItem(key);
+  const storedValue = localStorage.getItem(key);
   if (storedValue !== null) {
     try {
       const parsedValue = JSON.parse(storedValue);
@@ -102,7 +102,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       sessionStorage.setItem(key, JSON.stringify(value));
     };
     const updateLocalStorage = (key: string, value: any) => {
-      sessionStorage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(key, JSON.stringify(value));
     };
 
     updateSessionStorage("userId", userId);
