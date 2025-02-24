@@ -103,6 +103,32 @@ export const DisputeResult = ()=>{
         socket.emit("deleteBattle", battle._id);
         console.log("Battleid: "+ battle._id);
       };
+
+      const checkPlayer = (clicked: string) => {
+        if (!battle?.dispute?.proofs || battle.dispute.proofs.length === 0) {
+            return "No proof available";
+        }
+    
+        if (clicked === "image1") {
+            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === "Won" && proof.player === battle.player1);
+            return winningProof?.filename || "No image available";
+        } 
+        else if (clicked === "image2") {
+            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === "Won" && proof.player === battle.player2);
+            return winningProof?.filename || "No image available";
+        } 
+        else if (clicked === "clicked1") {
+            const winningProof = battle.dispute.proofs.find((proof) =>  proof.player === battle.player1);
+            return winningProof?.clicked || "No image available";
+        } 
+        else if (clicked === "clicked2") {
+            const winningProof = battle.dispute.proofs.find((proof) =>  proof.player === battle.player2);
+            return winningProof?.clicked || "No image available";
+        } 
+    
+       
+    };
+
     return (
         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
                     <div className="text-3xl font-serif">Battle</div>
@@ -146,7 +172,7 @@ export const DisputeResult = ()=>{
                         <div className="flex">
              <div className="p-2 w-28 border">Clicked </div>
              <div className="p-2 w-60 border">
-            {battle.dispute.proofs.find((proof)=>{ proof.player === battle.player1})?.clicked  }
+            {checkPlayer("clicked1") }
         </div>
                             </div>
                         <div className="flex">
@@ -179,7 +205,7 @@ export const DisputeResult = ()=>{
                             </div>}
                         </div>
                         { viewClicked  && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?.filename  && battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?._id as String === battle.player1}`} alt="" className="rounded-lg" />
+                            <img src={`${API_URL}/uploads/${checkPlayer("image1")}`} alt="" className="rounded-lg" />
                         </div> }
 
                         <div className="bg-gray-300 my-6 h-2"></div>
@@ -195,7 +221,7 @@ export const DisputeResult = ()=>{
                             <div className="flex">
              <div className="p-2 w-28 border">Clicked </div>
              <div className="p-2 w-60 border">
-            {battle.dispute.proofs.find((proof)=>{proof.clicked})?.clicked  && battle.dispute.proofs.find((proof)=>{proof.clicked})?._id as String === battle.player2 }
+            {checkPlayer("clicked2") }
         </div>
                             </div>
                             
@@ -228,7 +254,7 @@ export const DisputeResult = ()=>{
                             </div>}
                         </div>
                         { viewClicked2 && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?.filename  && battle.dispute.proofs.find((proof)=>{proof.clicked === "Won"})?._id as String === battle.player2}`} alt="" className="rounded-lg" />
+                            <img src={`${API_URL}/uploads/${checkPlayer("image2")}`} alt="" className="rounded-lg" />
                         </div> }
                     </div>
                     {rejectClicked && <div className="bg-gray-400 px-10 py-6 absolute top-60 shadow-md rounded-lg w-80 m-6">
