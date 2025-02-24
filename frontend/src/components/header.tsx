@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { SideBar } from "./sideBar";
 import { useUserContext } from "../hooks/UserContext";
 import axios from "axios";
@@ -9,7 +9,34 @@ export const Header = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
   const [ earnings , setEarnings] = useState(false);
   const navigate = useNavigate();
-  const { login,  phone, amount, setAmount } = useUserContext();
+  const { login,  phone, amount, setAmount, setUserId, setName, setPhone, setPhoneNumber, setLogin } = useUserContext();
+
+  const location = useLocation();
+  
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+  
+        const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+  
+        if (response.data.success) {
+          const userData = response.data.user;
+          setUserId(userData.userId);
+          setName(userData.name);
+          setPhone(userData.phoneNumber);
+          setPhoneNumber(userData.phoneNumber);
+          setLogin(true);
+  
+        }
+      } catch (err) {
+        console.log("User not logged in");
+      }
+    };
+  
+    checkAuth();
+  }, [ location.pathname, login ]); // ✅ Dependency added
+  
 
   
       useEffect(()=>{
@@ -18,7 +45,7 @@ export const Header = ()=>{
           }
           const updateAmount = async()=>{
             try{
-              const  response = await axios.get(`${API_URL}/api/auth/update-Amount`, { params:{ phoneNumber : phone } });
+              const  response = await axios.get(`${API_URL}/api/auth/update-Amount`, { params:{ phoneNumber : phone }, withCredentials: true });
               if(response && response.data && response.data.success){
                 console.log("Amount updated")
               }
