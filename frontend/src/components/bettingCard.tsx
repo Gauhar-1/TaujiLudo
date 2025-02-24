@@ -23,25 +23,23 @@ export const BettingCard = (props : any)=>{
     
         if (!response.data) {
           toast.error("No response from server. Please try again.", {
-            autoClose: 2000, // 3 seconds
+            autoClose: 1000, // 3 seconds
             position: "top-right",
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
-            theme: "dark",
           });
           return;
         }
     
         toast.success("Successfully joined the battle! 🎉", {
-          autoClose: 2000, // 3 seconds
+          autoClose: 1000, // 3 seconds
           position: "top-right",
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          theme: "dark",
         });
         // navigate('/battle'); // Uncomment if needed
     
@@ -54,44 +52,40 @@ export const BettingCard = (props : any)=>{
     
           if (status === 400) {
             toast.warn(message, {
-              autoClose: 2000, // 3 seconds
+              autoClose: 1000, // 3 seconds
               position: "top-right",
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
-              theme: "dark",
             });
           } else if (status === 404) {
             toast.error("Battle not found.", {
-              autoClose: 2000, // 3 seconds
+              autoClose: 1000, // 3 seconds
               position: "top-right",
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
-              theme: "dark",
             });
           } else {
             toast.error("Failed to join the battle. Please try again.", {
-              autoClose: 2000, // 3 seconds
+              autoClose: 1000, // 3 seconds
               position: "top-right",
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
-              theme: "dark",
             });
           }
         } else {
           toast.error("Network error. Please check your connection.", {
-            autoClose: 2000, // 3 seconds
+            autoClose: 1000, // 3 seconds
             position: "top-right",
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
-            theme: "dark",
           });
         }
       }
@@ -126,44 +120,40 @@ export const BettingCard = (props : any)=>{
     
           if (status === 400) {
             toast.warn(message, {
-              autoClose: 2000, // 3 seconds
+              autoClose: 1000, // 3 seconds
               position: "top-right",
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
-              theme: "dark",
             });
           } else if (status === 404) {
             toast.error("Battle not found.", {
-              autoClose: 2000, // 3 seconds
+              autoClose: 1000, // 3 seconds
               position: "top-right",
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
-              theme: "dark",
             });
           } else {
             toast.error("Failed to join the battle. Please try again.", {
-              autoClose: 2000, // 3 seconds
+              autoClose: 1000, // 3 seconds
               position: "top-right",
               hideProgressBar: false,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
-              theme: "dark",
             });
           }
         } else {
           toast.error("Network error. Please check your connection.", {
-            autoClose: 2000, // 3 seconds
+            autoClose: 1000, // 3 seconds
             position: "top-right",
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
-            theme: "dark",
           });
         }
         }
