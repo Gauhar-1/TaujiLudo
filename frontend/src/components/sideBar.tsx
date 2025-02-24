@@ -29,7 +29,7 @@ export const SideBar = (props : any)=>{
   
 
     return (
-        <div className="bg-gray-300 fixed min-h-screen min-w-64  z-50 flex flex-col">
+        <div className="bg-white fixed min-h-screen min-w-64  z-50 flex flex-col">
           <div className="flex justify-between">
             <div className="pt-2">
             <img src="/logo.png" alt="" className="h-12"/>
