@@ -33,15 +33,7 @@ export const BettingCard = (props : any)=>{
           return;
         }
     
-        toast.success("Successfully joined the battle! 🎉", {
-          autoClose: 1000, // 3 seconds
-          position: "top-right",
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-        // navigate('/battle'); // Uncomment if needed
+       
     
       } catch (err: any) {
         console.error("Error:", err);
