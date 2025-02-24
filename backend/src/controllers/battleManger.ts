@@ -283,63 +283,63 @@ export const manageRequest = async (req: any, res: any) => {
     }
 
     if (event === "opponent_entered") {
-      console.log("✅ Opponent entered event triggered");
-    
+      console.info("✅ Opponent entered event triggered");
+
       // ✅ Fetch all active battles of the player
       const playerBattles = await Battle.find({
-        $or: [{ player1: userId }, { player2: userId }],
+        $or: [{ player1: String(userId) }, { player2: String(userId) }],
         status: { $in: ["pending", "in-progress"] },
-      }).sort({ createdAt: 1 });
-    
-      console.log("📌 Active Battles:", JSON.stringify(playerBattles, null, 2));
-    
-      // ✅ Check if there's an "in-progress" battle
+      })
+        .sort({ createdAt: 1 })
+        .lean();
+
+      console.info("📌 Active Battles:", playerBattles.length);
+
+      // ✅ Check for an "in-progress" battle
       const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
-    
+
       if (inProgressBattle) {
-        console.log("⚠️ In-progress battle found:", inProgressBattle._id);
-    
-        // ✅ Delete all "pending" battles for the player and refund amounts
+        console.warn("⚠️ In-progress battle found:", inProgressBattle._id);
+
+        // ✅ Filter out pending battles
         const pendingBattles = playerBattles.filter((b) => b.status === "pending");
-    
+
         if (pendingBattles.length > 0) {
-          console.log(`🛑 Found ${pendingBattles.length} pending battles. Processing refunds...`);
-    
+          console.info(`🛑 Found ${pendingBattles.length} pending battles. Processing refunds...`);
+
           const pendingBattleIds = pendingBattles.map((b) => b._id);
-          console.log("🛑 Pending Battle IDs:", pendingBattleIds);
-    
-          const refundOperations: any[] = [];
-    
-          pendingBattles.forEach((battle) => {
-            console.log(`🔄 Refunding ${battle.amount} to players:`, battle.player1, battle.player2);
-    
-            refundOperations.push(
-              Profile.updateMany(
-                { userId: { $in: [battle.player1, battle.player2].map(String) } }, // Ensure string IDs
-                { $inc: { amount: battle.amount } }
-              ).then((result) => console.log("✅ Refund Success:", result))
-              .catch((err) => console.error("❌ Refund Failed:", err))
-            );
-          });
-    
-          console.log("💰 Refund operations pending...");
-    
-          await Promise.all(refundOperations);
-          console.log("✅ Refunds completed successfully.");
-    
-          const deleteResult = await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
-          console.log(`🗑️ Deleted pending battles:`, deleteResult);
+          console.info("🛑 Pending Battle IDs:", pendingBattleIds);
+
+          // ✅ Batch refund operations for efficiency
+          const refundOperations = pendingBattles.map((battle) => ({
+            updateMany: {
+              filter: { userId: { $in: [String(battle.player1), String(battle.player2)] } },
+              update: { $inc: { amount: battle.amount } },
+            },
+          }));
+
+          try {
+            await Profile.bulkWrite(refundOperations);
+            console.info("✅ Refunds processed successfully.");
+          } catch (err) {
+            console.error("❌ Refund processing failed:", err);
+          }
+
+          // ✅ Delete all pending battles in one query
+          try {
+            const deleteResult = await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
+            console.info(`🗑️ Deleted pending battles:`, deleteResult);
+          } catch (err) {
+            console.error("❌ Error deleting pending battles:", err);
+          }
         } else {
-          console.log("✅ No pending battles to delete.");
+          console.info("✅ No pending battles to delete.");
         }
       } else {
-        console.log("⚠️ No in-progress battle found, skipping pending battle deletion.");
+        console.warn("⚠️ No in-progress battle found, skipping pending battle deletion.");
       }
     }
-    
-    
 
-    
     return res.status(200).json(battle);
   } catch (error) {
     console.error("❌ Error in manageRequest:", error);

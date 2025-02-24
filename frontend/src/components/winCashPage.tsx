@@ -5,7 +5,10 @@ export const WinCashPage = ()=>{
     return (
         <div className="min-h-screen bg-gray-200 max-w-sm">
             <div className="pt-20 pb-16 flex flex-col gap-4">
-                <div className="bg-red-600 text-white p-6 m-4 rounded-lg text-xs font-bold">हम आपको सबसे कम कमीशन दर प्रदान करते हैं! हमारे साथ, आप केवल 3% कमीशन का भुगतान करेंगे और 3% रेफर और अर्न का लाभ उठा सकते हैं। यह सुनिश्चित करता है कि आप अधिकतम लाभ कमा सकें</div>
+                <div className="bg-red-600 text-white  p-6 m-4 rounded-lg text-xs font-bold">Taujiludo पर आपका स्वागत है  विड्रॉल केवल 5 से 10 मिनट मैं Support 27*7
+                  <br />
+Commission = 5% &nbsp;&nbsp;&nbsp;
+Refer = 2%</div>
                 <div className="flex flex-col gap-4">
                     <div className="flex">
                         <div className="pr-2 pl-4 flex flex-col gap-1">
