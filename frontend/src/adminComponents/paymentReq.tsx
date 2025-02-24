@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 export const PaymentRequest = ()=>{
 
-    const { paymentId } = useUserContext();
+    const { paymentId, setId, id } = useUserContext();
     const [ battle, setBattle ] = useState({
         _id : "",
         amount: 0,
@@ -45,6 +45,7 @@ export const PaymentRequest = ()=>{
             console.log("Filename: " + battle.filename);
 
             typeof battle.details === "string" ? setBank(response.data.details) : "";
+            setId(response.data.userId);
             console.log("Battle : " + battle);
         }
             catch(err){
@@ -66,7 +67,7 @@ export const PaymentRequest = ()=>{
             console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
     
 
-            const response = await axios.post(`${API_URL}/api/auth/verify-payment`,{transactionId: sanitizedTransactionId})
+            const response = await axios.post(`${API_URL}/api/auth/verify-payment`,{transactionId: sanitizedTransactionId, userId : id})
 
             if(response.data){
                 console.log("Response: "+response.data);
@@ -89,7 +90,7 @@ export const PaymentRequest = ()=>{
             console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
     
 
-            const response = await axios.post(`${API_URL}/api/auth/reject-payment`,{transactionId: sanitizedTransactionId, reason})
+            const response = await axios.post(`${API_URL}/api/auth/reject-payment`,{transactionId: sanitizedTransactionId, reason , userId : id})
 
             if(response.data){
                 console.log("Response: "+response.data);

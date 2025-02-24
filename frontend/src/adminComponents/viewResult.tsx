@@ -82,7 +82,7 @@ export const BattleResult = ()=>{
                 console.log("User Id",id);
             }
 
-            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`,{userId : id, reason, battleId})
+            const response = await axios.post(`${API_URL}/api/auth/battles/disputeBattle/reject`, {userId : id, reason, battleId})
 
             if(!response.data){
                 console.log("Response: "+response.data);
