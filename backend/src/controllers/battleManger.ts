@@ -222,8 +222,8 @@ export const manageRequest = async (req: any, res: any) => {
       // ✅ If status is "canceled", refund entry fees
       const refundAmount = battle.amount;
 
-      await Profile.updateMany(
-        { userId: { $in: [userId] } },
+      await Profile.findOneAndUpdate(
+        { userId },
         { $inc: { amount: refundAmount } }
       );
 
@@ -254,8 +254,7 @@ export const manageRequest = async (req: any, res: any) => {
         return res.status(404).json({ message: "Battle not found" });
       }
 
-      const opponentId = battle.player1 === userId ? battle.player2 : battle.player1;
-      const opponentProfile = await Profile.findOne({ userId: opponentId });
+      const opponentProfile = await Profile.findOne({ userId });
 
       if (!opponentProfile) {
         return res.status(404).json({ message: "Opponent profile not found" });
@@ -269,7 +268,7 @@ export const manageRequest = async (req: any, res: any) => {
       opponentProfile.amount -= battle.amount;
       await opponentProfile.save();
 
-      console.log(`✅ Deducted ${battle.amount} from opponent ${opponentId}`);
+      console.log(`✅ Deducted ${battle.amount} from opponent ${userId}`);
     }
 
     // ✅ Handle opponent entered event and push history in one step
