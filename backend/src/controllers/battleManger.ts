@@ -167,7 +167,7 @@ export const joinBattle = async (req: any, res: any, next: any) => {
 
     if (activeBattle) {
       console.log(`🚫 User ${userId} cannot join a new battle while battle ${activeBattle._id} is in progress.`);
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
       });
     }
@@ -282,40 +282,60 @@ export const manageRequest = async (req: any, res: any) => {
       return res.status(404).json({ message: "Battle not found" });
     }
 
-    if(event === "opponent_entered"){
+    if (event === "opponent_entered") {
+      console.log("✅ Opponent entered event triggered");
+    
       // ✅ Fetch all active battles of the player
-    const playerBattles = await Battle.find({
-      $or: [{ player1: userId }, { player2: userId }],
-      status: { $in: ["pending", "in-progress"] },
-    }).sort({ createdAt: 1 });
-
-    // ✅ Check if there's an "in-progress" battle
-    const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
-
-    if (inProgressBattle) {
-      // ✅ Delete all "pending" battles for the player and refund amounts
-      const pendingBattles = playerBattles.filter((b) => b.status === "pending");
-
-      if (pendingBattles.length > 0) {
-        const pendingBattleIds = pendingBattles.map((b) => b._id);
-        const refundOperations: any[] = [];
-
-        pendingBattles.forEach((battle) => {
-          refundOperations.push(
-            Profile.updateMany(
-              { userId: { $in: [battle.player1, battle.player2] } },
-              { $inc: { amount: battle.amount } }
-            )
-          );
-        });
-
-        await Promise.all(refundOperations); // Refund all players
-        await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
-
-        console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId} and refunded entry fees.`);
+      const playerBattles = await Battle.find({
+        $or: [{ player1: userId }, { player2: userId }],
+        status: { $in: ["pending", "in-progress"] },
+      }).sort({ createdAt: 1 });
+    
+      console.log("📌 Active Battles:", playerBattles);
+    
+      // ✅ Check if there's an "in-progress" battle
+      const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
+    
+      if (inProgressBattle) {
+        console.log("⚠️ In-progress battle found:", inProgressBattle._id);
+    
+        // ✅ Delete all "pending" battles for the player and refund amounts
+        const pendingBattles = playerBattles.filter((b) => b.status === "pending");
+    
+        if (pendingBattles.length > 0) {
+          console.log(`🛑 Found ${pendingBattles.length} pending battles. Processing refunds...`);
+    
+          const pendingBattleIds = pendingBattles.map((b) => b._id);
+          console.log("🛑 Pending Battle IDs:", pendingBattleIds);
+    
+          const refundOperations: any[] = [];
+    
+          pendingBattles.forEach((battle) => {
+            console.log(`🔄 Refunding ${battle.amount} to players:`, battle.player1, battle.player2);
+    
+            refundOperations.push(
+              Profile.updateMany(
+                { userId: { $in: [battle.player1, battle.player2] } },
+                { $inc: { amount: battle.amount } }
+              )
+            );
+          });
+    
+          console.log("💰 Refund operations:", refundOperations);
+    
+          await Promise.all(refundOperations); // Refund all players
+          console.log("✅ Refunds completed");
+    
+          const deleteResult = await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
+          console.log(`🗑️ Deleted pending battles:`, deleteResult);
+        } else {
+          console.log("✅ No pending battles to delete.");
+        }
+      } else {
+        console.log("⚠️ No in-progress battle found, skipping pending battle deletion.");
       }
     }
-    }
+    
 
     
     return res.status(200).json(battle);
