@@ -291,7 +291,7 @@ export const manageRequest = async (req: any, res: any) => {
         status: { $in: ["pending", "in-progress"] },
       }).sort({ createdAt: 1 });
     
-      console.log("📌 Active Battles:", playerBattles);
+      console.log("📌 Active Battles:", JSON.stringify(playerBattles, null, 2));
     
       // ✅ Check if there's an "in-progress" battle
       const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
@@ -315,16 +315,17 @@ export const manageRequest = async (req: any, res: any) => {
     
             refundOperations.push(
               Profile.updateMany(
-                { userId: { $in: [battle.player1, battle.player2] } },
+                { userId: { $in: [battle.player1, battle.player2].map(String) } }, // Ensure string IDs
                 { $inc: { amount: battle.amount } }
-              )
+              ).then((result) => console.log("✅ Refund Success:", result))
+              .catch((err) => console.error("❌ Refund Failed:", err))
             );
           });
     
-          console.log("💰 Refund operations:", refundOperations);
+          console.log("💰 Refund operations pending...");
     
-          await Promise.all(refundOperations); // Refund all players
-          console.log("✅ Refunds completed");
+          await Promise.all(refundOperations);
+          console.log("✅ Refunds completed successfully.");
     
           const deleteResult = await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
           console.log(`🗑️ Deleted pending battles:`, deleteResult);
@@ -335,6 +336,7 @@ export const manageRequest = async (req: any, res: any) => {
         console.log("⚠️ No in-progress battle found, skipping pending battle deletion.");
       }
     }
+    
     
 
     
