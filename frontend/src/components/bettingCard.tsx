@@ -68,9 +68,26 @@ export const BettingCard = (props : any)=>{
                 console.log("Response not found");
             }
 
+            joinBattle();
+
         }
-        catch(err){
+        catch(err : any){
             console.log("Error: "+err);
+            
+        if (err.response) {
+          const status = err.response.status;
+          const message = err.response.data.message || "Something went wrong.";
+    
+          if (status === 400) {
+            toast.warn(message);
+          } else if (status === 404) {
+            toast.error("Battle not found.");
+          } else {
+            toast.error("Failed to join the battle. Please try again.");
+          }
+        } else {
+          toast.error("Network error. Please check your connection.");
+        }
         }
       }
 
@@ -131,7 +148,6 @@ export const BettingCard = (props : any)=>{
                                              manageRequest("opponent_canceled", `Opponent left the battle`);
                                          } }>cancel</button></> : <button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md bg-purple-700`} onClick={() => {
                                              setBattleId(props.battle._id);
-                                             joinBattle();
                                              manageRequest("opponent_found" , `Opponent matched successfully`);
                                          } }>play</button>}
        </div>
