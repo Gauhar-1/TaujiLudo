@@ -37,34 +37,26 @@ export const createAdminDetails = async (req: any, res: any) => {
             }
         };
 
-        const calculateTodaysTotalAmount = async (transactionType: "deposit" | "withdraw"): Promise<number> => {
+        const calculateTotalAmount = async (transactionType: "deposit" | "withdraw"): Promise<number> => {
             try {
-              // Get start of the day (midnight)
+
+                 // Get start of the day (midnight)
               const startOfDay = new Date();
               startOfDay.setHours(0, 0, 0, 0);
           
-              // Get end of the day (11:59:59 PM)
-              const endOfDay = new Date();
-              endOfDay.setHours(23, 59, 59, 999);
-          
+
               const totalAmount = await Transaction.aggregate([
-                { 
-                  $match: { 
-                    type: transactionType, 
-                    createdAt: { $gte: startOfDay, $lte: endOfDay } // Filter transactions from today
-                  } 
-                },
-                { 
-                  $group: { _id: null, total: { $sum: "$amount" } } // Sum up amounts
-                }
+                { $match: { type: transactionType,  createdAt: { $gte: startOfDay } } }, // Filter by transaction type
+                { $group: { _id: null, total: { $sum: "$amount" } } }, // Sum all amounts
               ]);
           
               return totalAmount.length > 0 ? totalAmount[0].total : 0; // Return total or 0 if no transactions
             } catch (error) {
-              console.error("Error calculating today's total amount:", error);
+              console.error("Error calculating total amount:", error);
               return 0;
             }
           };
+          
 
         const getTodaysCount = async (Model: any, field?: string, value?: any) => {
             try {
@@ -121,8 +113,8 @@ export const createAdminDetails = async (req: any, res: any) => {
             getTotalCount(Battle, "status", "completed"),
             getTodaysCount(Battle, "status", "canceled"),
             getCommission(),
-            calculateTodaysTotalAmount("deposit"),
-            calculateTodaysTotalAmount("withdraw"),
+            calculateTotalAmount("deposit"),
+            calculateTotalAmount("withdraw"),
             getTodaysCount(Battle, "prize"),
             getTotalCount(Profile, "kycDetails.status", "pending"),
             getTotalCount(Profile, "kycDetails.status", "verified")
