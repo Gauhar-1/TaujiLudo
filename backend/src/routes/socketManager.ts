@@ -124,7 +124,7 @@ socket.on("createBattle", async (battleData, callback) => {
   });
 
 
-  // 🗑️ Handle battle deletion
+ // 🗑️ Handle battle deletion
 socket.on("deleteBattle", async (battleId, callback) => {
   try {
     // 🔍 Find the battle before deleting to get necessary details
@@ -133,24 +133,38 @@ socket.on("deleteBattle", async (battleId, callback) => {
       return callback({ status: 400, message: "Battle not found" });
     }
 
-    // ✅ Refund battle entry fee to player1 (since battle isn't completed)
-    await Profile.findOneAndUpdate(
-      { userId: battle.player1 },
-      { $inc: { amount: battle.amount } }, // Refund the entry fee
-      { new: true }
-    );
+    const { player1, player2, amount } = battle;
+
+    let refundMessage = "";
+
+    // 🔄 Check if both players are present
+    if (player1 && player2) {
+      // ✅ Both players present - refund 50% to each
+      await Profile.updateOne({ userId: player1 }, { $inc: { amount } });
+      await Profile.updateOne({ userId: player2 }, { $inc: { amount } });
+      refundMessage = `Both players refunded ${amount / 2}`;
+    } else if (player1) {
+      // ✅ Only player1 present - full refund
+      await Profile.updateOne({ userId: player1 }, { $inc: { amount } });
+      refundMessage = `Player1 refunded full amount ${amount}`;
+    } else if (player2) {
+      // ✅ Only player2 present - full refund
+      await Profile.updateOne({ userId: player2 }, { $inc: { amount } });
+      refundMessage = `Player2 refunded full amount ${amount}`;
+    }
 
     // 🗑️ Delete the battle
     await Battle.findByIdAndDelete(battleId);
 
     io.emit("battleDeleted", battleId);
-    return callback({ status: 200, message: "Battle deleted successfully, entry fee refunded" });
+    return callback({ status: 200, message: `Battle deleted successfully. ${refundMessage}` });
 
   } catch (error) {
     console.error("❌ Error deleting battle:", error);
     return callback({ status: 500, message: "Internal server error" });
   }
 });
+
 }
 
 export default socketManager;
