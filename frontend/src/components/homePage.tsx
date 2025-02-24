@@ -139,26 +139,24 @@ export const HomePage = () => {
   const createBattle = () => {
     if (!amount) {
       toast.warning("⚠️ Please enter an amount.", {
-        autoClose: 2000, // 3 seconds
+        autoClose: 1000, // 3 seconds
         position: "top-right",
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        theme: "dark",
       });
       return;
     }
 
     if (amount % 50 !== 0) {
       toast.warning("⚠️ Amount should be a multiple of 50.", {
-        autoClose: 2000, // 3 seconds
+        autoClose: 1000, // 3 seconds
         position: "top-right",
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        theme: "dark",
       });
       return;
     }
@@ -172,7 +170,7 @@ export const HomePage = () => {
 
       if (response.status === 400) {
         toast.warning(response.message, {
-          autoClose: 2000, // 3 seconds
+          autoClose: 1000, // 3 seconds
           position: "top-right",
           hideProgressBar: false,
           closeOnClick: true,
@@ -182,7 +180,7 @@ export const HomePage = () => {
         }); // Show error message
       } else if (response.status === 200) {
         toast.success("✅ Battle created successfully!", {
-          autoClose: 2000, // 3 seconds
+          autoClose: 1000, // 3 seconds
           position: "top-right",
           hideProgressBar: false,
           closeOnClick: true,
