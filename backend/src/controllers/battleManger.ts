@@ -159,6 +159,19 @@ export const joinBattle = async (req: any, res: any, next: any) => {
 
   try {
 
+    // ✅ Check if the user is already in an in-progress battle
+    const activeBattle = await Battle.findOne({
+      $or: [{ player1: userId }, { player2: userId }],
+      status: "in-progress",
+    });
+
+    if (activeBattle) {
+      console.log(`🚫 User ${userId} cannot join a new battle while battle ${activeBattle._id} is in progress.`);
+      return res.status(400).json({
+        success: false,
+      });
+    }
+
     // ✅ Join the battle
     const battle = await Battle.findByIdAndUpdate(
       battleId,
