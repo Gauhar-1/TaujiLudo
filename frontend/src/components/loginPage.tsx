@@ -28,7 +28,6 @@ export const LoginPage = () => {
     useEffect(() => {
       const checkAuth = async () => {
         try {
-          if (login) return; // ⛔ Stop if logged out
     
           const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
     
