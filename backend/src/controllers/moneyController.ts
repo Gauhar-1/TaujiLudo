@@ -247,22 +247,14 @@ export const rejectPayment = async (req : any, res : any) => {
       );
   
       // ✅ Find user profile
-      const profile = await Profile.findOne({ userId });
-      if (!profile) {
-        console.log("Profile not found");
-        return res.status(404).json({ success: false, message: "Profile not found" });
+      const profile =  await Profile.findOneAndUpdate(
+        { userId },
+        { $inc: { amount: transaction.amount } },
+        { new: true }
+      );
+      if(!profile){
+        return res.status(400).json("Profile not found");
       }
-  
-       // Ensure `transaction.wallet` is a valid number before assigning
-       if (typeof transaction.amount !== "number") {
-        console.log("Invalid amount:", transaction.amount);
-        return res.status(400).json({ success: false, message: "Invalid amount" });
-    }
-
-
-      // ✅ Ensure amount update is safe
-      profile.amount  += transaction.amount ;
-      await profile.save();
   
       return res.status(200).json({ success: true, message: "Payment rejected and tokens not added" });
     } catch (error : any) {
