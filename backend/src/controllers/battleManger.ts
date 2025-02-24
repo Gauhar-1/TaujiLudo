@@ -1,4 +1,3 @@
-import { de } from "@faker-js/faker/.";
 import { io } from "../app";
 import Battle from "../models/Battle";
 import Profile from "../models/Profile";
@@ -20,7 +19,6 @@ export const createBattle = async (
 
     // ✅ If user already has 2 active battles, block new creation
     if (activeBattles.length >= 2) {
-      console.log("⚠️ Cannot create more than 2 active battles");
       return callback({
         status: 400,
         message: "You already have 2 active battles. Finish or leave one to create a new one.",
@@ -198,7 +196,7 @@ export const manageRequest = async (req: any, res: any) => {
     if (event === "opponent_canceled") {
       battle = await Battle.findByIdAndUpdate(
         battleId,
-        { $set: { history: {} } }, // Reset history
+        { $set: { history: [] } }, // Reset history properly
         { new: true }
       );
 
@@ -210,8 +208,8 @@ export const manageRequest = async (req: any, res: any) => {
       // ✅ If status is "canceled", refund entry fees
       const refundAmount = battle.amount;
 
-      await Profile.findOneAndUpdate(
-        { userId },
+      await Profile.updateMany(
+        { userId: { $in: [battle.player1, battle.player2] } }, // Refund both players
         { $inc: { amount: refundAmount } }
       );
 
@@ -220,29 +218,27 @@ export const manageRequest = async (req: any, res: any) => {
     }
 
     if (event === "opponent_found") {
-     // ✅ Strictly check if the player is in THIS battle and it's "in-progress"
-const activeBattle = await Battle.findOne({
-  $or: [{ player1: userId }, { player2: userId }], // User must be in a battle
-  status: { $in: ["in-progress"] },  // Battle must be ongoing
-});
+      // ✅ Check if the user is already in an in-progress battle
+      const activeBattle = await Battle.findOne({
+        $or: [{ player1: userId }, { player2: userId }],
+        status: "in-progress",
+      });
 
-if (activeBattle) {
-  console.log(`🚫 User ${userId} cannot join a new battle while battle ${activeBattle._id} is in progress.`);
-  return res.status(400).json({
-    success: false,
-    message: "You cannot join a new battle while another battle is in progress.",
-  });
-}
+      if (activeBattle) {
+        console.log(`🚫 User ${userId} cannot join a new battle while battle ${activeBattle._id} is in progress.`);
+        return res.status(400).json({
+          success: false,
+          message: "You cannot join a new battle while another battle is in progress.",
+        });
+      }
 
       // ✅ Deduct the entry fee from the opponent's profile
       battle = await Battle.findById(battleId);
-
       if (!battle) {
         return res.status(404).json({ message: "Battle not found" });
       }
 
       const opponentProfile = await Profile.findOne({ userId });
-
       if (!opponentProfile) {
         return res.status(404).json({ message: "Opponent profile not found" });
       }
@@ -283,14 +279,26 @@ if (activeBattle) {
     const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
 
     if (inProgressBattle) {
-      // ✅ Delete all "pending" battles for the player
-      const pendingBattleIds = playerBattles
-        .filter((b) => b.status === "pending")
-        .map((b) => b._id);
+      // ✅ Delete all "pending" battles for the player and refund amounts
+      const pendingBattles = playerBattles.filter((b) => b.status === "pending");
 
-      if (pendingBattleIds.length > 0) {
+      if (pendingBattles.length > 0) {
+        const pendingBattleIds = pendingBattles.map((b) => b._id);
+        const refundOperations: any[] = [];
+
+        pendingBattles.forEach((battle) => {
+          refundOperations.push(
+            Profile.updateMany(
+              { userId: { $in: [battle.player1, battle.player2] } },
+              { $inc: { amount: battle.amount } }
+            )
+          );
+        });
+
+        await Promise.all(refundOperations); // Refund all players
         await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
-        console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId}`);
+
+        console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId} and refunded entry fees.`);
       }
     }
 
@@ -300,6 +308,7 @@ if (activeBattle) {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 export const handleLudoCode = async(req: any, res: any)=>{
