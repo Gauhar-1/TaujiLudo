@@ -269,7 +269,8 @@ export const manageRequest = async (req: any, res: any) => {
       return res.status(404).json({ message: "Battle not found" });
     }
 
-    // ✅ Fetch all active battles of the player
+    if(event === "opponent_entered"){
+      // ✅ Fetch all active battles of the player
     const playerBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
       status: { $in: ["pending", "in-progress"] },
@@ -301,7 +302,9 @@ export const manageRequest = async (req: any, res: any) => {
         console.log(`⚠️ Deleted ${pendingBattleIds.length} pending battles for user ${userId} and refunded entry fees.`);
       }
     }
+    }
 
+    
     return res.status(200).json(battle);
   } catch (error) {
     console.error("❌ Error in manageRequest:", error);
