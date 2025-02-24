@@ -22,11 +22,27 @@ export const BettingCard = (props : any)=>{
         });
     
         if (!response.data) {
-          toast.error("No response from server. Please try again.");
+          toast.error("No response from server. Please try again.", {
+            autoClose: 2000, // 3 seconds
+            position: "top-right",
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark",
+          });
           return;
         }
     
-        toast.success("Successfully joined the battle! 🎉");
+        toast.success("Successfully joined the battle! 🎉", {
+          autoClose: 2000, // 3 seconds
+          position: "top-right",
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
         // navigate('/battle'); // Uncomment if needed
     
       } catch (err: any) {
@@ -37,14 +53,46 @@ export const BettingCard = (props : any)=>{
           const message = err.response.data.message || "Something went wrong.";
     
           if (status === 400) {
-            toast.warn(message);
+            toast.warn(message, {
+              autoClose: 2000, // 3 seconds
+              position: "top-right",
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "dark",
+            });
           } else if (status === 404) {
-            toast.error("Battle not found.");
+            toast.error("Battle not found.", {
+              autoClose: 2000, // 3 seconds
+              position: "top-right",
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "dark",
+            });
           } else {
-            toast.error("Failed to join the battle. Please try again.");
+            toast.error("Failed to join the battle. Please try again.", {
+              autoClose: 2000, // 3 seconds
+              position: "top-right",
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "dark",
+            });
           }
         } else {
-          toast.error("Network error. Please check your connection.");
+          toast.error("Network error. Please check your connection.", {
+            autoClose: 2000, // 3 seconds
+            position: "top-right",
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark",
+          });
         }
       }
     };
@@ -77,14 +125,46 @@ export const BettingCard = (props : any)=>{
           const message = err.response.data.message || "Something went wrong.";
     
           if (status === 400) {
-            toast.warn(message);
+            toast.warn(message, {
+              autoClose: 2000, // 3 seconds
+              position: "top-right",
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "dark",
+            });
           } else if (status === 404) {
-            toast.error("Battle not found.");
+            toast.error("Battle not found.", {
+              autoClose: 2000, // 3 seconds
+              position: "top-right",
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "dark",
+            });
           } else {
-            toast.error("Failed to join the battle. Please try again.");
+            toast.error("Failed to join the battle. Please try again.", {
+              autoClose: 2000, // 3 seconds
+              position: "top-right",
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "dark",
+            });
           }
         } else {
-          toast.error("Network error. Please check your connection.");
+          toast.error("Network error. Please check your connection.", {
+            autoClose: 2000, // 3 seconds
+            position: "top-right",
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark",
+          });
         }
         }
       }

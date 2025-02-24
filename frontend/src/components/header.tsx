@@ -97,8 +97,11 @@ export const Header = ()=>{
          </div>
        </div>
    </div>}
-       {!login && <div className="flex justify-center">
+       {!login && <div className="flex justify-between px-2">
         <img src="../../logo.png" alt=""  className="h-14  "/>
+        <div className="p-2">
+          <div className="py-2 px-4 shadow-lg rounded-md  bg-purple-600 text-white ">Login</div>
+        </div>
        </div>}
         
     </div>
