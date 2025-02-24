@@ -46,7 +46,7 @@ export const createAdminDetails = async (req: any, res: any) => {
           
 
               const totalAmount = await Transaction.aggregate([
-                { $match: { type: transactionType,  createdAt: { $gte: startOfDay }, status : "completed" } }, // Filter by transaction type
+                { $match: { type: transactionType,  date: { $gte: startOfDay }, status : "completed" } }, // Filter by transaction type
                 { $group: { _id: null, total: { $sum: "$amount" } } }, // Sum all amounts
               ]);
           
