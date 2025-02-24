@@ -68,8 +68,6 @@ export const BettingCard = (props : any)=>{
                 console.log("Response not found");
             }
 
-            joinBattle();
-
         }
         catch(err : any){
             console.log("Error: "+err);
@@ -149,6 +147,7 @@ export const BettingCard = (props : any)=>{
                                          } }>cancel</button></> : <button className={`text-center font-mono  text-white py-2 px-4 text-xs rounded-md bg-purple-700`} onClick={() => {
                                              setBattleId(props.battle._id);
                                              manageRequest("opponent_found" , `Opponent matched successfully`);
+                                             joinBattle();
                                          } }>play</button>}
        </div>
     </div>
