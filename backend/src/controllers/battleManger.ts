@@ -235,7 +235,7 @@ export const manageRequest = async (req: any, res: any) => {
      // ✅ Strictly check if the player is in THIS battle and it's "in-progress"
 const activeBattle = await Battle.findOne({
   $or: [{ player1: userId }, { player2: userId }], // User must be in a battle
-  status: "in-progress", // Battle must be ongoing
+  status: { $in: ["in-progress"] },  // Battle must be ongoing
 });
 
 if (activeBattle) {
