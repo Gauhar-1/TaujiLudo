@@ -282,8 +282,6 @@ export const manageRequest = async (req: any, res: any) => {
       return res.status(404).json({ message: "Battle not found" });
     }
 
-    if (event === "opponent_entered") {
-      console.info("✅ Opponent entered event triggered");
 
       // ✅ Fetch all active battles of the player
       const playerBattles = await Battle.find({
@@ -338,7 +336,6 @@ export const manageRequest = async (req: any, res: any) => {
       } else {
         console.warn("⚠️ No in-progress battle found, skipping pending battle deletion.");
       }
-    }
 
     return res.status(200).json(battle);
   } catch (error) {
