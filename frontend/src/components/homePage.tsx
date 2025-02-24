@@ -138,12 +138,28 @@ export const HomePage = () => {
 
   const createBattle = () => {
     if (!amount) {
-      toast.warning("⚠️ Please enter an amount.");
+      toast.warning("⚠️ Please enter an amount.", {
+        autoClose: 2000, // 3 seconds
+        position: "top-right",
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
       return;
     }
 
     if (amount % 50 !== 0) {
-      toast.warning("⚠️ Amount should be a multiple of 50.");
+      toast.warning("⚠️ Amount should be a multiple of 50.", {
+        autoClose: 2000, // 3 seconds
+        position: "top-right",
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
       return;
     }
 
@@ -155,15 +171,27 @@ export const HomePage = () => {
       setLoading(false); // Re-enable button
 
       if (response.status === 400) {
-        toast.warning(response.message); // Show error message
+        toast.warning(response.message, {
+          autoClose: 2000, // 3 seconds
+          position: "top-right",
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        }); // Show error message
       } else if (response.status === 200) {
-        toast.success("✅ Battle created successfully!");
+        toast.success("✅ Battle created successfully!", {
+          autoClose: 2000, // 3 seconds
+          position: "top-right",
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
         console.log("✅ Battle Created:", response.battleData);
-
-        // Optionally update UI here, e.g., add battle to state
-      } else {
-        toast.error("❌ Something went wrong. Please try again.");
-      }
+      } 
     });
   };
 

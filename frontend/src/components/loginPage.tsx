@@ -119,24 +119,51 @@ export const LoginPage = () => {
     );
 
       if (response.data.success) {
-        toast.success("OTP verified successfully!");
+        toast.success("OTP verified successfully!", {
+          autoClose: 2000, // 3 seconds
+          position: "top-right",
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
         setUserId(response.data.userId);
         setName(response.data.name);
         setLogin(true);
         setPhone(phone);
         navigate("/winCash");
       } else {
-        toast.error(response.data.message || "Invalid OTP.");
+        toast.error(response.data.message || "Invalid OTP.", {
+          autoClose: 3000, // 3 seconds
+          position: "top-right",
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error verifying OTP. Please try again.");
+      toast.error("Error verifying OTP. Please try again.", {
+        autoClose: 3000, // 3 seconds
+        position: "top-right",
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
     }
   };
 
   return (
-    <div className="bg-gray-200 flex justify-center items-center max-w-sm min-h-screen">
-      <div className="relative w-full max-w-sm p-6">
+    <div className="bg-gray-200 flex justify-center pt-16 max-w-sm min-h-screen">
+      <div className="relative w-full flex flex-col gap-10 max-w-sm p-6">
+        <div>
+        <img src="../../logo.png" alt="" />
+        </div>
         <div className="bg-white shadow-md rounded-lg p-6">
           <h1 className="text-3xl font-serif text-center mb-2">Login Here!</h1>
 
