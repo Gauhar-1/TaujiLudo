@@ -204,56 +204,73 @@ export const verifyPayment = async (req: any, res: any) => {
 };
 
 
-export const  rejectPayment = async (req: any ,res : any) => {
-    const { transactionId , reason } = req.body;
-
+export const rejectPayment = async (req : any, res : any) => {
+    const { transactionId, reason, userId } = req.body;
+  
     if (!transactionId) {
-        return res.status(400).json({ success: false, message: "Transaction ID is required." });
+      return res.status(400).json({ success: false, message: "Transaction ID is required." });
     }
-    if (! reason ) {
-        return res.status(400).json({ success: false, message: "reason is required." });
+    if (!reason) {
+      return res.status(400).json({ success: false, message: "Reason is required." });
     }
-
+  
     try {
-
-        const sanitizedTransactionId = transactionId.toString().replace(/:/g, "");
-
-        console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
-
-        // Find the transaction by payment reference
-        const transaction = await Transaction.findById(sanitizedTransactionId);
-
-        if (!transaction) {
-            console.log('Transaction not found');
-            return res.status(404).json({ success: false, message: 'Transaction not found' });
-        }
-
-        transaction.status = 'failed';
-        await transaction.save();
-
-        // Update the transaction as completed
-        // Add tokens to the user's wallet (mocked here)
-        // Replace with your wallet update logic
-        console.log(`Tokens didn't add to user ${transaction.userId}: ${transaction.amount}`);
-
-        // Update notification as transaction completed
-        const notification = await Notification.findOneAndUpdate({paymentReference : transaction.paymentReference}, 
-       { status:'failed', 
-        reason,
-        createdAt : new Date().toISOString(),
-       });
-
-        if (!notification) {
-            console.log('notification not found');
-            return res.status(404).json({ success: false, message: 'notification  not found' });
-        }
-
-        res.status(200).json({ success: true, message: 'Payment Rejected and tokens not added' });
-    } catch (err : any) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Payment rejection failed', error: err.message });
+      // ✅ Validate Transaction ID
+      if (!mongoose.Types.ObjectId.isValid(transactionId)) {
+        return res.status(400).json({ success: false, message: "Invalid transaction ID." });
+      }
+      const sanitizedTransactionId = new mongoose.Types.ObjectId(transactionId);
+  
+      console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
+  
+      // ✅ Find the transaction
+      const transaction = await Transaction.findById(sanitizedTransactionId);
+      if (!transaction) {
+        console.log("Transaction not found");
+        return res.status(404).json({ success: false, message: "Transaction not found" });
+      }
+  
+      // ✅ Update transaction status
+      transaction.status = "failed";
+      await transaction.save();
+      console.log(`Tokens didn't add to user ${transaction.userId}: ${transaction.amount}`);
+  
+      // ✅ Update notification, create if not found
+      const notification = await Notification.findOneAndUpdate(
+        { paymentReference: transaction.paymentReference },
+        {
+          status: "failed",
+          reason,
+          createdAt: new Date().toISOString(),
+        },
+        { new: true, upsert: true }
+      );
+  
+      // ✅ Find user profile
+      const profile = await Profile.findOne({ userId });
+      if (!profile) {
+        console.log("Profile not found");
+        return res.status(404).json({ success: false, message: "Profile not found" });
+      }
+  
+       // Ensure `transaction.wallet` is a valid number before assigning
+       if (typeof transaction.amount !== "number") {
+        console.log("Invalid amount:", transaction.amount);
+        return res.status(400).json({ success: false, message: "Invalid amount" });
     }
-}
+
+
+      // ✅ Ensure amount update is safe
+      profile.amount  += transaction.amount ;
+      await profile.save();
+  
+      return res.status(200).json({ success: true, message: "Payment rejected and tokens not added" });
+    } catch (error : any) {
+      console.error("Error rejecting payment:", error);
+      return res.status(500).json({ success: false, message: "Payment rejection failed", error: error.message });
+    }
+  };
+  
 
 export const paymentProof = async(req: any, res: any, next: any)=>{
 
