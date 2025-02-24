@@ -41,6 +41,7 @@ import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
 import { Notifications } from "../components/notification";
 import { RedeemEarnings } from "../components/redeemEarning";
+import { useEffect } from "react";
 
 
 export const UserPage = ()=>{
@@ -56,7 +57,24 @@ export const UserPage = ()=>{
       //   }
       // },[login])
 
-  
+      useEffect(() => {
+        document.title = "taujiLudo"; // Change tab title
+      }, []);
+
+      const changeFavicon = (faviconUrl: string) => {
+        let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = faviconUrl;
+      };
+      
+      // Change favicon to "logo.png"
+      changeFavicon("/logo.png");
+      
+
     return (
         <div>
             { !adminClicked && <Header ></Header>}
