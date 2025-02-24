@@ -682,7 +682,7 @@ export const determineWinner = async (req: any, res: any) => {
       return res.status(404).json({ success: false, message: "Battle not found" });
     }
 
-    const loserId = userId === battle.player1 ? battle.player2 : battle.player1;
+    const loserId = userId as string === battle.player1 ? battle.player2 : battle.player1;
 
     // Update winner profile
     const winnerUpdate = await Profile.findOneAndUpdate(

@@ -93,38 +93,28 @@ export const BattleResult = ()=>{
         }
     }
 
-    const checkPlayer = ( clicked : string)=>{
-
-        if(clicked === "image"){
+    const checkPlayer = (clicked: string) => {
+        if (!battle?.dispute?.proofs || battle.dispute.proofs.length === 0) {
+            return "No proof available";
+        }
+    
+        if (clicked === "image") {
             const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === "Won");
-
-            const ImageName = winningProof
-              ? (winningProof.filename)
-              : "";
-            
-            return ImageName;
+            return winningProof?.filename || "No image available";
+        } 
+    
+        if (clicked === "Reject") {
+            const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === "Won");
+            return winningProof?.player || "No winner determined";
         }
-
-        else if ( clicked === "Reject"){
-            const winningProof = battle.dispute.proofs.find((proof) =>proof.clicked === "Won");
-
-            const winnerName = winningProof
-              ? (winningProof.player)
-              : "No winner determined";
-            
-            return winnerName;
-        }
-
-        const winningProof = battle.dispute.proofs.find((proof) => proof.clicked === clicked);
-
-        const winnerName = winningProof
-          ? (winningProof.player === battle.player1 ? battle.player1Name : battle.player2Name)
-          : "No winner determined";
+    
+        const proof = battle.dispute.proofs.find((proof) => proof.clicked === clicked);
         
-        return winnerName;
-        
-    }
-
+        if (!proof) return "No winner determined";
+    
+        return proof.player === battle.player1 ? battle.player1Name : battle.player2Name;
+    };
+    
     
     return (
         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
