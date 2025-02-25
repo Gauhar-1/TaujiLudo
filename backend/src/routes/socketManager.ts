@@ -121,13 +121,13 @@ socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
           {
             updateOne: {
               filter: { _id: battle.player1 },
-              update: { $inc: { balance: battle.amount } },
+              update: { $inc: { amount: battle.amount } },
             },
           },
           {
             updateOne: {
               filter: { _id: battle.player2 },
-              update: { $inc: { balance: battle.amount } },
+              update: { $inc: { amount: battle.amount } },
             },
           },
         ]);
