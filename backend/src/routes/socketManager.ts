@@ -26,9 +26,6 @@ socket.on("createBattle", async (battleData, callback) => {
       return callback({ status: 400, message: "Insufficient balance" });
     }
 
-    userProfile.amount -= amount;
-    await userProfile.save();
-
     // ✅ Check if the player has an "in-progress" battle
     const activeBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
@@ -78,6 +75,9 @@ socket.on("createBattle", async (battleData, callback) => {
       },
       { new: true, upsert: true }
     );
+
+    userProfile.amount -= amount;
+    await userProfile.save();
 
     console.log("✅ Battle created:", battle._id);
     io.emit("battleCreated", battle);
