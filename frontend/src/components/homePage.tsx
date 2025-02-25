@@ -195,10 +195,10 @@ export const HomePage = () => {
 
   useEffect(() => {
     // ✅ Listen for battle updates
-    socket.on("battleUpdated", (updatedBattle: any) => {
-      if (updatedBattle.status === "in-progress") {
+    socket.on("battleUpdated", (battle: any) => {
+      if (battle.status === "in-progress") {
         setPendingB((prevBattles) =>
-          prevBattles.filter((b : any) => b.player1 !== updatedBattle.player1 || b.amount !== updatedBattle.amount)
+          prevBattles.filter((b : any) => b.player1 !== battle.player1 || b.amount !== battle.amount)
         );
       }
     });
