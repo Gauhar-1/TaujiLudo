@@ -17,7 +17,7 @@ export const socket = io("https://api.taujiludo.in",{
 
 export const HomePage = () => {
     const navigate = useNavigate();
-  const { userId, name } = useUserContext(); // Access userId from the context
+  const { userId, name, battleId } = useUserContext(); // Access userId from the context
   const [amount, setAmount] = useState<number>(0);
   const [ info , setInfo ] = useState("");
 
@@ -195,7 +195,7 @@ export const HomePage = () => {
 
   useEffect(() => {
 
-    socket.emit("updateBattleStatus", {  status : "in-progress" }, (response: any) => {
+    socket.emit("updateBattleStatus", {  battleId ,status : "in-progress" }, (response: any) => {
       if (response.status === 200) {
         console.log("✅ Battle status updated successfully:", response.battle);
       } else {

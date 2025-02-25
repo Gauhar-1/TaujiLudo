@@ -92,10 +92,8 @@ socket.on("createBattle", async (battleData, callback) => {
 socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
   try {
     // ✅ Update the battle status
-    const battle = await Battle.findByIdAndUpdate(
-      battleId,
-      { status },
-      { new: true }
+    const battle = await Battle.findById(
+      battleId
     );
 
     if (!battle) {
