@@ -248,23 +248,29 @@ export const ProfilePage = ()=>{
             </div>
                 <div className="flex justify-around m-8">
                     <div className="">
-                        <div className="relative bg-gray-100 h-32 w-20 rounded-md  hover:bg-green-500">
-                        <img src="../../cash.png" alt="" className="size-8 absolute left-7 top-4"/>
-                        <div className="font-bold text-black absolute left-8 top-20">{cashWon}</div>
+                        <div className="relative bg-gray-100 h-32 w-20 rounded-md flex flex-col gap-4 hover:bg-green-500">
+                          <div className="flex justify-center p-4">
+                        <img src="../../cash.png" alt="" className="size-8 "/>
+                          </div>
+                        <div className="font-bold text-black  px-4 ">{cashWon}</div>
                         </div>
                         <div className="font-thin text-xs text-center p-2">cash won</div>
                     </div>
                     <div>
-                    <div className="bg-gray-100 h-32 w-20 rounded-md  relative hover:bg-green-500">
-                        <img src="../../battle.png" alt="" className="size-8 absolute left-7 top-4"/>
-                        <div className="font-bold text-black absolute left-8 top-20">{battlePlayed}</div>
+                    <div className="bg-gray-100 h-32 w-20 rounded-md  flex flex-col gap-4 hover:bg-green-500">
+                      <div className="flex justify-center p-4">
+                        <img src="../../battle.png" alt="" className="size-8"/>
+                      </div>
+                        <div className="font-bold text-black  text-center top-20">{battlePlayed}</div>
                     </div>
                     <div className="font-thin text-xs text-center p-2">Battle Played</div>
                     </div>
                     <div>
-                    <div className="bg-gray-100 h-32 w-20 rounded-md  relative hover:bg-green-500">
-                        <img src="../../referal.png" alt="" className="size-8 absolute left-7 top-4"/>
-                        <div className="font-bold text-black absolute left-8 top-20">{earnings}</div>
+                    <div className="bg-gray-100 h-32 w-20 rounded-md  flex flex-col gap-4 hover:bg-green-500">
+                      <div className="flex justify-center p-4">
+                        <img src="../../referal.png" alt="" className="size-8 "/>
+                      </div>
+                        <div className="font-bold text-black text-center">{earnings}</div>
                     </div>
                     <div className="font-thin text-xs text-center py-2">Referal Earnings</div>
                     </div>

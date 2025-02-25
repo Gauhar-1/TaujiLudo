@@ -89,39 +89,78 @@ socket.on("createBattle", async (battleData, callback) => {
   }
 });
 
-  // 🎮 Handle battle status update (Auto-delete pending battles)
-  socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
-    try {
-      // ✅ Update battle status
-      const battle = await Battle.findByIdAndUpdate(
-        battleId,
-        { status },
-        { new: true }
-      );
+socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
+  try {
+    // ✅ Update battle status
+    const battle = await Battle.findByIdAndUpdate(
+      battleId,
+      { status },
+      { new: true }
+    );
 
-      if (!battle) {
-        return callback({ status: 404, message: "Battle not found" });
-      }
-
-
-      // ✅ If battle is now "in-progress", delete all "pending" battles for this player
-      if (status === "in-progress") {
-        await Battle.deleteMany({
-          $or: [{ player1: battle.player1 }, { player2: battle.player2 }],
-          status: "pending",
-        });
-
-        console.log(`⚠️ Deleted all pending battles for player ${battle.player1} and ${battle.player2}`);
-      }
-
-      io.emit("battleUpdated", battle);
-      return callback({ status: 200, message: "Battle status updated", battle });
-
-    } catch (error) {
-      console.error("❌ Error updating battle status:", error);
-      return callback({ status: 500, message: "Internal server error" });
+    if (!battle) {
+      return callback({ status: 404, message: "Battle not found" });
     }
-  });
+
+    const { player1, player2 } = battle;
+
+    if (status === "in-progress") {
+      console.info(`📌 Checking pending battles where either ${player1} or ${player2} is involved`);
+
+      // ✅ Fetch all pending battles where either player1 or player2 is present
+      const pendingBattles = await Battle.find({
+        status: "pending",
+        $or: [{ player1: player1 }, { player2: player1 }, { player1: player2 }, { player2: player2 }],
+      }).lean();
+
+      if (pendingBattles.length > 0) {
+        console.info(`🛑 Found ${pendingBattles.length} pending battles. Processing refunds...`);
+
+        const pendingBattleIds = pendingBattles.map((b) => b._id);
+
+        // ✅ Prepare refund operations for each player in the pending battles
+        const refundOperations = pendingBattles.flatMap((battle) => [
+          {
+            updateOne: {
+              filter: { _id: battle.player1 },
+              update: { $inc: { amount: battle.amount } },
+            },
+          },
+          {
+            updateOne: {
+              filter: { _id: battle.player2 },
+              update: { $inc: { amount: battle.amount } },
+            },
+          },
+        ]);
+
+        try {
+          await Profile.bulkWrite(refundOperations);
+          console.info("✅ Refunds processed successfully.");
+        } catch (err) {
+          console.error("❌ Refund processing failed:", err);
+        }
+
+        try {
+          const deleteResult = await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
+          console.info(`🗑️ Deleted pending battles:`, deleteResult);
+        } catch (err) {
+          console.error("❌ Error deleting pending battles:", err);
+        }
+      } else {
+        console.info("✅ No pending battles to delete.");
+      }
+    }
+
+    io.emit("battleUpdated", battle);
+    return callback({ status: 200, message: "Battle status updated", battle });
+
+  } catch (error) {
+    console.error("❌ Error updating battle status:", error);
+    return callback({ status: 500, message: "Internal server error" });
+  }
+});
+
 
 
  // 🗑️ Handle battle deletion
@@ -142,7 +181,7 @@ socket.on("deleteBattle", async (battleId, callback) => {
       // ✅ Both players present - refund 50% to each
       await Profile.updateOne({ userId: player1 }, { $inc: { amount } });
       await Profile.updateOne({ userId: player2 }, { $inc: { amount } });
-      refundMessage = `Both players refunded ${amount / 2}`;
+      refundMessage = `Both players refunded ${amount }`;
     } else if (player1) {
       // ✅ Only player1 present - full refund
       await Profile.updateOne({ userId: player1 }, { $inc: { amount } });

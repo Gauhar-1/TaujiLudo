@@ -282,61 +282,6 @@ export const manageRequest = async (req: any, res: any) => {
       return res.status(404).json({ message: "Battle not found" });
     }
 
-
-      // ✅ Fetch all active battles of the player
-      const playerBattles = await Battle.find({
-        $or: [{ player1: String(userId) }, { player2: String(userId) }],
-        status: { $in: ["pending", "in-progress"] },
-      })
-        .sort({ createdAt: 1 })
-        .lean();
-
-      console.info("📌 Active Battles:", playerBattles.length);
-
-      // ✅ Check for an "in-progress" battle
-      const inProgressBattle = playerBattles.find((b) => b.status === "in-progress");
-
-      if (inProgressBattle) {
-        console.warn("⚠️ In-progress battle found:", inProgressBattle._id);
-
-        // ✅ Filter out pending battles
-        const pendingBattles = playerBattles.filter((b) => b.status === "pending");
-
-        if (pendingBattles.length > 0) {
-          console.info(`🛑 Found ${pendingBattles.length} pending battles. Processing refunds...`);
-
-          const pendingBattleIds = pendingBattles.map((b) => b._id);
-          console.info("🛑 Pending Battle IDs:", pendingBattleIds);
-
-          // ✅ Batch refund operations for efficiency
-          const refundOperations = pendingBattles.map((battle) => ({
-            updateMany: {
-              filter: { userId: { $in: [String(battle.player1), String(battle.player2)] } },
-              update: { $inc: { amount: battle.amount } },
-            },
-          }));
-
-          try {
-            await Profile.bulkWrite(refundOperations);
-            console.info("✅ Refunds processed successfully.");
-          } catch (err) {
-            console.error("❌ Refund processing failed:", err);
-          }
-
-          // ✅ Delete all pending battles in one query
-          try {
-            const deleteResult = await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
-            console.info(`🗑️ Deleted pending battles:`, deleteResult);
-          } catch (err) {
-            console.error("❌ Error deleting pending battles:", err);
-          }
-        } else {
-          console.info("✅ No pending battles to delete.");
-        }
-      } else {
-        console.warn("⚠️ No in-progress battle found, skipping pending battle deletion.");
-      }
-
     return res.status(200).json(battle);
   } catch (error) {
     console.error("❌ Error in manageRequest:", error);
