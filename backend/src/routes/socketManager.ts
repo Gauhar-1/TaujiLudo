@@ -120,13 +120,13 @@ socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
         const refundOperations = pendingBattles.flatMap((battle) => [
           {
             updateOne: {
-              filter: { _id: battle.player1 },
+              filter: { userId: battle.player1 },
               update: { $inc: { amount: battle.amount } },
             },
           },
           {
             updateOne: {
-              filter: { _id: battle.player2 },
+              filter: { userId: battle.player2 },
               update: { $inc: { amount: battle.amount } },
             },
           },
