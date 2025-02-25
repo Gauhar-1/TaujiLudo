@@ -93,11 +93,25 @@ export const LoginPage = () => {
          setResendTimeout(30); // Reset Timer
         setCanResend(true);
       } else {
-        toast.error(response.data.message || "Invalid phone number.");
+        toast.error(response.data.message, {
+          autoClose: 1000, // 3 seconds
+          position: "top-right",
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to send OTP. Please try again.");
+      toast.error("Failed to send OTP. Please try again.", {
+        autoClose: 1000, // 3 seconds
+        position: "top-right",
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
@@ -120,13 +134,12 @@ export const LoginPage = () => {
 
       if (response.data.success) {
         toast.success("OTP verified successfully!", {
-          autoClose: 2000, // 3 seconds
+          autoClose: 1000, // 3 seconds
           position: "top-right",
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          theme: "dark",
         });
         setUserId(response.data.userId);
         setName(response.data.name);
@@ -135,25 +148,23 @@ export const LoginPage = () => {
         navigate("/winCash");
       } else {
         toast.error(response.data.message || "Invalid OTP.", {
-          autoClose: 3000, // 3 seconds
+          autoClose: 1000, // 3 seconds
           position: "top-right",
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-          theme: "dark",
         });
       }
     } catch (error) {
       console.error(error);
       toast.error("Error verifying OTP. Please try again.", {
-        autoClose: 3000, // 3 seconds
+        autoClose: 1000, // 3 seconds
         position: "top-right",
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        theme: "dark",
       });
     }
   };
