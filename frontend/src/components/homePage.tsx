@@ -194,11 +194,16 @@ export const HomePage = () => {
   };
 
   useEffect(() => {
-    // ✅ Listen for battle updates
     socket.on("battleUpdated", (battle: any) => {
       if (battle.status === "in-progress") {
         setPendingB((prevBattles) =>
-          prevBattles.filter((b : any) => b.player1 !== battle.player1 || b.amount !== battle.amount)
+          prevBattles.filter(
+            (b: any) =>
+              b.player1 !== battle.player1 &&
+              b.player2 !== battle.player1 &&
+              b.player1 !== battle.player2 &&
+              b.player2 !== battle.player2
+          )
         );
       }
     });
@@ -208,9 +213,6 @@ export const HomePage = () => {
     };
   }, []);
   
-
-  
-
 
     return (
         <div className="max-w-sm bg-gray-300 min-h-screen">

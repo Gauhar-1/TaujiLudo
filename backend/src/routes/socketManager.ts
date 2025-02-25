@@ -91,7 +91,7 @@ socket.on("createBattle", async (battleData, callback) => {
 
 socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
   try {
-    // ✅ Update battle status
+    // ✅ Update the battle status
     const battle = await Battle.findByIdAndUpdate(
       battleId,
       { status },
@@ -105,12 +105,12 @@ socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
     const { player1, player2 } = battle;
 
     if (status === "in-progress") {
-      console.info(`📌 Checking pending battles where either ${player1} or ${player2} is involved`);
+      console.info(`📌 Checking pending battles for ${player1} or ${player2}...`);
 
-      // ✅ Fetch all pending battles where either player1 or player2 is present
+      // ✅ Find all pending battles involving player1 or player2
       const pendingBattles = await Battle.find({
         status: "pending",
-        $or: [{ player1: player1 }, { player2: player1 }, { player1: player2 }, { player2: player2 }],
+        $or: [{ player1 }, { player2 }, { player1: player2 }, { player2: player1 }],
       }).lean();
 
       if (pendingBattles.length > 0) {
@@ -118,18 +118,18 @@ socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
 
         const pendingBattleIds = pendingBattles.map((b) => b._id);
 
-        // ✅ Prepare refund operations for each player in the pending battles
+        // ✅ Refund players in the pending battles
         const refundOperations = pendingBattles.flatMap((battle) => [
           {
             updateOne: {
               filter: { _id: battle.player1 },
-              update: { $inc: { amount: battle.amount } },
+              update: { $inc: { balance: battle.amount } },
             },
           },
           {
             updateOne: {
               filter: { _id: battle.player2 },
-              update: { $inc: { amount: battle.amount } },
+              update: { $inc: { balance: battle.amount } },
             },
           },
         ]);
@@ -142,8 +142,9 @@ socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
         }
 
         try {
+          // ✅ Delete pending battles AFTER refunds are processed
           const deleteResult = await Battle.deleteMany({ _id: { $in: pendingBattleIds } });
-          console.info(`🗑️ Deleted pending battles:`, deleteResult);
+          console.info(`🗑️ Deleted ${deleteResult.deletedCount} pending battles.`);
         } catch (err) {
           console.error("❌ Error deleting pending battles:", err);
         }
@@ -160,7 +161,6 @@ socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
     return callback({ status: 500, message: "Internal server error" });
   }
 });
-
 
 
  // 🗑️ Handle battle deletion
