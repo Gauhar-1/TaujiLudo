@@ -182,7 +182,7 @@ export const joinBattle = async (req: any, res: any, next: any) => {
     // ✅ Restrict third player from joining
     if (battle.player1 && battle.player2) {
       console.log(`🚫 Battle ${battleId} already has two players.`);
-      return res.status(403).json({ success: false, message: "This battle is already full." });
+      return res.status(200).json({ success: false, message: "This battle is already full." });
     }
 
     // ✅ If player1 is present, set user as player2; otherwise, do nothing extra
@@ -263,7 +263,7 @@ export const manageRequest = async (req: any, res: any) => {
       // ✅ Restrict third player from joining
     if (battle?.player1 && battle?.player2) {
       console.log(`🚫 Battle ${battleId} already has two players.`);
-      return res.status(403).json({ success: false, message: "This battle is already full." });
+      return res.status(400).json({ success: false, message: "This battle is already full." });
     }
 
       const opponentProfile = await Profile.findOne({ userId });
