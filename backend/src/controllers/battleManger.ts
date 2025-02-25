@@ -158,7 +158,6 @@ export const joinBattle = async (req: any, res: any, next: any) => {
   }
 
   try {
-
     // ✅ Check if the user is already in an in-progress battle
     const activeBattle = await Battle.findOne({
       $or: [{ player1: userId }, { player2: userId }],
@@ -169,25 +168,35 @@ export const joinBattle = async (req: any, res: any, next: any) => {
       console.log(`🚫 User ${userId} cannot join a new battle while battle ${activeBattle._id} is in progress.`);
       return res.status(200).json({
         success: false,
+        message: "You are already in an active battle.",
       });
     }
 
-    // ✅ Join the battle
-    const battle = await Battle.findByIdAndUpdate(
-      battleId,
-      {
-        player2Name: name,
-        player2: userId,
-        createdAt: new Date(),
-      },
-      { new: true }
-    );
+    // ✅ Find the battle
+    const battle = await Battle.findById(battleId);
 
     if (!battle) {
       return res.status(404).json({ success: false, message: "Battle not found" });
     }
 
-    res.status(200).json({ success: true, message: "Joined battle successfully", battle });
+    // ✅ Restrict third player from joining
+    if (battle.player1 && battle.player2) {
+      console.log(`🚫 Battle ${battleId} already has two players.`);
+      return res.status(403).json({ success: false, message: "This battle is already full." });
+    }
+
+    // ✅ If player1 is present, set user as player2; otherwise, do nothing extra
+    const updatedBattle = await Battle.findByIdAndUpdate(
+      battleId,
+      {
+        player2: battle.player1 ? userId : null,
+        player2Name: battle.player1 ? name : null,
+        createdAt: new Date(),
+      },
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, message: "Joined battle successfully", battle: updatedBattle });
   } catch (error) {
     console.error("❌ Error joining battle:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -250,6 +259,12 @@ export const manageRequest = async (req: any, res: any) => {
       if (!battle) {
         return res.status(404).json({ message: "Battle not found" });
       }
+
+      // ✅ Restrict third player from joining
+    if (battle?.player1 && battle?.player2) {
+      console.log(`🚫 Battle ${battleId} already has two players.`);
+      return res.status(403).json({ success: false, message: "This battle is already full." });
+    }
 
       const opponentProfile = await Profile.findOne({ userId });
       if (!opponentProfile) {
