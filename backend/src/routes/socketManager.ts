@@ -102,7 +102,7 @@ socket.on("updateBattleStatus", async ({ battleId, status }, callback) => {
 
     const { player1, player2 } = battle;
 
-    if (status === "in-progress") {
+    if (battle.status === "in-progress") {
       console.info(`📌 Checking pending battles for ${player1} or ${player2}...`);
 
       // ✅ Find all pending battles involving player1 or player2
