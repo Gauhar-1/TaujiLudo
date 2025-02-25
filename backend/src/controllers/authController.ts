@@ -11,11 +11,12 @@ import crypto from 'crypto';
 
 dotenv.config();
 
-export const sendOtp = (async (req: Request, res: Response, next: NextFunction) => {
+export const sendOtp: RequestHandler = expressAsyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const phone = req.body.phoneNumber;
 
     if (!phone) {
-        return res.status(400).json({ success: false, message: 'Phone number is required.' });
+        res.status(400).json({ success: false, message: 'Phone number is required.'});
+        return;
     }
 
     try {
@@ -23,7 +24,8 @@ export const sendOtp = (async (req: Request, res: Response, next: NextFunction) 
         let user = await User.findOne({ phone });
 
         if (user?.status === "blocked") {
-            return res.status(403).json({ success: false, message: "Your account is blocked. Contact support." });
+            res.status(403).json({ success: false, message: "Your account is blocked. Contact support." });
+            return;
         }
 
         // ✅ Generate OTP
@@ -39,7 +41,7 @@ export const sendOtp = (async (req: Request, res: Response, next: NextFunction) 
             user.resendAvailableAt = resendAvailableAt;
             await user.save();
         } else {
-            user = await User.create({
+            await User.create({
                 phone,
                 otp,
                 status: "active",
@@ -60,8 +62,7 @@ export const sendOtp = (async (req: Request, res: Response, next: NextFunction) 
 
     } catch (error) {
         console.error('❌ Error sending OTP:', error);
-        res.status(500).json({ success: false, message: 'Error sending OTP' });
-        next(error);
+        next(error); // Pass the error to the global error handler
     }
 });
 
