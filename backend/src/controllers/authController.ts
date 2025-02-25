@@ -11,51 +11,60 @@ import crypto from 'crypto';
 
 dotenv.config();
 
-export const sendOtp : RequestHandler = expressAsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const  phone  = req.body.phoneNumber;
+export const sendOtp = (async (req: Request, res: Response, next: NextFunction) => {
+    const phone = req.body.phoneNumber;
 
-    if (!phone) 
-        return console.log('Phone number is required.' );
-
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    if (!phone) {
+        return res.status(400).json({ success: false, message: 'Phone number is required.' });
+    }
 
     try {
+        // ✅ Check if user exists
+        let user = await User.findOne({ phone });
 
-        const resendAvailableAt = new Date(Date.now() + 30 * 1000);
-
-        const user = await User.findOneAndUpdate(
-            { phone },
-            { otp, status: "active",  otpExpires: new Date(Date.now() + 10 * 60 * 1000), resendAvailableAt  },
-            { upsert: true, new: true }
-        );
-
-        if(!user){
-            await User.create(
-                { phone },
-                { otp,status: "active", otpExpires: new Date(Date.now() + 10 * 60 * 1000), resendAvailableAt },
-            { upsert: true, new: true },
-            );
+        if (user?.status === "blocked") {
+            return res.status(403).json({ success: false, message: "Your account is blocked. Contact support." });
         }
 
+        // ✅ Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+        const resendAvailableAt = new Date(Date.now() + 30 * 1000);
+
+        // ✅ If user exists, update; otherwise, create a new user
+        if (user) {
+            user.otp = otp;
+            user.status = "active";
+            user.otpExpires = otpExpires;
+            user.resendAvailableAt = resendAvailableAt;
+            await user.save();
+        } else {
+            user = await User.create({
+                phone,
+                otp,
+                status: "active",
+                otpExpires,
+                resendAvailableAt
+            });
+        }
+
+        // ✅ Send OTP via SMS API
         const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
-        const response = await axios.get(URL);
+        await axios.get(URL);
 
-
-        res.status(200).json({ 
+        res.status(200).json({
             success: true,
             message: 'OTP sent successfully',
-            resendAfter: resendAvailableAt 
-        },
-        );
+            resendAfter: resendAvailableAt
+        });
+
     } catch (error) {
-        console.error('Error sending OTP:', error);
+        console.error('❌ Error sending OTP:', error);
+        res.status(500).json({ success: false, message: 'Error sending OTP' });
         next(error);
-        res.status(500).json({ error: 'Error sending OTP' });
     }
 });
 
-// "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzgwYWJjZmE2ZjE4ZjUxMzg0MGUwODQiLCJwaG9uZU51bWJlciI6IjcwMDI5MjYyNTEiLCJuYW1lIjoiR29oYXIiLCJpYXQiOjE3MzkyOTAzMzAsImV4cCI6MTczOTg5NTEzMH0.IAfDxMQIJZ04c7WnEtFpP_ZSYhzC-6_gGjJ4lnxEJZw"
 
 
 export const verifyOtp  = (async (req: any, res: any, next: any) => {
