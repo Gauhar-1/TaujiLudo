@@ -15,17 +15,6 @@ socket.on("createBattle", async (battleData, callback) => {
       return callback({ status: 400, message: "Invalid battle data" });
     }
 
-    // ✅ Check user's profile & balance
-    const userProfile = await Profile.findOne({ userId });
-
-    if (!userProfile) {
-      return callback({ status: 404, message: "User profile not found" });
-    }
-
-    if (userProfile.amount < amount) {
-      return callback({ status: 400, message: "Insufficient balance" });
-    }
-
     // ✅ Check if the player has an "in-progress" battle
     const activeBattles = await Battle.find({
       $or: [{ player1: userId }, { player2: userId }],
@@ -55,6 +44,21 @@ socket.on("createBattle", async (battleData, callback) => {
       return callback({ status: 400, message: "You cannot create more than 2 battles" });
     }
 
+    // ✅ Check user's profile & balance
+    const userProfile = await Profile.findOne({ userId });
+
+    if (!userProfile) {
+      return callback({ status: 404, message: "User profile not found" });
+    }
+
+    if (userProfile.amount < amount) {
+      return callback({ status: 400, message: "Insufficient balance" });
+    }
+
+    userProfile.amount -= amount;
+    await userProfile.save();
+
+
     // ✅ Create a new battle
     const battle = new Battle({
       player1: userId,
@@ -75,9 +79,6 @@ socket.on("createBattle", async (battleData, callback) => {
       },
       { new: true, upsert: true }
     );
-
-    userProfile.amount -= amount;
-    await userProfile.save();
 
     console.log("✅ Battle created:", battle._id);
     io.emit("battleCreated", battle);
