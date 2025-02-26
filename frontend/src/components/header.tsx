@@ -13,34 +13,39 @@ export const Header = ()=>{
 
   const location = useLocation();
   
-  
-  useEffect(() => {
-
-    if(login === false){
-      return;
-    }
-
-    const checkAuth = async () => {
-      try {
-  
-        const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
-  
-        if (response.data.success) {
-          const userData = response.data.user;
-          setUserId(userData.userId);
-          setName(userData.name);
-          setPhone(userData.phoneNumber);
-          setPhoneNumber(userData.phoneNumber);
-          setLogin(true);
-  
+    useEffect(() => {
+      const checkAuth = async () => {
+        // Check if cookies are present before making the request
+        if (!document.cookie.includes("token")) {
+          console.log("No auth cookie found, skipping auth check.");
+          return;
         }
-      } catch (err) {
-        console.log("User not logged in");
-      }
-    };
-  
-    checkAuth();
-  }, [ location.pathname]); // ✅ Dependency added
+    
+        try {
+          const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+    
+          if (response.data.success) {
+            const userData = response.data.user;
+            setUserId(userData.userId);
+            setName(userData.name);
+            setPhone(userData.phoneNumber);
+            setPhoneNumber(userData.phoneNumber);
+            setLogin(true);
+          }
+        } catch (err : any) {
+          console.error("User not logged in", err.response?.status);
+    
+          // Handle session expiration (403) or unauthorized access (401)
+          if (err.response?.status === 403 || err.response?.status === 401) {
+            setLogin(false);
+            navigate("/"); // Redirect to login page
+          }
+        }
+      };
+    
+      checkAuth();
+    }, [location.pathname, navigate]); // ✅ Runs only when necessary
+    
   
 
   
