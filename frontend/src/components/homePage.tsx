@@ -289,6 +289,11 @@ export const HomePage = () => {
                                 <RunningBattle key={battle._id} battle={battle} />
                             ))}
                         </div>
+                        <div className="flex flex-col gap-3">
+                            {onGoingB && onGoingB.map((battle: any) => (
+                                <RunningBattle key={battle._id} battle={battle} />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

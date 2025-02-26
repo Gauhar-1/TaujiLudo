@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {  useNavigate } from "react-router-dom"
+import {  useLocation, useNavigate } from "react-router-dom"
 import { SideBar } from "./sideBar";
 import { useUserContext } from "../hooks/UserContext";
 import axios from "axios";
@@ -9,44 +9,44 @@ export const Header = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
   const [ earnings , setEarnings] = useState(false);
   const navigate = useNavigate();
-  const { login,  phone, amount, setAmount } = useUserContext();
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(false);
+  const { login,  phone, amount, setAmount, setUserId, setName, setPhone, setPhoneNumber, setLogin } = useUserContext();
 
-  // const location = useLocation();
+  const location = useLocation();
   
-    // useEffect(() => {
-    //   const checkAuth = async () => {
-    //     // Check if cookies are present before making the request
-    //     if (!document.cookie.includes("token")) {
-    //       console.log("No auth cookie found, skipping auth check.");
-    //       return;
-    //     }
+    useEffect(() => {
+      const checkAuth = async () => {
+        // Check if cookies are present before making the request
+        if (!document.cookie.includes("token")) {
+          console.log("No auth cookie found, skipping auth check.");
+          return;
+        }
     
-    //     try {
-    //       const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+        try {
+          const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
     
-    //       if (response.data.success) {
-    //         const userData = response.data.user;
-    //         setUserId(userData.userId);
-    //         setName(userData.name);
-    //         setPhone(userData.phoneNumber);
-    //         setPhoneNumber(userData.phoneNumber);
-    //         setLogin(true);
-    //       }
-    //     } catch (err : any) {
-    //       console.error("User not logged in", err.response?.status);
-    //     setError(true); // Set error state
+          if (response.data.success) {
+            const userData = response.data.user;
+            setUserId(userData.userId);
+            setName(userData.name);
+            setPhone(userData.phoneNumber);
+            setPhoneNumber(userData.phoneNumber);
+            setLogin(true);
+          }
+        } catch (err : any) {
+          console.error("User not logged in", err.response?.status);
+      }
 
-    //     // Handle session expiration (403) or unauthorized access (401)
-    //     if (err.response?.status === 403 || err.response?.status === 401) {
-    //       setLoading(true); // Redirect to login page
-    //     }
-    //   }
-    // };
+      
+      checkAuth();
+
+    // Polling every 5 seconds
+    const interval = setInterval(checkAuth, 5000);
+
+    // Cleanup on component unmount
+    return () => clearInterval(interval);
+    };
     
-    //   checkAuth();
-    // }, [location.pathname, navigate]); // ✅ Runs only when necessary
+    }, [location.pathname, navigate]); // ✅ Runs only when necessary
     
   
       useEffect(()=>{
