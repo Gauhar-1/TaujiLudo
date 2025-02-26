@@ -10,7 +10,7 @@ export const Header = ()=>{
   const [ earnings , setEarnings] = useState(false);
   const navigate = useNavigate();
   const { login,  phone, amount, setAmount, setUserId, setName, setPhone, setPhoneNumber, setLogin } = useUserContext();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   const location = useLocation();
@@ -40,11 +40,8 @@ export const Header = ()=>{
 
         // Handle session expiration (403) or unauthorized access (401)
         if (err.response?.status === 403 || err.response?.status === 401) {
-          setLogin(false);
-          navigate("/"); // Redirect to login page
+          setLoading(true); // Redirect to login page
         }
-      } finally {
-        setLoading(false); // Stop loading regardless of success or failure
       }
     };
     
@@ -53,7 +50,7 @@ export const Header = ()=>{
     
    // ✅ Show a loading screen while authentication is in progress
    if (loading) {
-    return <div className="h-screen flex justify-center items-center text-xl font-semibold">Loading...</div>;
+    return <div className="h-screen flex justify-center text-white items-center text-xl font-semibold">Loading...</div>;
   }
 
   // ✅ Show an error screen if authentication fails
