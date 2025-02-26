@@ -89,7 +89,7 @@ export const Header = ()=>{
             navigate('/winCash');
            }}/>
        </div>
-       <div className="m-3 flex gap-2">
+       <div className="ml-3 my-3 mr-5 flex gap-2">
          <div className="bg-green-900 flex flex-row  rounded-md h-8 w-20">
          <img src="../../money.png" alt=""  className="h-5 m-1"/>
          <div className="text-xs text-white">cash  {amount}</div>
