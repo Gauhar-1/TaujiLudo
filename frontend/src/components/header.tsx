@@ -35,7 +35,7 @@ export const Header = ()=>{
     };
   
     checkAuth();
-  }, [ location.pathname, login ]); // ✅ Dependency added
+  }, [ location.pathname]); // ✅ Dependency added
   
 
   
