@@ -15,6 +15,11 @@ export const Header = ()=>{
   
   
   useEffect(() => {
+
+    if(login === false){
+      return;
+    }
+
     const checkAuth = async () => {
       try {
   
