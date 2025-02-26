@@ -45,7 +45,7 @@ export const LoginPage = () => {
             }
           }
         } catch (error) {
-          window.location.href = "/login";
+          window.location.href = "/";
           setLogin(false);
         }
       };
