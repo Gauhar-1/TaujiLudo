@@ -29,9 +29,8 @@ export const Header = ()=>{
           setLogin(true);
   
         }
-      }  catch (error) {
-        window.location.href = "/login";
-        setLogin(false);
+      } catch (err) {
+        console.log("User not logged in");
       }
     };
   
