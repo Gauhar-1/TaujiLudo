@@ -7,23 +7,24 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
     } 
     const { userId } = useUserContext();
     return (
-        <div className="mx-6 mb-2  bg-red-300 p-4 rounded-md border border-black shadow-md flex flex-col">
+        <div className="mx-6 mb-2  bg-white  rounded-md border border-gray-300 shadow-md flex flex-col">
+          <div className={`bg-blue-500 px-3 py-1 text-white font-bold rounded-t-md ${notification.type === "notification" ? "bg-blue-500" : notification.type === "profile" ? "bg-green-500" : "bg-yellow-500" }`}>{notification.type === "notification" ? "Transaction" : notification.type}</div>
              {/* Display different content based on type */}
       {notification.type === "notification" ? (
-        <div className="w-full overflow-auto break-words">
+        <div className="w-full overflow-auto break-words p-1">
           {notification.reason}
         </div>
       ) : notification.type === "profile"  ? (
-        <div className="w-full overflow-auto break-words">
+        <div className="w-full overflow-auto break-words p-1">
           {notification.kycDetails.reason}
         </div>
-      ) :  <div className="w-full overflow-auto break-words">
+      ) :  <div className="w-full overflow-auto break-words p-1">
       {notification.dispute?.proofs?.[1]?.player === userId 
-  ? notification.dispute?.proofs?.[1]?.reason 
-  : notification.dispute?.proofs?.[0]?.reason }
+  ? notification.dispute?.proofs?.[1]?.adminReason 
+  : notification.dispute?.proofs?.[0]?.adminReason }
 
     </div>}
-            <div className="flex justify-end text-gray-500">
+            <div className="flex justify-end text-gray-500 p-1" >
            { notification.type === "profile"  ? <div>
             {formatDistanceToNowStrict(new Date(notification.kycDetails.createdAt), { addSuffix: true })}
     </div> : notification.type === "notification"  ? <div>

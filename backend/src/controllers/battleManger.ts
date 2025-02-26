@@ -375,7 +375,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
         if (!battle.dispute) {
             battle.dispute = {
                 players: [phoneNumber],
-                proofs: [{ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" }],
+                proofs: [{ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", adminReason: "",clicked: "Won" }],
                 resolved: false,
                 winner: null,
                 timestamp: new Date(),
@@ -387,7 +387,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
             }
 
             battle.dispute.players = [...new Set([...battle.dispute.players, phoneNumber])]; // Prevent duplicates
-            battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", clicked: "Won" });
+            battle.dispute.proofs.push({ player: playerId, filename: req.file.filename, path: req.file.path, reason: "", adminReason: "", clicked: "Won" });
         }
 
         await battle.save({ session });
@@ -462,7 +462,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
         if (!battle.dispute) {
             battle.dispute = {
                 players: [userId],
-                proofs: [{ player: userId, filename: "", path: "", reason: "", clicked: "Lost" }],
+                proofs: [{ player: userId, filename: "", path: "", reason: "", adminReason: "", clicked: "Lost" }],
                 resolved: false,
                 winner: null,
                 timestamp: new Date(),
@@ -473,7 +473,7 @@ export const uploadScreenShot = async (req: any, res: any, next: any) => {
             if (alreadyLost) return res.status(400).json({ error: "You have already marked yourself as lost" });
 
             battle.dispute.players = [...new Set([...battle.dispute.players, userId])]; // Ensure uniqueness
-            battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason: "", clicked: "Lost" });
+            battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason: "", adminReason: "", clicked: "Lost" });
         }
 
         await battle.save();
@@ -544,7 +544,7 @@ export const canceledBattle = async (req: any, res: any, next: any) => {
     if (!battle.dispute) {
       battle.dispute = {
         players: [phoneNumber],
-        proofs: [{ player: userId, filename: "", path: "", reason, clicked: "Canceled" }],
+        proofs: [{ player: userId, filename: "", path: "", reason, adminReason: "", clicked: "Canceled" }],
         resolved: false,
         winner: null,
         timestamp: new Date(),
@@ -554,7 +554,7 @@ export const canceledBattle = async (req: any, res: any, next: any) => {
       if (alreadyCanceled) return res.status(400).json({ error: "You have already canceled the battle" });
 
       battle.dispute.players.push(phoneNumber);
-      battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, clicked: "Canceled" });
+      battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason, adminReason: "", clicked: "Canceled" });
     }
     await battle.save();
 
@@ -751,7 +751,7 @@ export const determineWinner = async (req: any, res: any) => {
   
         if(battle.dispute){
             battle.dispute.proofs[0].player === userId ?
-            battle.dispute.proofs[0].reason = reason : battle.dispute.proofs[1].reason = reason;
+            battle.dispute.proofs[0].adminReason = reason : battle.dispute.proofs[1].adminReason = reason;
             battle.dispute.timestamp = new Date();
         }
         await battle.save();

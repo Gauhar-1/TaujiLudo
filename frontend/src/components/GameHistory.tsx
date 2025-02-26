@@ -42,7 +42,17 @@ export const GameHistory =()=>{
         }
 
         handleBattleHistory();
-    })
+    });
+
+    const decideWinner = (battle : any)=>{
+        if(battle.status === "canceled"){
+            return "N/A";
+        }
+
+        return battle.dispute.winner === battle.player1 ? battle.player1Name : battle.player2Name;
+
+
+    }
 
     return <div className="bg-white min-h-screen max-w-sm pt-12">
         {
@@ -63,13 +73,13 @@ export const GameHistory =()=>{
     <div className="flex  gap-2">
         <div className="font-mono text-sm text-purple-500">Status: </div>
         <div className="flex gap-2">
-     <div className="font-bold text-xs">{battle.status}</div>
+     <div className="font-bold text-xs" >{battle.status}</div>
         </div>
     </div>
     <div className="flex  gap-1">
         <div className="font-mono text-sm text-purple-500">Winner:</div>
         <div className="flex gap-2">
-     <div className="font-bold text-xs">{battle.dispute.winner === battle.player1 ? battle.player1Name : battle.player2Name}</div>
+     <div className="font-bold text-xs">{decideWinner(battle) }</div>
         </div>
     </div>
    </div>
