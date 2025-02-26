@@ -4,12 +4,12 @@ export const WinCashPage = ()=>{
     const navigate = useNavigate();
     return (
         <div className="min-h-screen bg-gray-200 max-w-sm">
-            <div className="pt-20 pb-16 flex flex-col gap-4">
+            <div className="py-16 flex flex-col ">
                 <div className="bg-red-600 text-white  p-6 m-4 rounded-lg text-xs font-bold">Taujiludo पर आपका स्वागत है  विड्रॉल केवल 5 से 10 मिनट मैं Support 27*7
                   <br />
 Commission = 5% &nbsp;&nbsp;&nbsp;
 Refer = 2%</div>
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
                     <div className="flex">
                         <div className="pr-2 pl-4 flex flex-col gap-1">
                             <div> ◉ LIVE</div>

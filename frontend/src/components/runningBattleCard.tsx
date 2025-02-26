@@ -48,7 +48,7 @@ export const RunningBattle = ({ battle }: RunningBattleProps)=>{
 </div>
 <div className="flex gap-2">
 <img src="../../cash.png" alt="" className="size-5"/>
-<div className="font-bold text-xs">{battle.prize}</div>
+<div className="font-bold text-xs">{(battle.amount*2 - battle.amount * 0.05)}</div>
 </div>
 </div>
             </div>

@@ -221,6 +221,58 @@ export const HomePage = () => {
       socket.off("battleUpdated");
     };
   }, []);
+
+  const fakeBattle = [
+    {
+      "_id" : "1",
+      "player1Name": "No popular game",
+      "player2Name": "Pushpa",
+      "amount": 100
+    },
+    {
+      "_id" : "2",
+      "player1Name": "राधे राधे 100",
+      "player2Name": "Banna ji",
+      "amount": 500
+    },
+    {
+      "_id" : "3",
+      "player1Name": "Gurjar ❤❤",
+      "player2Name": "Meena ji ",
+      "amount": 250
+    },
+    {
+      "_id" : "4",
+      "player1Name": "मीणा जी",
+      "player2Name": "Jaat",
+      "amount": 450
+    },
+  
+    {
+      "_id" : "6",
+      "player1Name": "Aslam mewati",
+      "player2Name": "Sher Singh",
+      "amount": 1500
+    },
+    {
+      "_id" : "7",
+      "player1Name": "Jai bhole ki",
+      "player2Name": "Official मेवाती",
+      "amount": 1650
+    },
+    {
+      "_id" : "8",
+      "player1Name": "Balam Chota",
+      "player2Name": "Rahul",
+      "amount": 150
+    },
+    {
+      "_id" : "9",
+      "player1Name": "Mia bhabi",
+      "player2Name": "Aaja ",
+      "amount": 3350
+    },
+  ]
   
 
     return (
@@ -290,7 +342,7 @@ export const HomePage = () => {
                             ))}
                         </div>
                         <div className="flex flex-col gap-3">
-                            {onGoingB && onGoingB.map((battle: any) => (
+                            {fakeBattle && fakeBattle.map((battle: any) => (
                                 <RunningBattle key={battle._id} battle={battle} />
                             ))}
                         </div>
