@@ -10,6 +10,8 @@ export const Header = ()=>{
   const [ earnings , setEarnings] = useState(false);
   const navigate = useNavigate();
   const { login,  phone, amount, setAmount, setUserId, setName, setPhone, setPhoneNumber, setLogin } = useUserContext();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const location = useLocation();
   
@@ -34,19 +36,30 @@ export const Header = ()=>{
           }
         } catch (err : any) {
           console.error("User not logged in", err.response?.status);
-    
-          // Handle session expiration (403) or unauthorized access (401)
-          if (err.response?.status === 403 || err.response?.status === 401) {
-            setLogin(false);
-            navigate("/"); // Redirect to login page
-          }
+        setError(true); // Set error state
+
+        // Handle session expiration (403) or unauthorized access (401)
+        if (err.response?.status === 403 || err.response?.status === 401) {
+          setLogin(false);
+          navigate("/"); // Redirect to login page
         }
-      };
+      } finally {
+        setLoading(false); // Stop loading regardless of success or failure
+      }
+    };
     
       checkAuth();
     }, [location.pathname, navigate]); // ✅ Runs only when necessary
     
-  
+   // ✅ Show a loading screen while authentication is in progress
+   if (loading) {
+    return <div className="h-screen flex justify-center items-center text-xl font-semibold">Loading...</div>;
+  }
+
+  // ✅ Show an error screen if authentication fails
+  if (error) {
+    return <div className="h-screen flex justify-center items-center text-red-500 text-xl">Authentication Failed</div>;
+  }
 
   
       useEffect(()=>{
