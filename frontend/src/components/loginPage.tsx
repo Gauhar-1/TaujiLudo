@@ -13,7 +13,7 @@ export const LoginPage = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
-  const { setUserId , phone, setPhone, setName, setLogin, setPhoneNumber } = useUserContext();
+  const { setUserId , phone, setPhone, setName, setLogin, login , setPhoneNumber } = useUserContext();
 
   // Validate phone number (basic validation)
   const isPhoneNumberValid = (phone: string) => /^(\+91)?[6-9]\d{9}$/.test(phone);
@@ -27,6 +27,9 @@ export const LoginPage = () => {
   
     useEffect(() => {
       const checkAuth = async () => {
+        if(login === false){
+          return;
+        }
         try {
     
           const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
@@ -45,7 +48,7 @@ export const LoginPage = () => {
             }
           }
         } catch (error) {
-          window.location.href = "/";
+          navigate('/');
           setLogin(false);
         }
       };
