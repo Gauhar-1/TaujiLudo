@@ -33,6 +33,20 @@ app.use(
   })
 );
 
+// ✅ Restrict Access to `/admin/*` Routes
+app.use("/admin", (req : any, res : any, next : any) => {
+  const allowedOrigin = "https://taujiludo.in";
+
+  if (
+    req.headers.origin !== allowedOrigin &&
+    !(req.headers.referer?.startsWith(allowedOrigin))
+  ) {
+    return res.status(403).json({ error: "Forbidden: Access Denied" });
+  }
+
+  next();
+});
+
 // ✅ Setup WebSocket Server
 const io = new Server(server, {
   cors: {
@@ -58,7 +72,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// ✅ Handle Missing Routes
+// ✅ Handle Missing Routes (Move Below `/admin` Middleware)
 app.use("*", (req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
