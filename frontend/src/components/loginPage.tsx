@@ -51,7 +51,7 @@ export const LoginPage = () => {
       };
     
       checkAuth();
-    }, [ location.pathname, login ]); // ✅ Dependency added
+    }, [ location.pathname]); // ✅ Dependency added
     
 
   useEffect(() => {
