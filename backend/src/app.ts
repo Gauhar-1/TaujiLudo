@@ -17,7 +17,7 @@ try {
     key: fs.readFileSync("/etc/letsencrypt/live/api.taujiludo.in/privkey.pem"),
     cert: fs.readFileSync("/etc/letsencrypt/live/api.taujiludo.in/fullchain.pem"),
   };
-} catch (error : any) {
+} catch (error: any) {
   console.error("🚨 SSL Certificate Error:", error.message);
   process.exit(1); // Stop the server if SSL is missing
 }
@@ -33,59 +33,49 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ✅ CORS Configuration
+// ✅ CORS Configuration (Ensure Same for Express & Socket.io)
 const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in", "https://api.taujiludo.in"];
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.error("Blocked WebSocket connection due to CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("Blocked CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST"],
+};
+app.use(cors(corsOptions)); // ✅ Apply before all routes
 
-app.use("/admin", ( req : any , res : any , next: any) => {
+// ✅ Restrict /admin access to taujiludo.in only
+app.use("/admin", (req : any, res: any, next: any) => {
   const allowedOrigin = "https://taujiludo.in";
   const origin = req.headers.origin || "";
   const referer = req.headers.referer || "";
 
-  // ✅ Allow access if the request is from the allowed origin
-  if (origin === allowedOrigin) {
+  if (origin === allowedOrigin || (referer && referer.startsWith(allowedOrigin))) {
     return next();
   }
 
-  // ✅ If referer exists, check if it starts with the allowed origin
-  if (referer && referer.startsWith(allowedOrigin)) {
-    return next();
-  }
-
-  // ❌ Block all other requests
   return res.status(403).json({ error: "Forbidden: Access Denied" });
 });
 
-
+// ✅ Initialize WebSocket Server (Fix CORS Issue)
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-  allowEIO3: true, // ✅ Fixes some WebSocket transport issues
-  path: "/socket.io/", // ✅ Ensures path consistency with frontend
+  cors: corsOptions, // ✅ Match with Express CORS
+  path: "/socket.io/",
 });
 
-
+// ✅ Register API Routes
 app.use('/api/auth', router);
 
+// ✅ WebSocket Connection Handling
 io.on("connection", (socket) => {
   console.log("✅ A user connected:", socket.id);
   socketManager(socket);
-  
+
   socket.on("disconnect", () => {
     console.log("❌ A user disconnected:", socket.id);
   });
@@ -95,13 +85,13 @@ io.on("error", (error) => {
   console.error("🚨 WebSocket Error:", error.message);
 });
 
-// ✅ Handle Missing Routes (Move Below `/admin` Middleware)
+// ✅ Handle 404 Routes
 app.use("*", (req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
 
-// ✅ Improved Error Handling (Fix: Handle WebSocket Errors)
-app.use((err : any, req : any , res : any , next: any) => {
+// ✅ Global Error Handling Middleware
+app.use((err: any, req: any, res: any, next: any) => {
   console.error("🚨 Error:", err.message);
 
   if (err.name === "UnauthorizedError") {
@@ -115,6 +105,6 @@ app.use((err : any, req : any , res : any , next: any) => {
   res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
-
+// ✅ Export Modules
 export { io, server };
 export default app;
