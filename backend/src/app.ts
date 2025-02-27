@@ -63,10 +63,12 @@ app.use("/admin", (req : any, res: any, next: any) => {
 });
 
 
-const io = require("socket.io")(server, {
+const io = new Server(server, {
   cors: {
-    origin: "https://taujiludo.in",
-  }
+    origin: "*", // Allow frontend connection
+    methods: ["GET", "POST"],
+  },
+  path: "/socket.io/", // Ensure the path matches the frontend
 });
 
 
