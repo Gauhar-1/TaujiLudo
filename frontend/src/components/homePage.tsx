@@ -12,7 +12,6 @@ import { toast } from "react-toastify";
 
 export const socket = io("https://api.taujiludo.in", {
   path: "/socket.io/",
-  transports: ["websocket", "polling"],
 });
 
 
