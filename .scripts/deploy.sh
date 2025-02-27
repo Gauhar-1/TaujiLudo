@@ -51,4 +51,4 @@ else
 fi
 
 
-echo "Deployment Finished!"
+echo "Deployment Finished"
