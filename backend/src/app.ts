@@ -71,7 +71,7 @@ app.use("/admin", ( req : any , res : any , next: any) => {
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://taujiludo.in", "http://localhost:5173", "https://api.taujiludo.in"],
+    origin: "*",
     credentials: true,
     methods: ["GET", "POST"],
   },
