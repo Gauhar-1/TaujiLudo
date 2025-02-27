@@ -62,26 +62,7 @@ app.use("/admin", (req : any, res: any, next: any) => {
   return res.status(403).json({ error: "Forbidden: Access Denied!" });
 });
 
-<<<<<<< HEAD
 
-// ✅ Setup WebSocket Server (Fix: Allow `null` origin)
-const io = new Server(server, {
-  cors: {
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.error("Blocked WebSocket connection due to CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    47746e233ff5c9f837e77bdd2498c3edc33f2ff0
-    credentials: true,
-    methods: ["GET", "POST"],
-  },
-});
-
-=======
 // ✅ Initialize WebSocket Server (Fix CORS Issue)
 const io = new Server(server, {
   cors: corsOptions, // ✅ Match with Express CORS
@@ -89,7 +70,6 @@ const io = new Server(server, {
 });
 
 // ✅ Register API Routes
->>>>>>> b242900f1ca52316a5dd33a04120dbbc0cdc9846
 app.use('/api/auth', router);
 
 // ✅ WebSocket Connection Handling
