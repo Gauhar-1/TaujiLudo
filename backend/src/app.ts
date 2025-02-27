@@ -72,6 +72,7 @@ app.use("/admin", ( req : any , res : any , next: any) => {
 // ✅ Setup WebSocket Server (Fix: Allow `null` origin)
 const io = new Server(server, {
   cors: {
+<<<<<<< HEAD
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -80,6 +81,9 @@ const io = new Server(server, {
         callback(new Error("Not allowed by CORS"));
       }
     },
+=======
+    origin: "*",
+>>>>>>> 47746e233ff5c9f837e77bdd2498c3edc33f2ff0
     credentials: true,
     methods: ["GET", "POST"],
   },
