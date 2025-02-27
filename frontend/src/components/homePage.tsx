@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 
 
-export const socket = io("https://api.taujiludo.in",{
+export const socket = io("wss://api.taujiludo.in",{
   path: '/socket.io/',
 
 });
