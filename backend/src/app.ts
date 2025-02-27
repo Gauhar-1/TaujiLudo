@@ -115,11 +115,6 @@ app.use((err : any, req : any , res : any , next: any) => {
   res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
 });
 
-// ✅ Start Server (Fix: Ensure `server.listen` is used)
-const PORT = process.env.PORT || 443;
-server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
 
 export { io, server };
 export default app;
