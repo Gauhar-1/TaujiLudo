@@ -65,8 +65,7 @@ app.use("/admin", (req : any, res: any, next: any) => {
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://api.taujiludo.in",
-    methods: ["GET", "POST"]
+    origin: "https://taujiludo.in",
   }
 });
 
