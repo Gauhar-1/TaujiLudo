@@ -1,14 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/db';
-import http from "http";
+import https from "https";
 import { Server } from "socket.io";
 import { router } from './routes/auth';
 import socketManager from './routes/socketManager';
 import cookieParser from "cookie-parser";
 
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(app);
 
 // ✅ Connect to Database
 connectDB();
