@@ -27,46 +27,39 @@ export const LoginPage = () => {
   
     useEffect(() => {
       const checkAuth = async () => {
-        if(login === false){
-          return;
-        }
-
-        if (!document.cookie.includes("token")) {
+        if (!login || !document.cookie.includes("token")) {
           console.log("No auth cookie found, skipping auth check.");
+          setLogin(false);
           return;
         }
-
+  
         try {
-    
           const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
-    
+  
           if (response.data.success) {
             const userData = response.data.user;
             setUserId(userData.userId);
             setName(userData.name);
-            setPhone(userData.phoneNumber);
             setPhoneNumber(userData.phoneNumber);
+            setPhone(userData.phoneNumber);
             setLogin(true);
-    
-            // Navigate only if coming from login page
+            // Navigate only if coming from the login page
             if (location.pathname === "/") {
               navigate("/winCash");
             }
           }
         } catch (error) {
-          navigate('/');
+          console.error("Authentication failed:", error);
           setLogin(false);
+          navigate('/');
         }
       };
-    
-      checkAuth();
-
-      // Polling every 5 seconds
-      const interval = setInterval(checkAuth, 1000);
   
-      // Cleanup on component unmount
-      return () => clearInterval(interval);
-    }, [ location.pathname]); // ✅ Dependency added
+      checkAuth();
+  
+      // Cleanup function to avoid unnecessary re-renders
+      return () => {};
+    }, [location.pathname]); // ✅ Dependency added
     
 
   useEffect(() => {
