@@ -8,7 +8,7 @@ echo "Cleaning untracked files..."
 git clean -fdX || { echo "Error cleaning untracked files"; exit 1; }
 
 # Stash local changes if there are any
-echo "Stashing local changes..."
+echo "Stashing local changes"
 git stash -u || echo "No local changes to stash"
 
 # Pull the latest version of the app
