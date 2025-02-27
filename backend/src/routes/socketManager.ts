@@ -12,7 +12,7 @@ socket.on("createBattle", async (battleData, callback) => {
     const { userId, amount, ludoCode, name } = battleData;
 
     if (!userId || !amount || !name) {
-      return callback({ status: 400, message: "Invalid battle data" });
+      return callback({ status: 400, message: "Invalid battle data||" });
     }
 
     // ✅ Check if the player has an "in-progress" battle
