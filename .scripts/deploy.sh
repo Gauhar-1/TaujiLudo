@@ -40,13 +40,15 @@ echo "Building TypeScript files..."
 tsc -b || { echo "Error building backend TypeScript files"; exit 1; }
 
 echo "PM2 Restarting Backend..."
-pm2 restart 0 || { echo "Error restarting PM2"; exit 1; }
+pm2 reload 0 || { echo "Error restarting PM2"; exit 1; }
 
-# Reapply any stashed changes if they exist
-if git stash list | grep -q "stash@{0}"; then
-  git stash pop
+# Stash local changes only if they exist
+if [[ -n $(git status --porcelain) ]]; then
+  echo "Stashing local changes..."
+  git stash -u || echo "No local changes to stash"
 else
-  echo "No stashed changes to apply"
+  echo "No local changes to stash"
 fi
+
 
 echo "Deployment Finished!"
