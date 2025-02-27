@@ -59,7 +59,7 @@ app.use("/admin", (req : any, res: any, next: any) => {
     return next();
   }
 
-  return res.status(403).json({ error: "Forbidden: Access Denied" });
+  return res.status(403).json({ error: "Forbidden: Access Denied!" });
 });
 
 // ✅ Initialize WebSocket Server (Fix CORS Issue)
