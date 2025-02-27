@@ -35,53 +35,41 @@ exports.server = server;
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
-// ✅ CORS Configuration
+// ✅ CORS Configuration (Ensure Same for Express & Socket.io)
 const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in", "https://api.taujiludo.in"];
-app.use((0, cors_1.default)({
+const corsOptions = {
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         }
         else {
-            console.error("Blocked WebSocket connection due to CORS:", origin);
+            console.error("Blocked CORS:", origin);
             callback(new Error("Not allowed by CORS"));
         }
     },
     credentials: true,
-}));
+    methods: ["GET", "POST"],
+};
+app.use((0, cors_1.default)(corsOptions)); // ✅ Apply before all routes
+// ✅ Restrict /admin access to taujiludo.in only
 app.use("/admin", (req, res, next) => {
     const allowedOrigin = "https://taujiludo.in";
     const origin = req.headers.origin || "";
     const referer = req.headers.referer || "";
-    // ✅ Allow access if the request is from the allowed origin
-    if (origin === allowedOrigin) {
+    if (origin === allowedOrigin || (referer && referer.startsWith(allowedOrigin))) {
         return next();
     }
-    // ✅ If referer exists, check if it starts with the allowed origin
-    if (referer && referer.startsWith(allowedOrigin)) {
-        return next();
-    }
-    // ❌ Block all other requests
-    return res.status(403).json({ error: "Forbidden: Access Denied" });
+    return res.status(403).json({ error: "Forbidden: Access Denied!" });
 });
-// ✅ Setup WebSocket Server (Fix: Allow `null` origin)
+// ✅ Initialize WebSocket Server (Fix CORS Issue)
 const io = new socket_io_1.Server(server, {
-    cors: {
-        origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            }
-            else {
-                console.error("Blocked WebSocket connection due to CORS:", origin);
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
-        credentials: true,
-        methods: ["GET", "POST"],
-    },
+    cors: corsOptions, // ✅ Match with Express CORS
+    path: "/socket.io/",
 });
 exports.io = io;
+// ✅ Register API Routes
 app.use('/api/auth', auth_1.router);
+// ✅ WebSocket Connection Handling
 io.on("connection", (socket) => {
     console.log("✅ A user connected:", socket.id);
     (0, socketManager_1.default)(socket);
@@ -92,11 +80,11 @@ io.on("connection", (socket) => {
 io.on("error", (error) => {
     console.error("🚨 WebSocket Error:", error.message);
 });
-// ✅ Handle Missing Routes (Move Below `/admin` Middleware)
+// ✅ Handle 404 Routes
 app.use("*", (req, res) => {
     res.status(404).json({ error: "API route not found" });
 });
-// ✅ Improved Error Handling (Fix: Handle WebSocket Errors)
+// ✅ Global Error Handling Middleware
 app.use((err, req, res, next) => {
     console.error("🚨 Error:", err.message);
     if (err.name === "UnauthorizedError") {
@@ -106,10 +94,5 @@ app.use((err, req, res, next) => {
         return res.status(403).json({ error: "CORS policy blocked this request" });
     }
     res.status(err.status || 500).json({ error: err.message || "Internal Server Error" });
-});
-// ✅ Start Server (Fix: Ensure `server.listen` is used)
-const PORT = process.env.PORT || 443;
-server.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
 });
 exports.default = app;
