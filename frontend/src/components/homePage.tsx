@@ -10,10 +10,11 @@ import { toast } from "react-toastify";
 
 
 
-export const socket = io("wss://api.taujiludo.in",{
-  path: '/socket.io/',
-
+export const socket = io("https://api.taujiludo.in", {
+  path: "/socket.io/",
+  transports: ["websocket"],
 });
+
 
 export const HomePage = () => {
     const navigate = useNavigate();

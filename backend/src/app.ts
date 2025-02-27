@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import connectDB from './config/db';
 import https from "https";
-import { Server } from "socket.io";
+import { DefaultEventsMap, Server, Socket } from "socket.io";
 import { router } from './routes/auth';
 import socketManager from './routes/socketManager';
 import cookieParser from "cookie-parser";
@@ -63,17 +63,19 @@ app.use("/admin", (req : any, res: any, next: any) => {
 });
 
 
-// ✅ Initialize WebSocket Server (Fix CORS Issue)
-const io = new Server(server, {
-  cors: corsOptions, // ✅ Match with Express CORS
-  path: "/socket.io/",
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "https://api.taujiludo.in",
+    methods: ["GET", "POST"]
+  }
 });
+
 
 // ✅ Register API Routes
 app.use('/api/auth', router);
 
 // ✅ WebSocket Connection Handling
-io.on("connection", (socket) => {
+io.on("connection", (socket:  any) => {
   console.log("✅ A user connected:", socket.id);
   socketManager(socket);
 
@@ -82,7 +84,7 @@ io.on("connection", (socket) => {
   });
 });
 
-io.on("error", (error) => {
+io.on("error", (error: any) => {
   console.error("🚨 WebSocket Error:", error.message);
 });
 
