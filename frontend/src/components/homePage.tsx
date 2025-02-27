@@ -10,9 +10,11 @@ import { toast } from "react-toastify";
 
 
 
-export const socket = io("https://taujiludo.in", {
+export const socket = io("https://api.taujiludo.in", {
   path: "/socket.io/",
+  transports: ["websocket", "polling"],
 });
+
 
 
 export const HomePage = () => {
