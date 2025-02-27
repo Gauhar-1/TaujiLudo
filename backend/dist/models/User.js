@@ -11,6 +11,7 @@ const userSchema = new mongoose_1.default.Schema({
         enum: ["active", "blocked"], // Define allowed string values
         required: true, },
     otpExpires: { type: Date, required: false },
+    resendAvailableAt: { type: Date, required: true },
 });
 const User = mongoose_1.default.model('User', userSchema);
 exports.default = User;

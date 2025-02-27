@@ -18,10 +18,12 @@ const Trans_notification_1 = require("../models/Trans-notification");
 const crypto_1 = __importDefault(require("crypto"));
 const notifyController_1 = require("./notifyController");
 const mongoose_1 = __importDefault(require("mongoose"));
+const Profile_1 = __importDefault(require("../models/Profile"));
 const depositAmount = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, image, wallet, amount, paymentMethod, upiId } = req.body;
+    var _a, _b;
+    const { userId, image, wallet, amount, paymentMethod, upiId, phoneNumber } = req.body;
     // Validate file upload
-    if (!req.file) {
+    if (!req.file && upiId !== "admin") {
         console.log("File not found", req.file);
         return res.status(400).json({ success: false, message: 'File not found. Please upload a valid file.' });
     }
@@ -39,6 +41,7 @@ const depositAmount = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         // Save transaction in the database
         const transaction = yield Transaction_1.default.create({
             userId,
+            phoneNumber,
             type: 'deposit',
             amount: parseFloat(amount),
             wallet: parseFloat(wallet),
@@ -46,8 +49,8 @@ const depositAmount = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             paymentReference,
             status: 'pending',
             details: upiId,
-            filename: req.file.filename,
-            path: req.file.path
+            filename: ((_a = req.file) === null || _a === void 0 ? void 0 : _a.filename) || null,
+            path: ((_b = req.file) === null || _b === void 0 ? void 0 : _b.path) || null
         });
         yield (0, notifyController_1.createNotification)(userId, 'deposit', `Your deposit of ${amount} tokens was successful.`, paymentReference, 'pending', amount);
         // Simulate UPI link (replace with QR code generation in production)
@@ -66,7 +69,8 @@ const depositAmount = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 });
 exports.depositAmount = depositAmount;
 const withdrawAmount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, wallet, amount, paymentMethod, destinationDetails } = req.body;
+    var _a;
+    const { userId, wallet, amount, paymentMethod, destinationDetails, phoneNumber } = req.body;
     if (!req.body.userId || !mongoose_1.default.isValidObjectId(req.body.userId)) {
         return res.status(400).json({ message: 'Invalid or missing userId' });
     }
@@ -76,9 +80,18 @@ const withdrawAmount = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (wallet + amount < amount) {
             return res.status(400).json({ success: false, message: 'Insufficient wallet balance' });
         }
+        const profile = yield Profile_1.default.findOne({ userId });
+        if (!profile) {
+            console.log("Profile not found");
+            return res.status(404).json({ success: false, message: "Profile not found" });
+        }
+        if (((_a = profile.kycDetails) === null || _a === void 0 ? void 0 : _a.status) !== "verified") {
+            return res.status(404).json({ success: false, message: "Please Complete your Kyc first" });
+        }
         // Deduct tokens and log the withdrawal request
         const transaction = yield Transaction_1.default.create({
             userId,
+            phoneNumber,
             type: 'withdraw',
             amount,
             wallet,
@@ -90,6 +103,8 @@ const withdrawAmount = (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!transaction) {
             console.log("Failed to create withdraw");
         }
+        profile.amount = wallet; // Assuming `amount` is a number
+        yield profile.save();
         yield (0, notifyController_1.createNotification)(userId, 'withdrawal', `Your whithdrwal of ${amount} tokens was successful.`, paymentReference, 'pending', amount);
         console.log("notification is passed");
         res.status(200).json({
@@ -110,64 +125,90 @@ const verifyPayment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(400).json({ success: false, message: "Transaction ID is required." });
     }
     try {
-        const sanitizedTransactionId = transactionId.toString().replace(/:/g, "");
+        const sanitizedTransactionId = typeof transactionId === "string" ? transactionId.replace(/:/g, "") : transactionId.toString();
         console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
         // Find the transaction by payment reference
-        const transaction = yield Transaction_1.default.findById(sanitizedTransactionId);
+        const transaction = yield Transaction_1.default.findById(sanitizedTransactionId).lean(); // Use `.lean()` to return a plain object
         if (!transaction) {
-            console.log('Transaction not found');
-            return res.status(404).json({ success: false, message: 'Transaction not found' });
+            console.log("Transaction not found");
+            return res.status(404).json({ success: false, message: "Transaction not found" });
         }
-        // Update the transaction as completed
-        transaction.status = 'completed';
-        yield transaction.save();
-        // Add tokens to the user's wallet (mocked here)
-        // Replace with your wallet update logic
+        // Ensure userId is a string
+        const userId = transaction.userId;
+        if (!userId) {
+            console.log("userId not found");
+            return res.status(400).json({ success: false, message: "User ID not found in transaction" });
+        }
+        const profile = yield Profile_1.default.findOne({ userId });
+        if (!profile) {
+            console.log("Profile not found");
+            return res.status(404).json({ success: false, message: "Profile not found" });
+        }
+        // Ensure `transaction.wallet` is a valid number before assigning
+        if (typeof transaction.wallet !== "number") {
+            console.log("Invalid wallet amount:", transaction.wallet);
+            return res.status(400).json({ success: false, message: "Invalid wallet amount" });
+        }
+        if (transaction.type === "deposit") {
+            profile.amount = transaction.wallet; // Assuming `amount` is a number
+            yield profile.save();
+        }
         console.log(`Tokens added to user ${transaction.userId}: ${transaction.amount}`);
+        // Update transaction status
+        yield Transaction_1.default.findByIdAndUpdate(sanitizedTransactionId, { $set: { status: "completed" } });
         // Update notification as transaction completed
-        yield Trans_notification_1.Notification.updateOne({ paymentReference: transaction.paymentReference, status: 'success' });
-        res.status(200).json({ success: true, message: 'Payment verified and tokens added' });
+        yield Trans_notification_1.Notification.updateOne({ paymentReference: transaction.paymentReference }, { $set: { status: "success" },
+            createdAt: new Date().toISOString(),
+        });
+        res.status(200).json({ success: true, message: "Payment verified and tokens added" });
     }
     catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Payment verification failed', error: err.message });
+        console.error("Error verifying payment:", err);
+        res.status(500).json({ success: false, message: "Payment verification failed", error: err.message });
     }
 });
 exports.verifyPayment = verifyPayment;
 const rejectPayment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { transactionId, reason } = req.body;
+    const { transactionId, reason, userId } = req.body;
     if (!transactionId) {
         return res.status(400).json({ success: false, message: "Transaction ID is required." });
     }
     if (!reason) {
-        return res.status(400).json({ success: false, message: "reason is required." });
+        return res.status(400).json({ success: false, message: "Reason is required." });
     }
     try {
-        const sanitizedTransactionId = transactionId.toString().replace(/:/g, "");
+        // ✅ Validate Transaction ID
+        if (!mongoose_1.default.Types.ObjectId.isValid(transactionId)) {
+            return res.status(400).json({ success: false, message: "Invalid transaction ID." });
+        }
+        const sanitizedTransactionId = new mongoose_1.default.Types.ObjectId(transactionId);
         console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
-        // Find the transaction by payment reference
+        // ✅ Find the transaction
         const transaction = yield Transaction_1.default.findById(sanitizedTransactionId);
         if (!transaction) {
-            console.log('Transaction not found');
-            return res.status(404).json({ success: false, message: 'Transaction not found' });
+            console.log("Transaction not found");
+            return res.status(404).json({ success: false, message: "Transaction not found" });
         }
-        transaction.status = 'failed';
+        // ✅ Update transaction status
+        transaction.status = "failed";
         yield transaction.save();
-        // Update the transaction as completed
-        // Add tokens to the user's wallet (mocked here)
-        // Replace with your wallet update logic
         console.log(`Tokens didn't add to user ${transaction.userId}: ${transaction.amount}`);
-        // Update notification as transaction completed
-        const notification = yield Trans_notification_1.Notification.findOneAndUpdate({ paymentReference: transaction.paymentReference }, { status: 'failed', reason });
-        if (!notification) {
-            console.log('notification not found');
-            return res.status(404).json({ success: false, message: 'notification  not found' });
+        // ✅ Update notification, create if not found
+        const notification = yield Trans_notification_1.Notification.findOneAndUpdate({ paymentReference: transaction.paymentReference }, {
+            status: "failed",
+            reason,
+            createdAt: new Date().toISOString(),
+        }, { new: true, upsert: true });
+        // ✅ Find user profile
+        const profile = yield Profile_1.default.findOneAndUpdate({ userId }, { $inc: { amount: transaction.amount } }, { new: true });
+        if (!profile) {
+            return res.status(400).json("Profile not found");
         }
-        res.status(200).json({ success: true, message: 'Payment Rejected and tokens not added' });
+        return res.status(200).json({ success: true, message: "Payment rejected and tokens not added" });
     }
-    catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Payment rejection failed', error: err.message });
+    catch (error) {
+        console.error("Error rejecting payment:", error);
+        return res.status(500).json({ success: false, message: "Payment rejection failed", error: error.message });
     }
 });
 exports.rejectPayment = rejectPayment;
