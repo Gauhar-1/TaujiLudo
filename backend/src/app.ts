@@ -51,7 +51,7 @@ app.use(cors(corsOptions)); // ✅ Apply before all routes
 
 // ✅ Restrict /admin access to taujiludo.in only
 app.use("/admin", (req : any, res: any, next: any) => {
-  const allowedOrigin = "https://taujiludo.in";
+  const allowedOrigin = allowedOrigins;
   const origin = req.headers.origin || "";
   const referer = req.headers.referer || "";
 
