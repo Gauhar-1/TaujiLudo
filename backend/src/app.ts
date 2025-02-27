@@ -65,11 +65,13 @@ app.use("/admin", (req : any, res: any, next: any) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow frontend connection
-    methods: ["GET", "POST"],
+    origin: "https://taujiludo.in", // Allow requests from your frontend URL
+    credentials: true, // Ensure cookies or authentication tokens are allowed
+    methods: ["GET", "POST"], // Allow GET and POST methods
   },
-  path: "/socket.io/", // Ensure the path matches the frontend
+  path: "/socket.io/",
 });
+
 
 
 // ✅ Register API Routes
