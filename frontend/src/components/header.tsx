@@ -39,7 +39,7 @@ export const Header = ()=>{
     checkAuth();
 
     // Optional: Polling every 5 seconds for session expiry handling
-    const interval = setInterval(checkAuth, 5000);
+    const interval = setInterval(checkAuth, 1000);
 
     return () => {
       clearInterval(interval);
