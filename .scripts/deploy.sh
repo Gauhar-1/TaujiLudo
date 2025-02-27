@@ -37,11 +37,10 @@ echo "Installing Backend Dependencies..."
 pnpm install || { echo "Error installing backend dependencies"; exit 1; }
 
 echo "Building TypeScript files..."
-pnpm add -g typescript
 tsc -b || { echo "Error building backend TypeScript files"; exit 1; }
 
 echo "PM2 Restarting Backend..."
-pm2 restart all || { echo "Error restarting PM2"; exit 1; }
+pm2 restart 0 || { echo "Error restarting PM2"; exit 1; }
 
 # Reapply any stashed changes if they exist
 if git stash list | grep -q "stash@{0}"; then
