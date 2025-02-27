@@ -69,21 +69,16 @@ app.use("/admin", ( req : any , res : any , next: any) => {
 });
 
 
-// ✅ Setup WebSocket Server (Fix: Allow `null` origin)
 const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.error("Blocked WebSocket connection due to CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: ["https://taujiludo.in", "http://localhost:5173", "https://api.taujiludo.in"],
     credentials: true,
     methods: ["GET", "POST"],
   },
+  allowEIO3: true, // ✅ Fixes some WebSocket transport issues
+  path: "/socket.io/", // ✅ Ensures path consistency with frontend
 });
+
 
 app.use('/api/auth', router);
 
