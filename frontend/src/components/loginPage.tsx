@@ -30,6 +30,12 @@ export const LoginPage = () => {
         if(login === false){
           return;
         }
+
+        if (!document.cookie.includes("token")) {
+          console.log("No auth cookie found, skipping auth check.");
+          return;
+        }
+
         try {
     
           const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
@@ -54,6 +60,12 @@ export const LoginPage = () => {
       };
     
       checkAuth();
+
+      // Polling every 5 seconds
+      const interval = setInterval(checkAuth, 1000);
+  
+      // Cleanup on component unmount
+      return () => clearInterval(interval);
     }, [ location.pathname]); // ✅ Dependency added
     
 

@@ -40,7 +40,7 @@ export const Header = ()=>{
       checkAuth();
 
     // Polling every 5 seconds
-    const interval = setInterval(checkAuth, 5000);
+    const interval = setInterval(checkAuth, 1000);
 
     // Cleanup on component unmount
     return () => clearInterval(interval);
