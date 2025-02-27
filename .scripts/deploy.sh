@@ -3,6 +3,9 @@ set -e
 
 echo "Deployment started..."
 
+# Log timestamp
+echo "Deploying started at $(date)" >> deploy.log
+
 # Clean untracked files and symbolic links
 echo "Cleaning untracked files..."
 git clean -fdX || { echo "Error cleaning untracked files"; exit 1; }
@@ -14,10 +17,17 @@ git stash -u || echo "No local changes to stash"
 # Pull the latest version of the app
 echo "Pulling the latest version of the app..."
 git pull origin main || { echo "Error pulling the latest version"; exit 1; }
-echo "New changes copied to server!"
+echo "New changes copied to server!" >> deploy.log
 
 # Frontend setup
 cd ./frontend/
+
+# Optional: Check for pnpm installation
+if ! command -v pnpm &> /dev/null
+then
+    echo "pnpm could not be found, please install it." >> deploy.log
+    exit 1
+fi
 
 rm -rf node_modules package-lock.json pnpm-lock.yaml yarn.lock
 
@@ -49,6 +59,5 @@ if [[ -n $(git status --porcelain) ]]; then
 else
   echo "No local changes to stash"
 fi
-
 
 echo "Deployment Finished"
