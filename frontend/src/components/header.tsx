@@ -13,22 +13,17 @@ export const Header = ()=>{
 
   
   useEffect(() => {
-    let isMounted = true; // Prevent state update after unmount
 
     const checkAuth = async () => {
       if ( !login || !document.cookie.includes("token")) {
         console.log("No auth cookie found, skipping auth check.");
-        if (isMounted) {
-          setLogin(false);
-          navigate('/')
-        }
         return;
       }
 
       try {
         const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
 
-        if (response.data.success && isMounted) {
+        if (response.data.success) {
           const userData = response.data.user;
           setUserId(userData.userId);
           setName(userData.name);
@@ -38,10 +33,6 @@ export const Header = ()=>{
         }
       } catch (err : any) {
         console.error("User not logged in", err.response?.status);
-        if (isMounted) {
-          setLogin(false);
-          navigate('/')
-        }
       }
     };
 
@@ -51,7 +42,6 @@ export const Header = ()=>{
     const interval = setInterval(checkAuth, 5000);
 
     return () => {
-      isMounted = false; // Cleanup flag to prevent memory leaks
       clearInterval(interval);
     };
   }, []); // Runs only once when the component mounts
