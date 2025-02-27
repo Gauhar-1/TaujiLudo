@@ -37,14 +37,17 @@ echo "Installing Backend Dependencies..."
 pnpm install || { echo "Error installing backend dependencies"; exit 1; }
 
 echo "Building TypeScript files..."
-npm install tsc
- tsc -b || { echo "Error building backend TypeScript files"; exit 1; }
+pnpm add -g typescript
+tsc -b || { echo "Error building backend TypeScript files"; exit 1; }
 
-echo "PM2 Reload"
-pm2 reload 0 || { echo "Error reloading PM2"; exit 1; }
+echo "PM2 Restarting Backend..."
+pm2 restart all || { echo "Error restarting PM2"; exit 1; }
 
 # Reapply any stashed changes if they exist
-echo "Reapplying stashed changes..."
-git stash pop || echo "No stashed changes to apply"
+if git stash list | grep -q "stash@{0}"; then
+  git stash pop
+else
+  echo "No stashed changes to apply"
+fi
 
 echo "Deployment Finished!"
