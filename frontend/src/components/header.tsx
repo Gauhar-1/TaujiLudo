@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {  useLocation, useNavigate } from "react-router-dom"
+import {   useNavigate } from "react-router-dom"
 import { SideBar } from "./sideBar";
 import { useUserContext } from "../hooks/UserContext";
 import axios from "axios";
@@ -11,42 +11,50 @@ export const Header = ()=>{
   const navigate = useNavigate();
   const { login,  phone, amount, setAmount, setUserId, setName, setPhone, setPhoneNumber, setLogin } = useUserContext();
 
-  const location = useLocation();
   
-    useEffect(() => {
-      const checkAuth = async () => {
-        // Check if cookies are present before making the request
-        if (!document.cookie.includes("token")) {
-          console.log("No auth cookie found, skipping auth check.");
-          return;
+  useEffect(() => {
+    let isMounted = true; // Prevent state update after unmount
+
+    const checkAuth = async () => {
+      if ( !login || !document.cookie.includes("token")) {
+        console.log("No auth cookie found, skipping auth check.");
+        if (isMounted) {
+          setLogin(false);
+          navigate('/')
         }
-    
-        try {
-          const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
-    
-          if (response.data.success) {
-            const userData = response.data.user;
-            setUserId(userData.userId);
-            setName(userData.name);
-            setPhone(userData.phoneNumber);
-            setPhoneNumber(userData.phoneNumber);
-            setLogin(true);
-          }
-        } catch (err : any) {
-          console.error("User not logged in", err.response?.status);
+        return;
       }
 
-      
-      checkAuth();
+      try {
+        const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
 
-    // Polling every 5 seconds
-    const interval = setInterval(checkAuth, 1000);
-
-    // Cleanup on component unmount
-    return () => clearInterval(interval);
+        if (response.data.success && isMounted) {
+          const userData = response.data.user;
+          setUserId(userData.userId);
+          setName(userData.name);
+          setPhoneNumber(userData.phoneNumber);
+          setPhone(userData.phoneNumber);
+          setLogin(true);
+        }
+      } catch (err : any) {
+        console.error("User not logged in", err.response?.status);
+        if (isMounted) {
+          setLogin(false);
+          navigate('/')
+        }
+      }
     };
-    
-    }, [location.pathname, navigate]); // ✅ Runs only when necessary
+
+    checkAuth();
+
+    // Optional: Polling every 5 seconds for session expiry handling
+    const interval = setInterval(checkAuth, 5000);
+
+    return () => {
+      isMounted = false; // Cleanup flag to prevent memory leaks
+      clearInterval(interval);
+    };
+  }, []); // Runs only once when the component mounts
     
   
       useEffect(()=>{
