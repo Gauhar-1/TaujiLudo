@@ -287,5 +287,5 @@ export const onlyAdmins = async(req: any, res:any )=>{
 }
 
 export const health = async(req: any, res: any, next: any)=>{
-    res.status(200).send({ status: "ok" });
+    res.status(200).send({ status: true });
 }

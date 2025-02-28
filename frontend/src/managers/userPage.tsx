@@ -43,6 +43,7 @@ import { Notifications } from "../components/notification";
 import { RedeemEarnings } from "../components/redeemEarning";
 import { useEffect, useState } from "react";
 import { ErrorPage } from "../components/errorPage";
+import axios from "axios";
 
 
 export const UserPage = ()=>{
@@ -63,10 +64,14 @@ export const UserPage = ()=>{
       useEffect(() => {
         const checkServerHealth = async () => {
           try {
-            const response = await fetch("https://api.taujiludo.in/api/auth/health");
-            if (!response.ok) throw new Error("Server down");
+            const response = await axios.get("https://api.taujiludo.in/api/auth/health");
+
+            const { status } = response.data;
+
+            if (!status) throw new Error("Server down");
             setIsServerUp(true);
           } catch (error) {
+            console.log("Error: "+ error);
             setIsServerUp(false);
           }
         };
