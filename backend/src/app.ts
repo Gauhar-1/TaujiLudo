@@ -50,6 +50,8 @@ const corsOptions = {
   optionsSuccessStatus: 200, // ✅ Fixes preflight request issues in some browsers
 };
 
+// ✅ Register API Routes
+app.use('/api/auth', router);
 app.use(cors(corsOptions)); // ✅ Apply before routes
 // ✅ Middleware
 app.use(express.json());
@@ -84,11 +86,6 @@ const io = new Server(server, {
   },
   path: "/socket.io/",
 });
-
-
-
-// ✅ Register API Routes
-app.use('/api/auth', router);
 
 // ✅ WebSocket Connection Handling
 io.on("connection", (socket:  any) => {
