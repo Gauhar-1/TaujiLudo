@@ -28,26 +28,38 @@ const server = https.createServer(options, app);
 // ✅ Connect to Database
 connectDB();
 
-// ✅ Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-// ✅ CORS Configuration (Ensure Same for Express & Socket.io)
 const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in", "https://api.taujiludo.in"];
+
+app.use((req, res, next) => {
+  console.log("🌍 Incoming request from:", req.headers.origin);
+  next();
+});
+
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error("Blocked CORS:", origin);
+      console.error("🚫 Blocked by CORS:", origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Added OPTIONS method
+  allowedHeaders: ["Content-Type", "Authorization"], // ✅ Ensure headers are allowed
+  optionsSuccessStatus: 200, // ✅ Fixes preflight request issues in some browsers
 };
-app.use(cors(corsOptions)); // ✅ Apply before all routes
+
+app.use(cors(corsOptions)); // ✅ Apply before routes
+// ✅ Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// ✅ Handle Preflight Requests Manually
+app.options("*", cors(corsOptions));
+
+
 
 // ✅ Restrict /admin access to taujiludo.in only
 app.use("/admin", (req : any, res: any, next: any) => {
