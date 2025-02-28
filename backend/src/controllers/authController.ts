@@ -164,7 +164,6 @@ export const autoLogin = async (req: any, res: any) => {
     console.log("🔵 AutoLogin Request Received");
 
     const token = req.cookies?.token;
-    console.log("🔵 Token from Cookie:", token);
 
     if (!token) {
         console.log("🛑 No token found, returning 401");
@@ -178,10 +177,8 @@ export const autoLogin = async (req: any, res: any) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload & { userId: string };
-        console.log("✅ Token Decoded:", decoded);
 
         const user = await Profile.findOne({ userId: decoded.userId });
-        console.log("🔵 User from DB:", user);
 
         if (!user) {
             console.log("🛑 User not found, returning 401");

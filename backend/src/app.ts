@@ -74,13 +74,14 @@ app.use('/api/auth', router);
 
 const io = new Server(server, {
   cors: {
-    origin:  allowedOrigins, // Allow requests from your frontend URL
-    credentials: true, // Ensure cookies or authentication tokens are allowed
-    methods: ["GET", "POST"], // Allow GET and POST methods
+    origin: ["https://taujiludo.in"], // ✅ Allow requests from your frontend
+    credentials: true, // ✅ Allow cookies and authentication
+    methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
   },
-  path: "/socket.io/",
-  transports: ["websocket", "polling"],
+  transports: ["websocket", "polling"], // ✅ Ensure both transport methods work
+  path: "/socket.io/", // ✅ WebSocket path (MUST match frontend)
 });
+
 
 // ✅ WebSocket Connection Handling
 io.on("connection", (socket:  any) => {
