@@ -161,7 +161,6 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
 });
 
 export const autoLogin = async (req: any, res: any) => {
-    console.log("🔵 AutoLogin Request Received");
 
     const token = req.cookies?.token;
 
@@ -185,7 +184,6 @@ export const autoLogin = async (req: any, res: any) => {
             return res.status(401).json({ success: false, message: "User not found" });
         }
 
-        console.log("✅ AutoLogin Success, Returning Response");
         res.json({ success: true, user });
 
     } catch (err) {

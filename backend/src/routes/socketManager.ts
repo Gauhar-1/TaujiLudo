@@ -13,6 +13,7 @@ const socketManager = (socket: Socket) => {
 
 // 🎮 Handle battle creation
 socket.on("createBattle", async (battleData, callback) => {
+  console.log("📥 Received createBattle event:", battleData);
   try {
     const { userId, amount, ludoCode, name } = battleData;
 

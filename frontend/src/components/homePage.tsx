@@ -46,7 +46,7 @@ export const HomePage = () => {
   
   const [onGoingB, setOnGoingB] = useState([]);
   const [pendingB, setPendingB] = useState([]);
-  const [, setLoading] = useState(false);
+  // const [, setLoading] = useState(false);
 
   // Centralized LocalStorage Setter
   const updateLocalStorage = (key: string, value: any) => {
@@ -170,7 +170,12 @@ export const HomePage = () => {
     // setLoading(true); // Disable button while processing
 
     socket.emit("createBattle", battleData, (response: { status: number; message: string; battleData?: any }) => {
-      setLoading(false); // Re-enable button
+      // setLoading(false); // Re-enable button
+
+      if (!response) {
+        toast.error("❌ No response from server.");
+        return;
+      }
 
       if (response.status === 400) {
         toast.warning(response.message, {
