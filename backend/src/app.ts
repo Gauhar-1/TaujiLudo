@@ -75,7 +75,6 @@ app.use('/api/auth', router);
 const io = new Server(server, {
   cors: {
     origin: ["https://taujiludo.in"], // ✅ Allow requests from your frontend
-    credentials: true, // ✅ Allow cookies and authentication
     methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
   },
   transports: ["websocket", "polling"], // ✅ Ensure both transport methods work
