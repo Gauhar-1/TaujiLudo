@@ -181,7 +181,7 @@ export const LoginPage = () => {
 
   return (
     <div className="bg-gray-200 flex justify-center pt-16 max-w-sm min-h-screen">
-      <div className="relative w-full flex flex-col gap-10 max-w-sm p-6">
+      <div className="relative w-full flex flex-col  max-w-sm p-6">
         <div>
         <img src="../../logo.png" alt="" />
         </div>

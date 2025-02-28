@@ -6,8 +6,21 @@ import Profile from "../models/Profile"; // ✅ Import Profile model
 const socketManager = (socket: Socket) => {
   console.log("A user connected:", socket.id);
 
+  socket.on("disconnect", () => {
+    console.log("❌ User disconnected:", socket.id);
+  });
+
+  socket.on("error", (error) => {
+    console.error(`🚨 WebSocket Error on ${socket.id}:`, error.message);
+  });
+  
+
+  socket.onAny((event, ...args) => {
+    console.log(`📩 Received event: ${event}`, args);
+  });
 // 🎮 Handle battle creation
 socket.on("createBattle", async (battleData, callback) => {
+  console.log("🟢 Received createBattle event:", battleData); 
   try {
     const { userId, amount, ludoCode, name } = battleData;
 

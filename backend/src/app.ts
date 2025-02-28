@@ -65,7 +65,7 @@ app.use("/admin", (req : any, res: any, next: any) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "https://taujiludo.in", // Allow requests from your frontend URL
+    origin: allowedOrigins, // Allow requests from your frontend URL
     credentials: true, // Ensure cookies or authentication tokens are allowed
     methods: ["GET", "POST"], // Allow GET and POST methods
   },

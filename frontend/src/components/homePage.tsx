@@ -43,7 +43,7 @@ export const HomePage = () => {
   
   const [onGoingB, setOnGoingB] = useState([]);
   const [pendingB, setPendingB] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // Centralized LocalStorage Setter
   const updateLocalStorage = (key: string, value: any) => {
@@ -296,7 +296,7 @@ export const HomePage = () => {
                                 />
                                     <button
                                         className="bg-green-600 w-16 rounded p-2 font-bold"
-                                        disabled={loading}
+                                        // disabled={loading}
                                         onClick={() => {
                                           createBattle();
                                         }}
