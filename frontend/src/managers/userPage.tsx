@@ -59,7 +59,7 @@ export const UserPage = ()=>{
       //   }
       // },[login])
 
-      const [isServerUp, setIsServerUp] = useState(false);
+      const [isServerUp, setIsServerUp] = useState(true);
 
       useEffect(() => {
         const checkServerHealth = async () => {
