@@ -43,9 +43,7 @@ export const LoginPage = () => {
             setPhone(userData.phoneNumber);
             setLogin(true);
             // Navigate only if coming from the login page
-            if (location.pathname === "/") {
               navigate("/winCash");
-            }
           }
         } catch (error) {
           console.error("Authentication failed:", error);
@@ -53,7 +51,7 @@ export const LoginPage = () => {
 
           // Prevent infinite redirects
           if (location.pathname === "/") {
-              navigate("/winCash");
+              navigate("/");
             }
         }
       };
