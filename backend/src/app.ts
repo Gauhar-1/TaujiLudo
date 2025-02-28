@@ -28,7 +28,7 @@ const server = https.createServer(options, app);
 // ✅ Connect to Database
 connectDB();
 
-const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in", "https://api.taujiludo.in"];
+const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in"];
 
 app.use((req, res, next) => {
   console.log("🌍 Incoming request from:", req.headers.origin);
