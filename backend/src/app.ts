@@ -55,7 +55,8 @@ app.use("/admin", (req : any, res: any, next: any) => {
   const origin = req.headers.origin || "";
   const referer = req.headers.referer || "";
 
-  if (origin === allowedOrigin || (referer && referer.startsWith(allowedOrigin))) {
+  if (origin === allowedOrigin || (referer && referer.startsWith(allowedOrigin)))
+    {
     return next();
   }
 
@@ -65,7 +66,7 @@ app.use("/admin", (req : any, res: any, next: any) => {
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins, // Allow requests from your frontend URL
+    origin: "*", // Allow requests from your frontend URL
     credentials: true, // Ensure cookies or authentication tokens are allowed
     methods: ["GET", "POST"], // Allow GET and POST methods
   },
