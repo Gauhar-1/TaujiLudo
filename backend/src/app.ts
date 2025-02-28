@@ -45,7 +45,7 @@ const corsOptions = {
     }
   },
   credentials: true,
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
 };
 app.use(cors(corsOptions)); // ✅ Apply before all routes
 
@@ -66,7 +66,7 @@ app.use("/admin", (req : any, res: any, next: any) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow requests from your frontend URL
+    origin:  allowedOrigins, // Allow requests from your frontend URL
     credentials: true, // Ensure cookies or authentication tokens are allowed
     methods: ["GET", "POST"], // Allow GET and POST methods
   },
