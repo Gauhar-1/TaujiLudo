@@ -41,7 +41,8 @@ import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
 import { Notifications } from "../components/notification";
 import { RedeemEarnings } from "../components/redeemEarning";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { ErrorPage } from "../components/errorPage";
 
 
 export const UserPage = ()=>{
@@ -56,6 +57,26 @@ export const UserPage = ()=>{
       //     navigate('/winCash')
       //   }
       // },[login])
+
+      const [isServerUp, setIsServerUp] = useState(true);
+
+      useEffect(() => {
+        const checkServerHealth = async () => {
+          try {
+            const response = await fetch("https://api.taujiludo.in/health");
+            if (!response.ok) throw new Error("Server down");
+            setIsServerUp(true);
+          } catch (error) {
+            setIsServerUp(false);
+          }
+        };
+    
+        // Check every 5 seconds
+        const interval = setInterval(checkServerHealth, 5000);
+        checkServerHealth(); // Check immediately on load
+    
+        return () => clearInterval(interval);
+      }, []);
 
       useEffect(() => {
         document.title = "taujiLudo"; // Change tab title
@@ -76,7 +97,7 @@ export const UserPage = ()=>{
       
 
     return (
-        <div>
+      isServerUp ? (<div>
             { !adminClicked && <Header ></Header>}
        <Routes>
             <Route path="/home" element={<HomePage />}></Route>
@@ -121,6 +142,8 @@ export const UserPage = ()=>{
            </Route>
        </Routes>
      { !adminClicked && <Footer></Footer> }
-        </div>
+        </div> ) : (
+    <ErrorPage />
+  )
     )
 }

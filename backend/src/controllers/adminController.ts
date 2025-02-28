@@ -285,3 +285,7 @@ export const onlyAdmins = async(req: any, res:any )=>{
         res.status(500).json({ message: "Server error" });
       }
 }
+
+export const health = async(req: any, res: any, next: any)=>{
+    res.status(200).send({ status: "ok" });
+}
