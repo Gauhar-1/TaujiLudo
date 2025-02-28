@@ -92,7 +92,7 @@ io.on("error", (error: any) => {
 });
 
 // ✅ Handle 404 Routes
-app.use("*", (req, res) => {
+app.use("*", (req : any, res: any) => {
   res.status(404).json({ error: "API route not found" });
 });
 
