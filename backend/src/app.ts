@@ -30,11 +30,6 @@ connectDB();
 
 const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in"];
 
-app.use((req, res, next) => {
-  console.log("🌍 Incoming request from:", req.headers.origin);
-  next();
-});
-
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -50,16 +45,19 @@ const corsOptions = {
   optionsSuccessStatus: 200, // ✅ Fixes preflight request issues in some browsers
 };
 
-// ✅ Register API Routes
-app.use('/api/auth', router);
-app.use(cors(corsOptions)); // ✅ Apply before routes
-// ✅ Middleware
+
+// ✅ Middleware (CORS should be first)
+app.use(cors(corsOptions)); // Apply CORS before routes
+app.options("*", cors(corsOptions)); // Handle preflight requests
+
+// ✅ JSON, URL Encoding, and Cookie Parsing Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ✅ Handle Preflight Requests Manually
-app.options("*", cors(corsOptions));
+// ✅ Register API Routes (After CORS)
+app.use('/api/auth', router);
+
 
 
 
@@ -85,6 +83,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"], // Allow GET and POST methods
   },
   path: "/socket.io/",
+  transports: ["websocket", "polling"],
 });
 
 // ✅ WebSocket Connection Handling
