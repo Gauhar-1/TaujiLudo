@@ -160,7 +160,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
     }
 });
 
-export const autoLogin = async (req: Request, res: Response) => {
+export const autoLogin = async (req: any, res: any) => {
     console.log("🔵 AutoLogin Request Received");
 
     const token = req.cookies?.token;
@@ -197,7 +197,7 @@ export const autoLogin = async (req: Request, res: Response) => {
     }
 };
 
-export const logOut = async (req: Request, res: Response) => {
+export const logOut = async (req: any, res: any) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: true, // Secure only in production
