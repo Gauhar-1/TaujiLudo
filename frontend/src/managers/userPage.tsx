@@ -63,7 +63,7 @@ export const UserPage = ()=>{
       useEffect(() => {
         const checkServerHealth = async () => {
           try {
-            const response = await fetch("https://api.taujiludo.in/health");
+            const response = await fetch("https://api.taujiludo.in/api/auth/health");
             if (!response.ok) throw new Error("Server down");
             setIsServerUp(true);
           } catch (error) {
