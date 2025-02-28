@@ -41,9 +41,7 @@ import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
 import { Notifications } from "../components/notification";
 import { RedeemEarnings } from "../components/redeemEarning";
-import { useEffect, useState } from "react";
-import { ErrorPage } from "../components/errorPage";
-import axios from "axios";
+import { useEffect } from "react";
 
 
 export const UserPage = ()=>{
@@ -59,29 +57,34 @@ export const UserPage = ()=>{
       //   }
       // },[login])
 
-      const [isServerUp, setIsServerUp] = useState(true);
+      // const [isServerUp, setIsServerUp] = useState(false);
 
-      useEffect(() => {
-        const checkServerHealth = async () => {
-          try {
-            const response = await axios.get("https://api.taujiludo.in/api/auth/health");
+      // useEffect(() => {
 
-            const { status } = response.data;
+      //   if(isServerUp){
+      //     return console.log("Server is up");
+      //   }
 
-            if (!status) throw new Error("Server down");
-            setIsServerUp(true);
-          } catch (error) {
-            console.log("Error: "+ error);
-            setIsServerUp(false);
-          }
-        };
+      //   const checkServerHealth = async () => {
+      //     try {
+      //       const response = await axios.get("https://api.taujiludo.in/api/auth/health");
+
+      //       const { status } = response.data;
+
+      //       if (!status) throw new Error("Server down");
+      //       setIsServerUp(true);
+      //     } catch (error) {
+      //       console.log("Error: "+ error);
+      //       setIsServerUp(false);
+      //     }
+      //   };
     
-        // Check every 5 seconds
-        const interval = setInterval(checkServerHealth, 5000);
-        checkServerHealth(); // Check immediately on load
+      //   // Check every 5 seconds
+      //   const interval = setInterval(checkServerHealth, 5000);
+      //   checkServerHealth(); // Check immediately on load
     
-        return () => clearInterval(interval);
-      }, []);
+      //   return () => clearInterval(interval);
+      // }, []);
 
       useEffect(() => {
         document.title = "taujiLudo"; // Change tab title
@@ -102,7 +105,7 @@ export const UserPage = ()=>{
       
 
     return (
-      isServerUp ? (<div>
+       (<div>
             { !adminClicked && <Header ></Header>}
        <Routes>
             <Route path="/home" element={<HomePage />}></Route>
@@ -147,8 +150,7 @@ export const UserPage = ()=>{
            </Route>
        </Routes>
      { !adminClicked && <Footer></Footer> }
-        </div> ) : (
-    <ErrorPage />
-  )
+        </div> ) 
+  
     )
 }
