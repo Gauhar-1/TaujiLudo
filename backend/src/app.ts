@@ -47,8 +47,9 @@ const corsOptions = {
 
 
 // ✅ Middleware (CORS should be first)
-app.use(cors()); // Apply CORS before routes
-// app.options("*", cors(corsOptions)); // Handle preflight requests
+app.use(cors(corsOptions)); // ✅ Apply corsOptions here
+app.options("*", cors(corsOptions)); // ✅ Handle preflight requests
+
 
 // ✅ JSON, URL Encoding, and Cookie Parsing Middleware
 app.use(express.json());
@@ -58,22 +59,17 @@ app.use(cookieParser());
 // ✅ Register API Routes (After CORS)
 app.use('/api/auth', router);
 
+// app.use("/admin", (req: any, res: any, next: any) => {
+//   const origin = req.headers.origin || "";
+//   const referer = req.headers.referer || "";
 
+//   if (allowedOrigins.includes(origin) || allowedOrigins.some((o) => referer.startsWith(o))) {
+//     return next();
+//   }
 
+//   return res.status(403).json({ error: "Forbidden: Access Denied!" });
+// });
 
-// ✅ Restrict /admin access to taujiludo.in only
-app.use("/admin", (req : any, res: any, next: any) => {
-  const allowedOrigin = allowedOrigins;
-  const origin = req.headers.origin || "";
-  const referer = req.headers.referer || "";
-
-  if (origin === allowedOrigin || (referer && referer.startsWith(allowedOrigin)))
-    {
-    return next();
-  }
-
-  return res.status(403).json({ error: "Forbidden: Access Denied!" });
-});
 
 
 const io = new Server(server, {
