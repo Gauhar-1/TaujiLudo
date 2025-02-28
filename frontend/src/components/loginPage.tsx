@@ -27,9 +27,8 @@ export const LoginPage = () => {
   
     useEffect(() => {
       const checkAuth = async () => {
-        if (!login || !document.cookie.includes("token")) {
+        if (!login) {
           console.log("No auth cookie found, skipping auth check.");
-          setLogin(false);
           return;
         }
   
@@ -51,7 +50,11 @@ export const LoginPage = () => {
         } catch (error) {
           console.error("Authentication failed:", error);
           setLogin(false);
-          navigate('/');
+
+          // Prevent infinite redirects
+          if (location.pathname === "/") {
+              navigate("/winCash");
+            }
         }
       };
   

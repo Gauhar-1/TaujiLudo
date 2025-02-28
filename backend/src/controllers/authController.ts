@@ -160,10 +160,10 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
     }
 });
 
-export const autoLogin = async (req: any, res: any) => {
+export const autoLogin = async (req: Request, res: Response) => {
     console.log("🔵 AutoLogin Request Received");
-    
-    const token = req.cookies.token;
+
+    const token = req.cookies?.token;
     console.log("🔵 Token from Cookie:", token);
 
     if (!token) {
@@ -171,8 +171,13 @@ export const autoLogin = async (req: any, res: any) => {
         return res.status(401).json({ success: false, message: "Not authenticated" });
     }
 
+    if (!process.env.JWT_SECRET) {
+        console.error("🛑 JWT_SECRET is not defined in environment variables.");
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload & { userId: string };
         console.log("✅ Token Decoded:", decoded);
 
         const user = await Profile.findOne({ userId: decoded.userId });
@@ -192,28 +197,31 @@ export const autoLogin = async (req: any, res: any) => {
     }
 };
 
-export const logOut = async (req: any, res: any) => {
-    // ✅ Clear all authentication cookies
+export const logOut = async (req: Request, res: Response) => {
     res.clearCookie("token", {
         httpOnly: true,
-        secure: true, 
-        sameSite: "None",
-        expires: new Date(0), // Expire immediately
+        secure: true, // Secure only in production
+        sameSite: "none",
+        expires: new Date(0),
+        domain: ".taujiludo.in"
     });
 
     res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: true, 
-        sameSite: "None",
+        secure: true,
+        sameSite: "none",
         expires: new Date(0),
+        domain: ".taujiludo.in"
     });
 
     res.clearCookie("sessionId", {
         httpOnly: true,
-        secure: true, 
-        sameSite: "None",
+        secure: true,
+        sameSite: "none",
         expires: new Date(0),
+        domain: ".taujiludo.in"
     });
 
+    res.setHeader("Cache-Control", "no-store");
     res.status(200).json({ success: true, message: "Logged out successfully. All cookies cleared." });
 };

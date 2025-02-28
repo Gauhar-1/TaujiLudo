@@ -15,7 +15,7 @@ export const Header = ()=>{
   useEffect(() => {
 
     const checkAuth = async () => {
-      if ( !login || !document.cookie.includes("token")) {
+      if ( !login) {
         console.log("No auth cookie found, skipping auth check.");
         return;
       }
@@ -33,13 +33,17 @@ export const Header = ()=>{
         }
       } catch (err : any) {
         console.error("User not logged in", err.response?.status);
+
+        if (err.response?.status === 401) {
+          console.log("Session expired, logging out...");
+        }
       }
     };
 
     checkAuth();
 
     // Optional: Polling every 5 seconds for session expiry handling
-    const interval = setInterval(checkAuth, 1000);
+    const interval = setInterval(checkAuth, 5000);
 
     return () => {
       clearInterval(interval);
