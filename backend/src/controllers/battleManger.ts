@@ -180,7 +180,7 @@ export const joinBattle = async (req: any, res: any, next: any) => {
     }
 
     // ✅ Restrict third player from joining
-    if (battle.player1 !== userId && battle.player2 !== userId) {
+    if (battle.player1 !== userId && battle.player2 !== userId && battle.player2) {
       console.log(`🚫 Battle ${battleId} already has two players.`);
       return res.status(200).json({ success: false, message: "This battle is already full." });
     }
