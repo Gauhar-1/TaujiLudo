@@ -63,11 +63,10 @@ export const UserPage = ()=>{
 
       useEffect(() => {
 
-        if(isServerUp){
-          return console.log("Server is up");
-        }
-
         const checkServerHealth = async () => {
+          if(isServerUp){
+            return console.log("Server is up");
+          }
           try {
             const response = await axios.get("https://api.taujiludo.in/api/auth/health");
 
