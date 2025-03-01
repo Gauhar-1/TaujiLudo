@@ -202,9 +202,7 @@ export const HomePage = () => {
     socket.emit("updateBattleStatus", {  battleId ,status : "in-progress" }, (response: any) => {
       if (response.status === 200) {
         console.log("✅ Battle status updated successfully:", response.battle);
-      } else {
-        console.error("❌ Error updating battle status:", response.message);
-      }
+      } 
     });
 
     socket.on("battleUpdated", (battle: any) => {
