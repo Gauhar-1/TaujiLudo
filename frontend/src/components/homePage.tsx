@@ -8,15 +8,9 @@ import { io } from "socket.io-client";
 import { RunningBattle } from "./runningBattleCard";
 import { toast } from "react-toastify";
 
-
-
-export const socket = io("wss://api.taujiludo.in", {
+export const socket = io("https://api.taujiludo.in", {
   path: "/socket.io/",
-  transports: ["websocket", "polling"],
 });
-
-
-
 
 export const HomePage = () => {
     const navigate = useNavigate();
