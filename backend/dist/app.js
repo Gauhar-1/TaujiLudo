@@ -31,44 +31,47 @@ const server = https_1.default.createServer(options, app);
 exports.server = server;
 // ✅ Connect to Database
 (0, db_1.default)();
-// ✅ Middleware
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
-app.use((0, cookie_parser_1.default)());
-// ✅ CORS Configuration (Ensure Same for Express & Socket.io)
-const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in", "https://api.taujiludo.in"];
+const allowedOrigins = ["http://localhost:5173", "https://taujiludo.in"];
 const corsOptions = {
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         }
         else {
-            console.error("Blocked CORS:", origin);
+            console.error("🚫 Blocked by CORS:", origin);
             callback(new Error("Not allowed by CORS"));
         }
     },
     credentials: true,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Added OPTIONS method
+    allowedHeaders: ["Content-Type", "Authorization"], // ✅ Ensure headers are allowed
+    optionsSuccessStatus: 200, // ✅ Fixes preflight request issues in some browsers
 };
-app.use((0, cors_1.default)(corsOptions)); // ✅ Apply before all routes
-// ✅ Restrict /admin access to taujiludo.in only
-app.use("/admin", (req, res, next) => {
-    const allowedOrigin = "https://taujiludo.in";
-    const origin = req.headers.origin || "";
-    const referer = req.headers.referer || "";
-    if (origin === allowedOrigin || (referer && referer.startsWith(allowedOrigin))) {
-        return next();
-    }
-    return res.status(403).json({ error: "Forbidden: Access Denied!" });
-});
-// ✅ Initialize WebSocket Server (Fix CORS Issue)
+// ✅ Middleware (CORS should be first)
+app.use((0, cors_1.default)(corsOptions)); // ✅ Apply corsOptions here
+app.options("*", (0, cors_1.default)(corsOptions)); // ✅ Handle preflight requests
+// ✅ JSON, URL Encoding, and Cookie Parsing Middleware
+app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: true }));
+app.use((0, cookie_parser_1.default)());
+// ✅ Register API Routes (After CORS)
+app.use('/api/auth', auth_1.router);
+// app.use("/admin", (req: any, res: any, next: any) => {
+//   const origin = req.headers.origin || "";
+//   const referer = req.headers.referer || "";
+//   if (allowedOrigins.includes(origin) || allowedOrigins.some((o) => referer.startsWith(o))) {
+//     return next();
+//   }
+//   return res.status(403).json({ error: "Forbidden: Access Denied!" });
+// });
 const io = new socket_io_1.Server(server, {
-    cors: corsOptions, // ✅ Match with Express CORS
-    path: "/socket.io/",
+    cors: {
+        origin: ["https://taujiludo.in", "https://api.taujiludo.in"], // ✅ Allow requests from your frontend
+        methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
+    },
+    path: "/socket.io/", // ✅ WebSocket path (MUST match frontend)
 });
 exports.io = io;
-// ✅ Register API Routes
-app.use('/api/auth', auth_1.router);
 // ✅ WebSocket Connection Handling
 io.on("connection", (socket) => {
     console.log("✅ A user connected:", socket.id);

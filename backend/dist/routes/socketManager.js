@@ -17,12 +17,16 @@ const Battle_1 = __importDefault(require("../models/Battle"));
 const Profile_1 = __importDefault(require("../models/Profile")); // ✅ Import Profile model
 const socketManager = (socket) => {
     console.log("A user connected:", socket.id);
+    socket.on("error", (error) => {
+        console.error(`🚨 WebSocket Error on ${socket.id}:`, error.message);
+    });
     // 🎮 Handle battle creation
     socket.on("createBattle", (battleData, callback) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("📥 Received createBattle event:", battleData);
         try {
             const { userId, amount, ludoCode, name } = battleData;
             if (!userId || !amount || !name) {
-                return callback({ status: 400, message: "Invalid battle data" });
+                return callback({ status: 400, message: "Invalid battle data||" });
             }
             // ✅ Check if the player has an "in-progress" battle
             const activeBattles = yield Battle_1.default.find({

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onlyAdmins = exports.getAdmin = exports.UPIsettings = exports.QRsettings = exports.infoSettings = exports.supportSettings = exports.createAdminDetails = void 0;
+exports.health = exports.onlyAdmins = exports.getAdmin = exports.UPIsettings = exports.QRsettings = exports.infoSettings = exports.supportSettings = exports.createAdminDetails = void 0;
 const Admin_1 = __importDefault(require("../models/Admin"));
 const Profile_1 = __importDefault(require("../models/Profile"));
 const Transaction_1 = __importDefault(require("../models/Transaction"));
@@ -233,3 +233,7 @@ const onlyAdmins = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.onlyAdmins = onlyAdmins;
+const health = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).send({ status: true });
+});
+exports.health = health;

@@ -17,6 +17,7 @@ exports.router = router;
 router.post('/send-otp', authController_1.sendOtp);
 router.post('/verify-otp', authController_1.verifyOtp);
 router.get('/me', authController_1.autoLogin);
+router.get('/health', adminController_1.health);
 router.post('/logout', authController_1.logOut);
 router.post('/deposit', multerService_1.upload.single('image'), moneyController_1.depositAmount);
 router.post('/withdraw', moneyController_1.withdrawAmount);

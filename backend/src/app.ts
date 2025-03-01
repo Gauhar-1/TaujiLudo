@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/db';
-import https from "https";
+import http from "http";
 import { DefaultEventsMap, Server, Socket } from "socket.io";
 import { router } from './routes/auth';
 import socketManager from './routes/socketManager';
@@ -10,20 +10,8 @@ import fs from "fs";
 
 const app = express();
 
-// ✅ Load SSL Certificates
-let options;
-try {
-  options = {
-    key: fs.readFileSync("/etc/letsencrypt/live/api.taujiludo.in/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/api.taujiludo.in/fullchain.pem"),
-  };
-} catch (error: any) {
-  console.error("🚨 SSL Certificate Error:", error.message);
-  process.exit(1); // Stop the server if SSL is missing
-}
-
 // ✅ Create HTTPS Server
-const server = https.createServer(options, app);
+const server = http.createServer(app);
 
 // ✅ Connect to Database
 connectDB();
@@ -74,7 +62,7 @@ app.use('/api/auth', router);
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://taujiludo.in", "https://api.taujiludo.in"], // ✅ Allow requests from your frontend
+    origin: [ "http://localhost:5173","https://taujiludo.in", "https://api.taujiludo.in"], // ✅ Allow requests from your frontend
     methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
   },
   path: "/socket.io/", // ✅ WebSocket path (MUST match frontend)
