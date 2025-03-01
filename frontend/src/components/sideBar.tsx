@@ -9,7 +9,7 @@ export const SideBar = (props : any)=>{
     const { setAdminClicked, phone } = useUserContext();
 
 
-    const [isAdmin, setIsAdmin] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
   
     useEffect(() => {
       const checkAdmin = async () => {
