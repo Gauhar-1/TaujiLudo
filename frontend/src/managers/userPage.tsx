@@ -89,20 +89,25 @@ export const UserPage = ()=>{
 
       useEffect(() => {
         document.title = "taujiLudo"; // Change tab title
-      }, []);
-
-      const changeFavicon = (faviconUrl: string) => {
-        let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
-        if (!link) {
-          link = document.createElement("link");
-          link.rel = "icon";
-          document.head.appendChild(link);
-        }
-        link.href = faviconUrl;
-      };
       
-      // Change favicon to "logo.png"
-      changeFavicon("/logo.png");
+        const checkServerHealth = async () => {
+          try {
+            const response = await axios.get("https://api.taujiludo.in/api/auth/health");
+            if (!response.data.status) throw new Error("Server down");
+            setIsServerUp(true);
+          } catch (error) {
+            console.log("Error: " + error);
+            setIsServerUp(false);
+          }
+        };
+      
+        if (!isServerUp) {
+          checkServerHealth();
+          const interval = setInterval(checkServerHealth, 5000);
+          return () => clearInterval(interval);
+        }
+      }, [isServerUp]);
+      
       
 
     return (
