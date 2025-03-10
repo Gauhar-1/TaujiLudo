@@ -11,10 +11,12 @@ export const  WithdrawToUPI = ()=>{
     const [message, setMessage] = useState("");
     const [balanceLess, setBalanceLess] = useState(false);
     const { userId , amount, phone, setAmount } = useUserContext();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleWithdraw = async () => {
 
         try {
+            setIsLoading(true);
           const response = await axios.post(`${API_URL}/api/auth/withdraw`, {
                 userId,
                 phoneNumber : phone,
@@ -42,6 +44,9 @@ export const  WithdrawToUPI = ()=>{
                 console.log("Error in withdrawal:", err);
             }
         }
+        finally{
+            setIsLoading(false);
+        }
         
     };
   
@@ -53,24 +58,24 @@ export const  WithdrawToUPI = ()=>{
                 <div className="p-4 w-80 text-center font-serif text-2xl">Withdrawal To UPI</div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Your Linked UPI ID</div>
-                    <input type="text" className="rounded-md border border-gray-950 p-1" onChange={(e)=>{
+                    <input type="text" disabled={isLoading} className="rounded-md border border-gray-950 p-1" onChange={(e)=>{
                         setUpiId(e.target.value);
                     }}/>
                  </div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Amount to Withdraw:</div>
-                    <input type="text" className="rounded-md border border-gray-950 p-1"  onChange={(e)=>{
+                    <input type="text" disabled={isLoading} className="rounded-md border border-gray-950 p-1"  onChange={(e)=>{
                         const newValue = parseInt(e.target.value);
                         setToken(newValue);
                     }}/>
                  </div>
                  <div className="p-2 flex justify-center">
-                 <div className=" bg-green-500 h-10 w-64 text-white rounded-md text-center pt-2 mb-2" onClick={handleWithdraw}>Withdraw</div>
+                 <button disabled={isLoading} className=" bg-green-500 h-10 w-64 text-white rounded-md text-center pt-2 mb-2" onClick={handleWithdraw}>Withdraw</button >
                  </div>
                  <div className="flex justify-center">
-                 <div className="bg-blue-700 w-28 text-white text-center rounded-md p-1 mb-8" onClick={()=>{
+                 <button disabled={isLoading} className="bg-blue-700 w-28 text-white text-center rounded-md p-1 mb-8" onClick={()=>{
                     navigate('/withdraw')
-                 }}>back</div>
+                 }}>back</button >
                  </div>
                 </div>
             </div>
@@ -79,6 +84,9 @@ export const  WithdrawToUPI = ()=>{
                 <div className="bg-blue-500 text-white p-2 text-center rounded-lg" onClick={()=>{
                     setBalanceLess(false);
                 }}>Ok</div>
+             </div>}
+             {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
              </div>}
         </div>
     )

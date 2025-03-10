@@ -67,9 +67,9 @@ export const UserPage = ()=>{
           if(isServerUp){
             return console.log("Server is up");
           }
-          try {
+          try { 
             const response = await axios.get("https://api.taujiludo.in/api/auth/health");
-
+           
             const { status } = response.data;
 
             if (!status) throw new Error("Server down");
@@ -77,7 +77,7 @@ export const UserPage = ()=>{
           } catch (error) {
             console.log("Error: "+ error);
             setIsServerUp(false);
-          }
+          } 
         };
     
         // Check every 5 seconds
@@ -97,56 +97,59 @@ export const UserPage = ()=>{
       
       }, []);
       
-      
 
-    return (
-      isServerUp ? (<div>
-            { !adminClicked && <Header ></Header>}
-       <Routes>
-            <Route path="/home" element={<HomePage />}></Route>
-           <Route path="/profile" element={<ProfilePage  />}></Route>
-           <Route path="/wallet" element={<WalletPage/>}></Route>
-           <Route path="/history" element={<HistoryPage/>}></Route>
-           <Route path="/" element={<LoginPage />}></Route>
-           <Route path="/deposit" element={<DepositPage    />}></Route>
-           <Route path="/withdraw" element={<WithdrawPage />}></Route>
-           <Route path="/withdrawToBank" element={<WithdrawToBank  />}></Route>
-           <Route path="/withdrawToUPI" element={<WithdrawToUPI  />}></Route>
-           <Route path="/support" element={<SupportPage/>}></Route>
-           <Route path="/battle" element={<BattlePage  />}></Route>
-           <Route path="/rules" element={<RulesPgage/>}></Route>
-           <Route path="/refer" element={<ReferPage/>}></Route>
-           <Route path="/gameHistory" element={<GameHistory />}></Route>
-           <Route path="/winCash" element={<WinCashPage/>}></Route>
-           <Route path="/notification" element={<Notifications/>}></Route>
-           <Route path="/referalEarning" element={<RedeemEarnings/>}></Route>
-           <Route path="/admin" element={<AdminPage />}>
-                  <Route index element={<DashBoard />}></Route>
-                  <Route path="allPlayers" element={<AllPlayers />}></Route>
-                  <Route path="allPlayers/transaction" element={<TransactionHistory />}></Route>
-                  <Route path="blocked" element={<BlockedPlayer />}></Route>
-                  <Route path="pendingBattle" element={<PendingBattle />}></Route>
-                  <Route path="runningBattle" element={<RunningBattle />}></Route>
-                  <Route path="completeBattle" element={<CompleteBattle />}></Route>
-                  <Route path="disputeBattle" element={<DisputeBattle />}></Route>
-                  <Route path="viewResult" element={<BattleResult />}></Route>
-                  <Route path="disputeResult" element={<DisputeResult />}></Route>
-                  <Route path="allPayments" element={<AllPayments />}></Route>
-                  <Route path="reqPayments" element={<ReqPayments />}></Route>
-                  <Route path="paymentReq" element={<PaymentRequest />}></Route>
-                  <Route path="rechargeUser" element={<RechargeUser />}></Route>
-                  <Route path="addMoney" element={<MoneyRecharge />}></Route>
-                  <Route path="pendingKyc" element={<PendingKyc />}></Route>
-                  <Route path="verifiedKyc" element={<VerifiedKyc />}></Route>
-                  <Route path="pendingKyc/kycView" element={<KycVerification />}></Route>
-                  <Route path="paymentSettings" element={<PaymentSettings />}></Route>
-                  <Route path="adminSettings" element={<AdminSettings />}></Route>
-                  <Route path="adminNotification" element={<AdminNotification />}></Route>
-           </Route>
-       </Routes>
-     { !adminClicked && <Footer></Footer> }
-        </div> ) : (
-    <ErrorPage />
-  )
-    )
+  // If server is down, show the error page
+  if (!isServerUp) {
+    return <ErrorPage />;
+  }
+
+  return (
+    <div>
+      {!adminClicked && <Header />}
+      <Routes>
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/wallet" element={<WalletPage />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/deposit" element={<DepositPage />} />
+        <Route path="/withdraw" element={<WithdrawPage />} />
+        <Route path="/withdrawToBank" element={<WithdrawToBank />} />
+        <Route path="/withdrawToUPI" element={<WithdrawToUPI />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/battle" element={<BattlePage />} />
+        <Route path="/rules" element={<RulesPgage />} />
+        <Route path="/refer" element={<ReferPage />} />
+        <Route path="/gameHistory" element={<GameHistory />} />
+        <Route path="/winCash" element={<WinCashPage />} />
+        <Route path="/notification" element={<Notifications />} />
+        <Route path="/referalEarning" element={<RedeemEarnings />} />
+        <Route path="/admin" element={<AdminPage />}>
+          <Route index element={<DashBoard />} />
+          <Route path="allPlayers" element={<AllPlayers />} />
+          <Route path="allPlayers/transaction" element={<TransactionHistory />} />
+          <Route path="blocked" element={<BlockedPlayer />} />
+          <Route path="pendingBattle" element={<PendingBattle />} />
+          <Route path="runningBattle" element={<RunningBattle />} />
+          <Route path="completeBattle" element={<CompleteBattle />} />
+          <Route path="disputeBattle" element={<DisputeBattle />} />
+          <Route path="viewResult" element={<BattleResult />} />
+          <Route path="disputeResult" element={<DisputeResult />} />
+          <Route path="allPayments" element={<AllPayments />} />
+          <Route path="reqPayments" element={<ReqPayments />} />
+          <Route path="paymentReq" element={<PaymentRequest />} />
+          <Route path="rechargeUser" element={<RechargeUser />} />
+          <Route path="addMoney" element={<MoneyRecharge />} />
+          <Route path="pendingKyc" element={<PendingKyc />} />
+          <Route path="verifiedKyc" element={<VerifiedKyc />} />
+          <Route path="pendingKyc/kycView" element={<KycVerification />} />
+          <Route path="paymentSettings" element={<PaymentSettings />} />
+          <Route path="adminSettings" element={<AdminSettings />} />
+          <Route path="adminNotification" element={<AdminNotification />} />
+        </Route>
+      </Routes>
+      {!adminClicked && <Footer />}
+    </div>
+  );
+    
 }

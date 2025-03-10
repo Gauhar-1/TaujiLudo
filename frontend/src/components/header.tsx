@@ -87,8 +87,8 @@ export const Header = ()=>{
               setSidebarClicked(true);
          }}> ☰</div>
            
-           <div  className="w-10 h-10 overflow-hidden">
-           <img src="../../logo.png" alt="Cropped Image"  className="w-full h-full object-cover" onClick={()=>{
+           <div  className=" h-10 overflow-hidden">
+           <img src="../../logo.png"  className="h-9 mt-1 w-full  " onClick={()=>{
             navigate('/winCash');
            }}/>
            </div>
@@ -112,7 +112,7 @@ export const Header = ()=>{
        </div>
    </div>}
        {!login && <div className="flex justify-between px-2">
-        <img src="../../logo.png" alt=""  className="h-14  "/>
+        <img src="../../logo.png" alt=""  className="h-9 mt-2 "/>
         <div className="p-2">
           <div className="py-2 px-4 shadow-lg rounded-md  bg-purple-600 text-white ">Login</div>
         </div>

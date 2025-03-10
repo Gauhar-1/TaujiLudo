@@ -42,10 +42,21 @@ export const GameHistory =()=>{
         }
 
         handleBattleHistory();
-    });
+
+        const interval = setInterval( handleBattleHistory, 5000);
+
+        // Cleanup on component unmount
+        return () => clearInterval(interval);
+    },[]);
 
     const decideWinner = (battle : any)=>{
         if(battle.status === "canceled"){
+            return "N/A";
+        }
+        if(battle.status === "in-progress" ){
+            return "N/A";
+        }
+        if(battle.status === "disputed" ){
             return "N/A";
         }
 

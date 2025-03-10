@@ -12,16 +12,16 @@ export const  NotifyCard = ( { notification }: { notification: any })=>{
              {/* Display different content based on type */}
       {notification.type === "notification" ? (
         <div className="w-full overflow-auto break-words p-1">
-          {notification.reason}
+          {notification.reason ? notification.reason : "No notifications"}
         </div>
       ) : notification.type === "profile"  ? (
         <div className="w-full overflow-auto break-words p-1">
-          {notification.kycDetails.reason}
+          {notification.kycDetails.reason ? notification.kycDetails.reason : "No notifications"}
         </div>
       ) :  <div className="w-full overflow-auto break-words p-1">
       {notification.dispute?.proofs?.[1]?.player === userId 
-  ? notification.dispute?.proofs?.[1]?.adminReason 
-  : notification.dispute?.proofs?.[0]?.adminReason }
+  ? (notification.dispute?.proofs?.[1]?.adminReason ? notification.dispute?.proofs?.[1]?.adminReason : "No notifications")
+  : notification.dispute?.proofs?.[0]?.adminReason ? notification.dispute?.proofs?.[0]?.adminReason : "No notifications" }
 
     </div>}
             <div className="flex justify-end text-gray-500 p-1" >

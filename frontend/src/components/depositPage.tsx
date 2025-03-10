@@ -15,6 +15,7 @@ export const DepositPage = ()=>{
     const navigate = useNavigate();
 
     const { userId, amount, phone } = useUserContext();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(()=>{
         const handleInfoBar = async()=>{
@@ -44,6 +45,16 @@ export const DepositPage = ()=>{
             console.log(userId);
             return;
           }
+          if(!token){
+            alert("Enter the Amount!");
+            return;
+          }
+
+          if(!upiId){
+            alert("Enter the UTR Number!");
+            return;
+          }
+
           const formData = new FormData();
           formData.append("image", selectedFile);
           formData.append("userId", userId.toString());
@@ -58,13 +69,16 @@ export const DepositPage = ()=>{
     console.log(pair[0] + ": " + pair[1]);
 }
 
-
         try {
+            setIsLoading(true);
             const response = await axios.post(`${API_URL}/api/auth/deposit`,  formData );
             setUpiLink(response.data.upiLink);
             navigate("/wallet");
         } catch (err : any) {
             console.log('Error initiating deposit: ' + err.response?.data?.message || err.message);
+        }
+        finally{
+            // setIsLoading(false);
         }
     };
    
@@ -76,6 +90,9 @@ export const DepositPage = ()=>{
                 
             <div className="bg-gray-200 py-4  ">
             <div className=" relative ">
+            {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>}
                 <div className="  rounded-md bg-gray-300 m-2 ">
                 <div className="p-4 w-80 text-center font-serif text-2xl">Deposit via QR</div>
                  <div className="px-6 py-2 flex flex-col gap-2">
@@ -88,19 +105,19 @@ export const DepositPage = ()=>{
                     </div>
                     <div className=" flex flex-col gap-2 ">
                         <div className="text-sm text-slate-500  font-semibold">Upload screenShot:</div>
-                    <input  type="file" id="fileInput" className="text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
+                    <input disabled={isLoading}  type="file" id="fileInput" className="text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
                     if(e.target.files)
                     setSelectedFile(e.target.files[0])
                 }} />
                     </div>
                     <div className="text-sm font-semibold text-slate-500">UTR Number</div>
-                    <input type="text" className="rounded-md border border-gray-950 py-1 px-2" onChange={(e)=>{
+                    <input type="text" disabled={isLoading} className="rounded-md border border-gray-950 py-1 px-2" onChange={(e)=>{
                         setUpiId(e.target.value)
                     }}/>
                  </div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Amount to Deposit:</div>
-                    <input type="text"  className="rounded-md border border-gray-950 py-1 px-2" onChange={(e)=>{
+                    <input type="text" disabled={isLoading}  className="rounded-md border border-gray-950 py-1 px-2" onChange={(e)=>{
                         const newValue = parseInt(e.target.value);
                         setToken(newValue);
                     }}/>
@@ -113,15 +130,15 @@ export const DepositPage = ()=>{
             </div>
                  </div>
                  <div className="p-2 flex justify-center">
-                 <div className=" bg-green-500 h-10 w-64 rounded-md text-center text-white pt-2 mb-2" onClick={()=>{
+                 <button disabled={isLoading} className=" bg-green-500 h-10 w-64 rounded-md text-center text-white pt-2 mb-2" onClick={()=>{
                     handleDeposit();
                     // uploadScreenshot();
-                 }}>Deposit</div>
+                 }}>Deposit</button>
                  </div>
                  <div className="flex justify-center">
-                 <div className="bg-gray-700 w-28 text-center rounded-md p-1 mb-8 text-white" onClick={()=>{
+                 <button disabled={isLoading} className="bg-gray-700 w-28 text-center rounded-md p-1 mb-8 text-white" onClick={()=>{
                     navigate('/wallet')
-                 }}>back</div>
+                 }}>back</button>
                  </div>
                 </div>
             </div>

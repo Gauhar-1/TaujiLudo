@@ -44,6 +44,7 @@ export const HomePage = () => {
   
   const [onGoingB, setOnGoingB] = useState([]);
   const [pendingB, setPendingB] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   // const [, setLoading] = useState(false);
 
   // Centralized LocalStorage Setter
@@ -105,6 +106,9 @@ export const HomePage = () => {
       } catch (error) {
         console.error("Error fetching ongoing battles:", error);
       }
+      finally{
+        setIsLoading(false);
+      }
     };
 
     fetchOngoingBattles();
@@ -127,6 +131,9 @@ export const HomePage = () => {
 
       } catch (error) {
         console.error("Error fetching ongoing battles:", error);
+      }
+      finally{
+        setIsLoading(false)
       }
     };
 
@@ -165,7 +172,7 @@ export const HomePage = () => {
 
     const battleData = { name, userId, amount };
 
-    // setLoading(true); // Disable button while processing
+    setIsLoading(true); // Disable button while processing
 
     socket.emit("createBattle", battleData, (response: { status: number; message: string; battleData?: any }) => {
       // setLoading(false); // Re-enable button
@@ -195,6 +202,7 @@ export const HomePage = () => {
           draggable: true,
           theme: "dark",
         });
+        setIsLoading(false);
         console.log("✅ Battle Created:", response.battleData);
       } 
     });
@@ -354,6 +362,9 @@ export const HomePage = () => {
                     </div>
                 </div>
             </div>
+            {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>}
         </div>
     );
 };

@@ -1,7 +1,49 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
+import { useUserContext } from "../hooks/UserContext";
+import axios from "axios";
+import { API_URL } from "../utils/url";
 
 export const WalletPage = ()=>{
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [ cashWon , setCashWon ] = useState(0)
+    const [ token , setToken ] = useState(0)
+    const { phone } = useUserContext();
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+          setIsLoading(true);
+          if (!phone) {
+            console.log("Phone number (Profile): "+ phone);
+            return;
+          }
+    
+          try {
+            const response = await axios.get(
+              `${API_URL}/api/auth/findProfile`,
+               { params :{ phoneNumber : phone }} 
+            );
+    
+            if (response.data) {
+              const { cashWon, amount } = response.data[0];
+              setCashWon(cashWon);
+              setToken(amount);
+              console.log("Profile fetched successfully.");
+            } else {
+              console.warn("Failed to fetch profile.");
+            }
+          } catch (err) {
+            console.error("Error fetching profile:", err);
+          }
+          finally{
+            setIsLoading(false);
+          }
+        };
+    
+        fetchProfile();
+      }, []);
+
     return (
         <div className="bg-gray-300 min-h-screen max-w-sm pt-12 py-6 flex flex-col ">
             <div className="bg-white py-4 text-center rounded-md my-6 ml-8 w-80 flex justify-center gap-4 text-blue-600 " onClick={()=>{
@@ -16,7 +58,7 @@ export const WalletPage = ()=>{
                             <div>
                             <div className="flex gap-2">
                          <img src="../../cash.png" alt="" className="size-8" />
-                         <div className="text-white font-bold text-xl">10</div>
+                         <div className="text-white font-bold text-xl">{token}</div>
                             </div>
                     <div className="text-white font-serif"> Deposit Cash</div>
                             </div>
@@ -32,7 +74,7 @@ export const WalletPage = ()=>{
                             <div>
                             <div className="flex gap-2">
                          <img src="../../cash.png" alt="" className="size-8" />
-                         <div className="text-white font-bold text-xl">0</div>
+                         <div className="text-white font-bold text-xl">{cashWon}</div>
                             </div>
                     <div className="text-white font-serif"> Wining Cash</div>
                             </div>
@@ -44,6 +86,9 @@ export const WalletPage = ()=>{
                         Cannot be withdrawn to Paytm or Bank.</div>
                     </div>
                 </div>
+                {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>}
         </div>
     )
 }

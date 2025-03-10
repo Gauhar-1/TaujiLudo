@@ -182,7 +182,7 @@ export const LoginPage = () => {
   return (
     <div className="bg-gray-200 flex justify-center pt-16 max-w-sm min-h-screen">
       <div className="relative w-full flex flex-col  max-w-sm p-6">
-        <div>
+        <div className="py-4 px-2">
         <img src="../../logo.png" alt="" />
         </div>
         <div className="bg-white shadow-md rounded-lg p-6">

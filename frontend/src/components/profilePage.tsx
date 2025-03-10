@@ -21,7 +21,8 @@ export const ProfilePage = ()=>{
     const [ kycStatus , setKycStatus ] = useState("")
     const [ earnings , setEarnings ] = useState(0)
     const [ cashWon , setCashWon ] = useState(0)
-    const [ battlePlayed , setBattlePlayed ] = useState(0)
+    const [ battlePlayed , setBattlePlayed ] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
   
     // Get phoneNumber from location state or fallback
@@ -30,6 +31,7 @@ export const ProfilePage = ()=>{
   
     useEffect(() => {
       const fetchProfile = async () => {
+        setIsLoading(true);
         if (!phone) {
           console.log("Phone number (Profile): "+ phone);
           return;
@@ -59,12 +61,16 @@ export const ProfilePage = ()=>{
         } catch (err) {
           console.error("Error fetching profile:", err);
         }
+        finally{
+          setIsLoading(false);
+        }
       };
   
       fetchProfile();
     }, []);
   
     const updateProfile = async () => {
+      setIsLoading(true);
       if (!name || !phone || !email) {
         console.error("All fields are required:", { name, phone, email });
         return;
@@ -91,6 +97,10 @@ export const ProfilePage = ()=>{
         alert("Please select a file to upload.");
         return;
       }
+      if (!Name ||  !DOB ||  !state  ||  !documentNumber) {
+        alert("Please Enter all the details first");
+        return;
+      }
       const formData = new FormData();
       formData.append("image", selectedFile);
       formData.append("image2", selectedFile2);
@@ -101,17 +111,21 @@ export const ProfilePage = ()=>{
       formData.append("documentNumber", documentNumber);
 
       console.log("Form data:", selectedFile, userId);
-  
+      setIsLoading(true);
       try {
           await axios.post(`${API_URL}/api/auth/kyc`, formData);
 
       } catch (err) {
         console.error("Error uploading screenshot:", err);
       }
+      finally{
+        setIsLoading(false);
+      }
     };
 
     const handleLogOut = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
     
         if (response.data.success) {
@@ -131,6 +145,9 @@ export const ProfilePage = ()=>{
       } catch (err) {
         console.error("Logout Error:", err);
         toast.error("Something went wrong. Try again!", { position: "top-right" });
+      }
+      finally{
+        setIsLoading(false);
       }
     };
 
@@ -165,14 +182,14 @@ export const ProfilePage = ()=>{
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col gap-1">
                     <div className="font-bold text-xs">Front View :</div>
-                  <input  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
+                  <input disabled={isLoading}  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
                     if(e.target.files)
                     setSelectedFile(e.target.files[0])
                 }} />
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="font-bold text-xs">Back View :</div>
-                  <input  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
+                  <input disabled={isLoading}   type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
                     if(e.target.files)
                     setSelectedFile2(e.target.files[0])
                 }} />
@@ -181,29 +198,29 @@ export const ProfilePage = ()=>{
                 <div className="flex flex-col gap-3 pt-2">
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-xs">Enter the Name :</div>
-            <input type="text" className="rounded-md p-1"  onChange={(e)=>{setname(e.target.value)}}/>
+            <input disabled={isLoading}  type="text" className="rounded-md p-1"  onChange={(e)=>{setname(e.target.value)}}/>
                 </div>
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-xs"> Date of Birth :</div>
-            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDOB(e.target.value)}}/>
+            <input disabled={isLoading}  type="text" className="rounded-md p-1"   onChange={(e)=>{setDOB(e.target.value)}}/>
                 </div>
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-xs"> State :</div>
-            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setState(e.target.value)}}/>
+            <input disabled={isLoading}  type="text" className="rounded-md p-1"   onChange={(e)=>{setState(e.target.value)}}/>
                 </div>
                 <div className="flex flex-col gap-2">
                     <div className="font-bold text-xs"> Aadhar Number :</div>
-            <input type="text" className="rounded-md p-1"   onChange={(e)=>{setDocumentNumber(e.target.value)}}/>
+            <input disabled={isLoading}  type="text" className="rounded-md p-1"   onChange={(e)=>{setDocumentNumber(e.target.value)}}/>
                 </div>
                 </div>
                
-                <div className="bg-green-400 text-white text-center mt-6 mx-8 p-2 rounded-lg " onClick={()=>{
+                <button disabled={isLoading}  className="bg-green-400 text-white text-center mt-6 mx-8 p-2 rounded-lg " onClick={()=>{
                   uploadScreenshot();
                   setKycClicked(false);
-                }}>Done</div>
-                <div className="bg-gray-500 text-white text-center mt-2 mx-16 p-2 rounded-lg " onClick={()=>{
+                }}>Done</button>
+                <button disabled={isLoading}  className="bg-gray-500 text-white text-center mt-2 mx-16 p-2 rounded-lg " onClick={()=>{
                   setKycClicked(false);
-                }}>back</div>
+                }}>back</button>
                 </div>}
             <div className="m-5 bg-gray-600 rounded-xl flex flex-col hover:bg-gray-700 ">
                 <div className="flex">
@@ -282,6 +299,9 @@ export const ProfilePage = ()=>{
                     navigate('/');
                 }}>Log out</div>
                 </div>
+                {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>}
         </div>
 
         </div>
