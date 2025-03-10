@@ -90,23 +90,8 @@ export const UserPage = ()=>{
       useEffect(() => {
         document.title = "taujiLudo"; // Change tab title
       
-        const checkServerHealth = async () => {
-          try {
-            const response = await axios.get("https://api.taujiludo.in/api/auth/health");
-            if (!response.data.status) throw new Error("Server down");
-            setIsServerUp(true);
-          } catch (error) {
-            console.log("Error: " + error);
-            setIsServerUp(false);
-          }
-        };
       
-        if (!isServerUp) {
-          checkServerHealth();
-          const interval = setInterval(checkServerHealth, 5000);
-          return () => clearInterval(interval);
-        }
-      }, [isServerUp]);
+      }, []);
       
       
 

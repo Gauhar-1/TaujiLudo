@@ -5,7 +5,7 @@ import { AdminSideBar } from "./adminSideBar";
 export const AdminHeader = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
    return (
-    <div className="z-80">
+    <div className="z-50">
 
     <div className="fixed left-0 top-0  w-96 shadow-xl max-w-sm bg-white">
        <div className=" flex flex-row justify-between ">

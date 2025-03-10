@@ -35,10 +35,8 @@ echo "Installing Dependencies..."
 pnpm install || { echo "Error installing frontend dependencies"; exit 1; }
 
 echo "Creating Production Build..."
-pnpm run build || { echo "Error creating production build"; exit 1; }
+npm run build || { echo "Error creating production build"; exit 1; }
 
-sudo chown -R www-data:www-data /var/www/Betting-App/frontend/dist
-sudo chmod -R 755 /var/www/Betting-App/frontend/dist
 
 echo "Restarting nginx..."
 sudo systemctl restart nginx || { echo "Error restarting nginx"; exit 1; }
