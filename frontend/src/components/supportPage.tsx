@@ -42,7 +42,10 @@ export const SupportPage = ()=>{
             <div className="mb-40 flex flex-col gap-4">
             <img src="../../contact_us.png" alt=""  className="h-64 "/>
             <div className="mt-4 flex flex-col gap-4">
-                <div className="text-center bg-blue-500 p-2 text-white rounded-lg " onClick={openWhatsapp}>Contact us</div>
+                <div className="text-center bg-green-500 p-2 flex justify-center gap-2 text-white font-bold rounded-lg " onClick={openWhatsapp}>
+                  <img src="whatsapp.svg" className="h-6" alt="" />
+                  <div>Contact us</div>
+                </div>
                 <div className="text-center bg-gray-500 text-white p-2 rounded-lg ">+91   {""+phone}</div>
             </div>
             </div>
