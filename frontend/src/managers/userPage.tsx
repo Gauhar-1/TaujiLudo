@@ -90,6 +90,10 @@ export const UserPage = ()=>{
       useEffect(() => {
         document.title = "taujiLudo"; // Change tab title
       
+        const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+        if (favicon) {
+          favicon.href = "logo.png"; // Replace with your favicon path
+        }
       
       }, []);
       
