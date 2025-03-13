@@ -185,9 +185,11 @@ export const joinBattle = async (req: any, res: any, next: any) => {
       return res.status(200).json({ success: false, message: "This battle is already full." });
     }
 
-    if (amount < battle.amount) {
-      return res.status(400).json({ message: "Opponent has insufficient balance" });
-    }
+     // ✅ Ensure user has enough tokens (assuming you have a User model)
+     const profile = await Profile.findOne({userId});
+     if (!profile || profile.amount < battle.amount) {
+       return res.status(400).json({ success: false, message: "You have insufficient tokens." });
+     }
 
     // ✅ If player1 is present, set user as player2; otherwise, do nothing extra
     const updatedBattle = await Battle.findByIdAndUpdate(
