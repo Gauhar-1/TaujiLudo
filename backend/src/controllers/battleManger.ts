@@ -151,7 +151,7 @@ export const battleHistory = async (req: any, res: any, next: any) => {
 
 
 export const joinBattle = async (req: any, res: any, next: any) => {
-  const { battleId, userId, name } = req.body;
+  const { battleId, userId, name, amount } = req.body;
 
   if (!battleId || !name || !userId) {
     return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -183,6 +183,10 @@ export const joinBattle = async (req: any, res: any, next: any) => {
     if (battle.player1 !== userId && battle.player2 !== userId && battle.player2) {
       console.log(`🚫 Battle ${battleId} already has two players.`);
       return res.status(200).json({ success: false, message: "This battle is already full." });
+    }
+
+    if (amount < battle.amount) {
+      return res.status(400).json({ message: "Opponent has insufficient balance" });
     }
 
     // ✅ If player1 is present, set user as player2; otherwise, do nothing extra

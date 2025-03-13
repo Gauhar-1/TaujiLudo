@@ -10,7 +10,7 @@ export const BettingCard = (props : any)=>{
     // const navigate = useNavigate();
     const {  userId } = useUserContext();
 
-    const { setBattleId, name  } = useUserContext();
+    const { setBattleId, name , amount } = useUserContext();
 
     const navigate = useNavigate();
     const joinBattle = async () => {
@@ -19,6 +19,7 @@ export const BettingCard = (props : any)=>{
           name,
           userId,
           battleId: props.battle._id,
+          amount
         });
     
         if (!response.data) {

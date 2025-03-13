@@ -13,7 +13,7 @@ export const ProfilePage = ()=>{
     const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
     const [email, setEmail] = useState( () => localStorage.getItem("email") ||  "@gmail.com");
     const navigate = useNavigate();
-    const { name, setName, phone, userId, setPhone , setUserId, setLogin } = useUserContext();
+    const { name, setName, phone, userId, setPhone , setUserId, setLogin, setPhoneNumber } = useUserContext();
     const [ Name , setname ] = useState("")
     const [ DOB , setDOB ] = useState("")
     const [ state , setState ] = useState("")
@@ -135,6 +135,7 @@ export const ProfilePage = ()=>{
           setUserId("");
           setName("");
           setPhone("");
+          setPhoneNumber("");
           setLogin(false);
     
           // Redirect to login page
@@ -295,8 +296,6 @@ export const ProfilePage = ()=>{
                 <div className="mt-16 ">
                 <div className="absolute w-80 bg-gray-300 text-black rounded-xl p-2 m-8 border border-black text-center hover:cursor-pointer hover:bg-green-500 hover:text-white" onClick={()=>{
                     handleLogOut();
-                    setLogin(false);
-                    navigate('/');
                 }}>Log out</div>
                 </div>
                 {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">

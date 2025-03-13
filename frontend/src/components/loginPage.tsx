@@ -23,6 +23,7 @@ export const LoginPage = () => {
 
 
     const location = useLocation();
+    const [isLoading, setIsLoading] = useState(false);
   
   
     useEffect(() => {
@@ -33,6 +34,7 @@ export const LoginPage = () => {
         }
   
         try {
+          setIsLoading(true);
           const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
   
           if (response.data.success) {
@@ -53,6 +55,9 @@ export const LoginPage = () => {
           if (location.pathname === "/") {
               navigate("/");
             }
+        }
+        finally{
+          setIsLoading(false);
         }
       };
   
@@ -132,8 +137,8 @@ export const LoginPage = () => {
       return;
     }
 
-
     try {
+      setIsLoading(true);
       const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
         phoneNumber : phone,
         otp,
@@ -176,6 +181,9 @@ export const LoginPage = () => {
         pauseOnHover: true,
         draggable: true,
       });
+    }
+    finally{
+      setIsLoading(false)
     }
   };
 
@@ -243,6 +251,9 @@ export const LoginPage = () => {
           : "Verify OTP"}
       </button>
         </div>
+        {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>}
       </div>
     </div>
   );
