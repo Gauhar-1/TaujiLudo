@@ -14,6 +14,10 @@ export const BettingCard = (props : any)=>{
 
     const navigate = useNavigate();
     const joinBattle = async () => {
+
+      if(!amount){
+        return console.log("Amount not found");
+      }
       try {
         const response = await axios.post(`${API_URL}/api/auth/battles/join`, {
           name,

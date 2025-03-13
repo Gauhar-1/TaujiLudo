@@ -153,7 +153,7 @@ export const battleHistory = async (req: any, res: any, next: any) => {
 export const joinBattle = async (req: any, res: any, next: any) => {
   const { battleId, userId, name, amount } = req.body;
 
-  if (!battleId || !name || !userId) {
+  if (!battleId || !name || !userId || !amount) {
     return res.status(400).json({ success: false, message: "Missing required fields" });
   }
 
