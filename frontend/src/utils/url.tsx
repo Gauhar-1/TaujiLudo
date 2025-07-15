@@ -1,3 +1,3 @@
 // Get API_URL based on the environment
-// export const API_URL =  "https://api.taujiludo.in";
-export const API_URL =  "http://localhost:3000";
+export const API_URL =  "https://taujiludo.onrender.com";
+// export const API_URL =  "http://localhost:3000";
