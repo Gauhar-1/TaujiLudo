@@ -10,7 +10,12 @@ import { toast } from "react-toastify";
 
 
 
-export const socket = io("https://api.taujiludo.in", {
+// export const socket = io("https://api.taujiludo.in", {
+//   transports: ["websocket"], // Force WebSocket connection
+//   path: "/socket.io/",
+//   withCredentials: true,
+// });
+export const socket = io("http://localhost:5000", {
   transports: ["websocket"], // Force WebSocket connection
   path: "/socket.io/",
   withCredentials: true,

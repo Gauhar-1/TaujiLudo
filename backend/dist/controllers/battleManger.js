@@ -126,8 +126,8 @@ const battleHistory = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 });
 exports.battleHistory = battleHistory;
 const joinBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { battleId, userId, name } = req.body;
-    if (!battleId || !name || !userId) {
+    const { battleId, userId, name, amount } = req.body;
+    if (!battleId || !name || !userId || !amount) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
     }
     try {
@@ -149,9 +149,14 @@ const joinBattle = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             return res.status(404).json({ success: false, message: "Battle not found" });
         }
         // ✅ Restrict third player from joining
-        if (battle.player1 && battle.player2) {
+        if (battle.player1 !== userId && battle.player2 !== userId && battle.player2) {
             console.log(`🚫 Battle ${battleId} already has two players.`);
             return res.status(200).json({ success: false, message: "This battle is already full." });
+        }
+        // ✅ Ensure user has enough tokens (assuming you have a User model)
+        const profile = yield Profile_1.default.findOne({ userId });
+        if (!profile || profile.amount < battle.amount) {
+            return res.status(400).json({ success: false, message: "You have insufficient tokens." });
         }
         // ✅ If player1 is present, set user as player2; otherwise, do nothing extra
         const updatedBattle = yield Battle_1.default.findByIdAndUpdate(battleId, {

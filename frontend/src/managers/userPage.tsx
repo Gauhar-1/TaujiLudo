@@ -44,6 +44,7 @@ import { RedeemEarnings } from "../components/redeemEarning";
 import { useEffect, useState } from "react";
 import { ErrorPage } from "../components/errorPage";
 import axios from "axios";
+import { API_URL } from "../utils/url";
 
 
 export const UserPage = ()=>{
@@ -68,7 +69,7 @@ export const UserPage = ()=>{
             return console.log("Server is up");
           }
           try { 
-            const response = await axios.get("https://api.taujiludo.in/api/auth/health");
+            const response = await axios.get(`${API_URL}/api/auth/health`);
            
             const { status } = response.data;
 
