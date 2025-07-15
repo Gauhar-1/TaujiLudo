@@ -18,25 +18,18 @@ connectDB();
 
 const allowedOrigins = ["http://localhost:5173", "https://tauji-ludo.vercel.app/"];
 
-const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("🚫 Blocked by CORS:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Added OPTIONS method
-  allowedHeaders: ["Content-Type", "Authorization"], // ✅ Ensure headers are allowed
-  optionsSuccessStatus: 200, // ✅ Fixes preflight request issues in some browsers
-};
-
-
-// ✅ Middleware (CORS should be first)
-app.use(cors(corsOptions)); // ✅ Apply corsOptions here
-app.options("*", cors(corsOptions)); // ✅ Handle preflight requests
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow no-origin requests (e.g., Postman) or allowed domains
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+  })
+);
 
 
 // ✅ JSON, URL Encoding, and Cookie Parsing Middleware
@@ -47,22 +40,10 @@ app.use(cookieParser());
 // ✅ Register API Routes (After CORS)
 app.use('/api/auth', router);
 
-// app.use("/admin", (req: any, res: any, next: any) => {
-//   const origin = req.headers.origin || "";
-//   const referer = req.headers.referer || "";
-
-//   if (allowedOrigins.includes(origin) || allowedOrigins.some((o) => referer.startsWith(o))) {
-//     return next();
-//   }
-
-//   return res.status(403).json({ error: "Forbidden: Access Denied!" });
-// });
-
-
 
 const io = new Server(server, {
   cors: {
-    origin: [ "http://localhost:5173","https://taujiludo.in", "https://api.taujiludo.in"], // ✅ Allow requests from your frontend
+    origin: [ "http://localhost:5173","https://tauji-ludo.vercel.app/"], // ✅ Allow requests from your frontend
     methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
     credentials: true,
   },
@@ -89,9 +70,9 @@ app.use("*", (req : any, res: any) => {
   res.status(404).json({ error: "API route not found" });
 });
 
-// ✅ Global Error Handling Middleware
+// ✅ Handle Errors
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error("🚨 Error:", err.message);
+  console.error("🚨 Error:", err.message) ;
 
   if (err.name === "UnauthorizedError") {
     return res.status(401).json({ error: "Unauthorized access" });
