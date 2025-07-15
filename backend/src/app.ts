@@ -16,7 +16,7 @@ const server = http.createServer(app);
 // ✅ Connect to Database
 connectDB();
 
-const allowedOrigins = ["http://localhost:5173", "https://tauji-ludo.vercel.app/"];
+const allowedOrigins = ["http://localhost:5173", "https://tauji-ludo.vercel.app"];
 
 app.use(
   cors({
