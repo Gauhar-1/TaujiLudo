@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { BettingCard } from "./bettingCard";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { API_URL } from "../utils/url";
+import { API_URL, SOCKET_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
 import { io } from "socket.io-client";
 import { RunningBattle } from "./runningBattleCard";
@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 //   path: "/socket.io/",
 //   withCredentials: true,
 // });
-export const socket = io("http://localhost:5000", {
+export const socket = io(`${SOCKET_URL}`, {
   transports: ["websocket"], // Force WebSocket connection
   path: "/socket.io/",
   withCredentials: true,
