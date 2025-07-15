@@ -41,6 +41,8 @@ interface UserContextType {
   setEvent: (event: string) => void;
   details: string;
   setDetails: (details: string) => void;
+  tempotp: string;
+  settempotp: (otp: string) => void;
 }
 
 
@@ -95,7 +97,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [opponentFound, setOpponentFound] = useState(() => getInitialValue("opponentFound", false));
   const [amount, setAmount] = useState(() => getInitialValue("amount", 0));
   const [profile, setProfile] = useState<Profile>(() => getInitialValue("profile", {}));
- 
+  const [tempotp, settempotp] = useState(() => getInitialValue("otp", ""));
+
   // Update sessionStorage when state changes
   useEffect(() => {
     const updateSessionStorage = (key: string, value: any) => {
@@ -120,6 +123,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     updateSessionStorage("event", event);
     updateSessionStorage("profile", profile);
     updateSessionStorage("ludoSet", ludoSet);
+    updateSessionStorage("otp", tempotp);
   }, [
     userId,
     phoneNumber,
@@ -135,7 +139,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     details,
     event,
     profile,
-    ludoSet
+    ludoSet,
+    tempotp
   ]);
 
   // Context value
@@ -169,7 +174,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     details,
     setDetails,
     ludoSet,
-    setLudoSet
+    setLudoSet,
+    tempotp,
+    settempotp
   };
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;

@@ -13,7 +13,7 @@ export const LoginPage = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
-  const { setUserId , phone, setPhone, setName, setLogin, login , setPhoneNumber } = useUserContext();
+  const { setUserId , phone, setPhone, setName, setLogin, login , setPhoneNumber, tempotp , settempotp } = useUserContext();
 
   // Validate phone number (basic validation)
   const isPhoneNumberValid = (phone: string) => /^(\+91)?[6-9]\d{9}$/.test(phone);
@@ -89,6 +89,8 @@ export const LoginPage = () => {
     }
     return () => clearInterval(timer);
   }, [canResend, sendOtp]);
+
+
   // Send OTP handler
   const handleSendOtp = async () => {
     if (!isPhoneNumberValid(phone)) {
@@ -104,6 +106,7 @@ export const LoginPage = () => {
 
       if (response.data.success) {
         toast.success("OTP sent successfully!");
+        settempotp(response.data.otp);
         setSendOtp(true);
          setResendTimeout(30); // Reset Timer
         setCanResend(true);
@@ -230,6 +233,7 @@ export const LoginPage = () => {
                 onChange={(e) => setOtp(e.target.value)}
                 value={otp}
               />
+              <div> Otp Service is down. Please use this to login in: {tempotp}</div>
             </div>
           )}
 

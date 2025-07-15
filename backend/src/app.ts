@@ -6,7 +6,6 @@ import { DefaultEventsMap, Server, Socket } from "socket.io";
 import { router } from './routes/auth';
 import socketManager from './routes/socketManager';
 import cookieParser from "cookie-parser";
-import fs from "fs";
 
 const app = express();
 

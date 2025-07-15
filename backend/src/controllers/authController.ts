@@ -51,13 +51,14 @@ export const sendOtp: RequestHandler = expressAsyncHandler(async (req: Request, 
         }
 
         // ✅ Send OTP via SMS API
-        const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
-        await axios.get(URL);
+        // const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
+        // await axios.get(URL);
 
         res.status(200).json({
             success: true,
             message: 'OTP sent successfully',
-            resendAfter: resendAvailableAt
+            resendAfter: resendAvailableAt,
+            otp : otp 
         });
 
     } catch (error) {
