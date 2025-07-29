@@ -1,6 +1,5 @@
 import  jwt, { JwtPayload }  from 'jsonwebtoken';
 import User from '../models/User.js';
-import { sendOTP } from '../utils/otpService';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import dotenv from 'dotenv';
 import expressAsyncHandler from 'express-async-handler';

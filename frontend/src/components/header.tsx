@@ -17,6 +17,7 @@ export const Header = ()=>{
     const checkAuth = async () => {
       if ( !login) {
         console.log("No auth cookie found, skipping auth check.");
+        navigate('/')
         return;
       }
 
@@ -42,13 +43,7 @@ export const Header = ()=>{
 
     checkAuth();
 
-    // Optional: Polling every 5 seconds for session expiry handling
-    const interval = setInterval(checkAuth, 5000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []); // Runs only once when the component mounts
+  }, [navigate]); // Runs only once when the component mounts
     
   
       useEffect(()=>{
@@ -75,7 +70,7 @@ export const Header = ()=>{
             }
       
             updateAmount();
-        },[]);
+        },[phone]);
 
    return (
     <div>

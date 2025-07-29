@@ -118,7 +118,7 @@ export const HomePage = () => {
 
     fetchOngoingBattles();
 
-    const interval = setInterval( fetchOngoingBattles, 1000);
+    const interval = setInterval( fetchOngoingBattles, 5000);
 
     // Cleanup on component unmount
     return () => clearInterval(interval);
@@ -144,7 +144,7 @@ export const HomePage = () => {
 
     fetchOngoingBattles();
 
-    const interval = setInterval( fetchOngoingBattles, 1000);
+    const interval = setInterval( fetchOngoingBattles, 10000);
 
     // Cleanup on component unmount
     return () => clearInterval(interval);
