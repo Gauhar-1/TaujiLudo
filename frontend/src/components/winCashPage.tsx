@@ -1,7 +1,26 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 
 export const WinCashPage = ()=>{
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState<Boolean>(false);
+
+    useEffect(()=>{
+      setIsLoading(true);
+        setTimeout(()=>{
+          setIsLoading(false);  
+        },1000);
+    },[])
+
+    if(isLoading){
+      return (
+        <div className="flex items-center h-screen w-full ">
+        <div className="bg-gray-200 mx-10 bg-opacity-100 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>
+        </div>
+      )
+    }
     return (
         <div className="min-h-screen bg-gray-200 max-w-sm">
             <div className="py-16 flex flex-col ">

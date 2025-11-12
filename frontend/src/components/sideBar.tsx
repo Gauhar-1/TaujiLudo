@@ -30,11 +30,8 @@ export const SideBar = (props : any)=>{
 
     return (
         <div className="bg-white fixed min-h-screen min-w-64  z-50 flex flex-col">
-          <div className="flex justify-between">
-            <div className="pt-2">
-            <img src="/logo.png" alt="" className="h-12"/>
-            </div>
-            <div className="p-4 font-bold text-lg" onClick={()=>{
+          <div className="flex justify-end"> 
+            <div className="py-1 px-4 hover:cursor-pointer font-bold text-lg" onClick={()=>{
             props.setSidebarClicked(false);
           }}>
             X

@@ -17,7 +17,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_js_1 = __importDefault(require("../models/User.js"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
-const axios_1 = __importDefault(require("axios"));
 const Profile_js_1 = __importDefault(require("../models/Profile.js"));
 const faker_1 = require("@faker-js/faker");
 const crypto_1 = __importDefault(require("crypto"));
@@ -57,12 +56,13 @@ exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awa
             });
         }
         // ✅ Send OTP via SMS API
-        const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
-        yield axios_1.default.get(URL);
+        // const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
+        // await axios.get(URL);
         res.status(200).json({
             success: true,
             message: 'OTP sent successfully',
-            resendAfter: resendAvailableAt
+            resendAfter: resendAvailableAt,
+            otp: otp
         });
     }
     catch (error) {

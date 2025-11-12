@@ -151,13 +151,22 @@ export const ProfilePage = ()=>{
         setIsLoading(false);
       }
     };
-
+  
+    if(isLoading){
+      return (
+        <div className="flex items-center h-screen w-full ">
+        <div className="bg-gray-200 mx-10 bg-opacity-100 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>
+        </div>
+      )
+    }
     
 
     return ( 
-    <div className=" ">
+    <div className="">
         <div className="flex flex-col left-0 inset-y-0 pt-12">
-      <div className="bg-gray-200 max-w-sm  min-h-screen">
+      <div className="bg-gray-200 max-w-sm relative  min-h-screen">
         {editClicked && <div className="absolute bg-gray-300 rounded-lg top-60 left-16 w-60 z-40 p-4 ">
             <div className="flex justify-end font-bold " onClick={()=>{
                 setEditClicked(false);
@@ -179,7 +188,7 @@ export const ProfilePage = ()=>{
             </div>
             </div>}
              {/*********** *Kyc upload **************/}
-             { kycClicked && <div className="absolute z-30 top-32 left-12 bg-gray-400 p-8 rounded-lg">
+             { kycClicked && <div className="absolute top-20 left-3 z-30  bg-gray-400 p-8 rounded-lg">
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col gap-1">
                     <div className="font-bold text-xs">Front View :</div>
@@ -246,10 +255,10 @@ export const ProfilePage = ()=>{
                 </div>
             </div>
             <div className="flex justify-around m-4">
-                <div className="bg-gray-100 h-16 w-40 rounded-md relative z-3 hover:bg-gray-700  font-bold" onClick={()=>{
+                <div className="bg-gray-100 h-16 w-40 rounded-md relative z-3 hover:bg-gray-400  font-bold" onClick={()=>{
                   navigate('/wallet')
                 }}>
-                    <img src="../../wallet.png" alt="" className="size-7 absolute top-0 left-16 mt-2   " />
+                    <img src="../../wallet.png" alt="" className="size-7 absolute top-0 left-16 mt-2" />
                     <div className="absolute top-8 left-10 mt-1">My Wallet</div>
                 </div>
                 { kycStatus === "pending" &&<div className="bg-red-500  rounded-md h-16 w-40 flex justify-center " onClick={()=>{
@@ -298,9 +307,7 @@ export const ProfilePage = ()=>{
                     handleLogOut();
                 }}>Log out</div>
                 </div>
-                {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
-               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-             </div>}
+                
         </div>
 
         </div>

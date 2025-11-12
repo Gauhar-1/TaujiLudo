@@ -6,6 +6,7 @@ import { useUserContext } from "../hooks/UserContext";
 
 export const HistoryPage = ()=>{
   const { userId } = useUserContext() ;
+  const [ isLoading, setIsLoading] = useState<Boolean>(false);
   const[notifications, setNotifications] = useState<[{
       _id: string;
       userId: string;
@@ -31,6 +32,7 @@ export const HistoryPage = ()=>{
      useEffect(()=>{
 
       const loadNotificatons = async()=>{
+        setIsLoading(true);
        try{ const response = await axios
         .get(`${API_URL}/api/auth/notifications`, {params: { userId }})
 
@@ -46,10 +48,23 @@ export const HistoryPage = ()=>{
               catch(err){
                 console.log("err :" +err);
               }
+              finally{
+                setIsLoading(false);
+              }
           }
           
           loadNotificatons();
   },[userId, setNotifications])
+
+   if(isLoading){
+      return (
+        <div className="flex items-center h-screen w-full ">
+        <div className="bg-gray-200 mx-10 bg-opacity-100 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>
+        </div>
+      )
+    }
   
     return (
         <div className="bg-gray-300 pt-12 min-h-screen max-w-sm flex flex-col pb-16">

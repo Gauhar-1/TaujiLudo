@@ -50,8 +50,8 @@ export const  WithdrawToBank = ()=>{
 
     return (
         <div className="bg-gray-200 min-h-screen max-w-sm ">
-            <div className=" relative ">
-                <div className="absolute top-20 rounded-md bg-gray-300 m-6 ">
+            <div className="pt-16">
+                <div className="rounded-md bg-gray-300 m-8 ">
                 <div className="p-4 w-80 text-center font-serif text-2xl">Withdrawal To Bank</div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Account Holder's Name:</div>

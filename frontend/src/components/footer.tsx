@@ -5,7 +5,8 @@ export const Footer =()=>{
     const navigate = useNavigate();
     const { login } = useUserContext();
     return (
-        <div className="fixed left-0 bottom-0  w-96 z-50">
+        <div className="fixed bottom-0">
+        <div className="w-96 z-50">
         {login && <div className="bg-yellow-500  flex justify-between pl-6 pr-8 py-2">
             <img src="../../home.png" alt="." className="size-6 hover:bg-yellow-600" onClick={()=>{
                 navigate("/winCash");
@@ -17,6 +18,7 @@ export const Footer =()=>{
                 navigate("/profile");
             }}/>
         </div>}
+        </div>
         </div>
     )
 }

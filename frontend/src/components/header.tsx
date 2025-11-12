@@ -73,9 +73,8 @@ export const Header = ()=>{
         },[phone]);
 
    return (
-    <div>
-
-    <div className="fixed left-0 top-0 z-40 w-96 shadow-xl max-w-sm bg-white">
+    <div className="fixed top-0">
+    <div className="z-40 w-96 shadow-xl max-w-sm bg-white">
       { login && <div className=" flex flex-row justify-between ">
        <div className="flex flex-row p-2 gap-6">
          <div className="ml-2 pt-2" onClick={()=>{

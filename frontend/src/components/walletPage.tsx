@@ -44,6 +44,16 @@ export const WalletPage = ()=>{
         fetchProfile();
       }, []);
 
+       if(isLoading){
+      return (
+        <div className="flex items-center h-screen w-full ">
+        <div className="bg-gray-200 mx-10 bg-opacity-100 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>
+        </div>
+      )
+    }
+
     return (
         <div className="bg-gray-300 min-h-screen max-w-sm pt-12 py-6 flex flex-col ">
             <div className="bg-white py-4 text-center rounded-md my-6 ml-8 w-80 flex justify-center gap-4 text-blue-600 " onClick={()=>{
@@ -86,9 +96,7 @@ export const WalletPage = ()=>{
                         Cannot be withdrawn to Paytm or Bank.</div>
                     </div>
                 </div>
-                {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
-               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-             </div>}
+                
         </div>
     )
 }

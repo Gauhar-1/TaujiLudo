@@ -47,8 +47,8 @@ export const  RedeemEarnings = ()=>{
     const navigate = useNavigate();
     return (
         <div className="bg-gray-200 min-h-screen max-w-sm ">
-            <div className=" relative ">
-                <div className="absolute top-20 rounded-md bg-gray-300 my-6 mx-8 ">
+            <div className=" pt-16">
+                <div className=" rounded-md bg-gray-300 my-6 mx-8 ">
                 <div className="p-4 w-80 text-center font-serif text-2xl"><b className="text-3xl text-purple-600 ">Redeem</b> <br /> <b className="text-lg font-mono"> Referal Earnings</b> </div>
                  <div className="px-6 py-2 flex flex-col gap-2">
                     <div className="text-sm font-semibold text-slate-500">Amount to Redeem:</div>

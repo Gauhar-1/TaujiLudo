@@ -84,12 +84,12 @@ export const DepositPage = ()=>{
    
     
     return (
-        <div className="bg-gray-200 min-h-screen max-w-sm flex flex-col justify-between">
-            <div className="relative"> 
-            <div className=" absolute   top-16 left-0 px-4 flex flex-col gap-6">
+        <div className="z-6 bg-gray-200 min-h-screen max-w-sm flex flex-col justify-between">
+            <div className="mt-12"> 
+            <div className="px-4 flex flex-col gap-6">
                 
             <div className="bg-gray-200 py-4  ">
-            <div className=" relative ">
+            <div className="">
             {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
              </div>}

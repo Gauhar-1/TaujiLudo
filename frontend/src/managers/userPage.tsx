@@ -105,8 +105,9 @@ export const UserPage = ()=>{
   // }
 
   return (
-    <div>
+    <div className="flex justify-center">
       {!adminClicked && <Header />}
+    <div>
       <Routes>
         <Route path="/home" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -149,6 +150,7 @@ export const UserPage = ()=>{
           <Route path="adminNotification" element={<AdminNotification />} />
         </Route>
       </Routes>
+    </div>
       {!adminClicked && <Footer />}
     </div>
   );

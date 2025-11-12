@@ -4,7 +4,7 @@ export const WithdrawPage =()=>{
     const navigate = useNavigate();
     return (
         <div className="bg-gray-200 min-h-screen max-w-sm p-2"> 
-            <div className="flex flex-col justify-start pt-16 gap-4 px-4">
+            <div className="flex flex-col justify-start pt-16 gap-4 px-8">
                 <div className="font-serif text-2xl">Choose withdrawal option</div>
                 <div className="bg-white flex p-4 rounded-md gap-4 hover:cursor-pointer" onClick={()=>{
                     navigate('/withdrawToUPI')

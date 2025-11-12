@@ -27,6 +27,7 @@ export const HomePage = () => {
   const { userId, name, battleId } = useUserContext(); // Access userId from the context
   const [amount, setAmount] = useState<number>(0);
   const [ info , setInfo ] = useState("");
+  const [ isFetching ,setIsFetching] = useState<Boolean>(false);
 
   const getLocalStorageValue = (key: string, defaultValue: any) => {
     try {
@@ -83,6 +84,7 @@ export const HomePage = () => {
   // Info Bar
   useEffect(()=>{
     const handleInfoBar = async()=>{
+      setIsLoading(false);
       try{
         const response = await axios.get(`${API_URL}/api/auth/getAdmin`);
         if(!response.data){
@@ -93,6 +95,9 @@ export const HomePage = () => {
       }
       catch(err){
         console.log("Error: "+ err);
+      }
+      finally{
+        setIsLoading(false);
       }
     }
 
@@ -128,6 +133,7 @@ export const HomePage = () => {
   // Fetch ongoing battles
   useEffect(() => {
     const fetchOngoingBattles = async () => {
+      setIsFetching(true);
       try {
         const response = await axios.get(`${API_URL}/api/auth/battles`, { params : { status :  "in-progress"}});
         if (response?.data) {
@@ -138,7 +144,7 @@ export const HomePage = () => {
         console.error("Error fetching ongoing battles:", error);
       }
       finally{
-        setIsLoading(false)
+        setIsFetching(false)
       }
     };
 
@@ -292,12 +298,22 @@ export const HomePage = () => {
     },
   ]
   
+  if(isLoading){
+      return (
+        <div className="flex items-center h-screen w-full ">
+        <div className="bg-gray-200 mx-10 bg-opacity-100 shadow-xl p-10 rounded-md flex flex-col gap-4">
+               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+             </div>
+        </div>
+      )
+    }
+  
 
     return (
-        <div className="max-w-sm bg-gray-300 min-h-screen">
+        <div className=" bg-gray-300 min-h-screen w-96">
             <div className="flex flex-col pt-12">
                 <div className="bg-gray-300 pb-16">
-                  <div className="bg-yellow-500 px-4 pt-3 pb-1 shadow-md   text-sm font-mono text-center text-white">Commision 5% | Referal 2%</div>
+                  <div className="bg-yellow-500 px-4 pb-1 pt-3 w-full shadow-md   text-sm font-mono text-center text-white">Commision 5% | Referal 2%</div>
                         <div>
                           <div className="p-6 shadow-md text-center bg-purple-700 border border-black mx-6 mt-4 rounded-lg font-semibold text-gray-200 text-xs  ">{info}</div>
                             <div className="font-serif text-center pt-4">CREATE A BATTLE!</div>
