@@ -371,7 +371,7 @@ export const HomePage = () => {
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                            {onGoingB && onGoingB.map((battle: any) => (
+                            {isFetching?<div>Loading...</div> :onGoingB && onGoingB.map((battle: any) => (
                                 <RunningBattle key={battle._id} battle={battle} />
                             ))}
                         </div>
