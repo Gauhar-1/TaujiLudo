@@ -6,8 +6,7 @@ export const AdminHeader = ()=>{
   const [sidebarClicked , setSidebarClicked] = useState(false);
    return (
     <div className="z-50">
-
-    <div className="fixed left-0 top-0  w-96 shadow-xl max-w-sm bg-white">
+    <div className="w-96 shadow-xl max-w-sm bg-white">
        <div className=" flex flex-row justify-between ">
        <div className="flex flex-row p-2 gap-6">
          <div className="ml-2 pt-2" onClick={()=>{

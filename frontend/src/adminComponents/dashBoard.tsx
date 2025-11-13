@@ -49,7 +49,7 @@ export const DashBoard = ()=>{
     
 
     return (
-        <div className="bg-gray-200 min-h-screen max-w-sm pt-20 px-4 pb-10">
+        <div className="bg-gray-200 min-h-screen max-w-sm pt-4 px-4 pb-10">
             <div className="text-3xl font-serif">DashBoard</div>
             <div className="bg-white  rounded-md shadow-md pb-4">
                 <div className="bg-gray-100 rounded-t-md">

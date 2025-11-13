@@ -47,7 +47,7 @@ export const AdminNotification = ()=>{
   },[])
   
     return (
-        <div className="bg-gray-200 pt-16 min-h-screen max-w-sm flex flex-col pb-16">
+        <div className="bg-gray-200 pt-4 min-h-screen max-w-sm flex flex-col pb-16">
           {notifications.map((notification) => (
     <NotifyCard key={notification._id} notification={notification} />
   ))}

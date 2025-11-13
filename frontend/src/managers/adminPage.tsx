@@ -5,7 +5,7 @@ export const AdminPage = ()=>{
     return (
         <div>
             <AdminHeader></AdminHeader>
-        <Outlet /> {/* Render the nested route's component here */}
+        <Outlet /> 
       </div>
     )
 }

@@ -37,7 +37,7 @@ export const TransactionHistory = ()=>{
     },[userId])
 
     return (
-        <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
+        <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-4 px-4">
                    <div className="text-3xl font-serif pb-4">Transaction History</div>
                    <div className="bg-white  rounded-md shadow-md pb-4">
                     <div className="bg-gray-300 flex justify-center gap-2 p-6">

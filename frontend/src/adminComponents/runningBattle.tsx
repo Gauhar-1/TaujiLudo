@@ -3,7 +3,7 @@ import { StickyTable } from "../utils/runningBTable"
 
  export const RunningBattle = ()=>{
     return (
-         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-20 px-4">
+         <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-4 px-4">
             <div className="text-3xl font-serif">Battles</div>
             <div className="bg-white  rounded-md shadow-md pb-4">
                 <div className="bg-gray-100 rounded-t-md">
