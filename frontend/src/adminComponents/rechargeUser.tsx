@@ -14,7 +14,7 @@ import { useUserContext } from "../hooks/UserContext";
                     <div className=" font-semibold my-4 py-3 px-4 text-blue-700 border-b-2">Recharge Money</div>
                 </div>
                 <div className="px-6  flex flex-col gap-2">
-                    <div className="text-gray-400">Search Player :</div>
+                    <div className="text-gray-400">Search Player:</div>
                     <input type="text" placeholder="Name , Phone Number, userId" className="border border-black rounded-md px-2 py-1" onChange={(e)=>{
                         setPhoneNumber(e.target.value);
                     }}/>
