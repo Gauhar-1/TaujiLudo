@@ -4,314 +4,223 @@ import { useNavigate } from "react-router-dom";
 import { API_URL } from "../utils/url";
 import { useUserContext } from "../hooks/UserContext";
 import { toast } from "react-toastify";
+import { 
+  User, Edit3, Mail, Phone, Wallet, ShieldCheck, 
+  ShieldAlert, Trophy, Sword, Users, LogOut, Camera, X 
+} from "lucide-react";
 
-export const ProfilePage = ()=>{
+export const ProfilePage = () => {
+  const [editClicked, setEditClicked] = useState(false);
+  const [kycClicked, setKycClicked] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
+  const [email, setEmail] = useState(() => localStorage.getItem("email") || "");
+  const navigate = useNavigate();
+  const { name, setName, phone, userId, setPhone, setUserId, setLogin, setPhoneNumber } = useUserContext();
+  const [Name, setname] = useState("");
+  const [DOB, setDOB] = useState("");
+  const [state, setState] = useState("");
+  const [documentNumber, setDocumentNumber] = useState("");
+  const [kycStatus, setKycStatus] = useState("");
+  const [earnings, setEarnings] = useState(0);
+  const [cashWon, setCashWon] = useState(0);
+  const [battlePlayed, setBattlePlayed] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [editClicked, setEditClicked] = useState(false);
-    const [ kycClicked, setKycClicked ] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
-    const [email, setEmail] = useState( () => localStorage.getItem("email") ||  "@gmail.com");
-    const navigate = useNavigate();
-    const { name, setName, phone, userId, setPhone , setUserId, setLogin, setPhoneNumber } = useUserContext();
-    const [ Name , setname ] = useState("")
-    const [ DOB , setDOB ] = useState("")
-    const [ state , setState ] = useState("")
-    const [ documentNumber , setDocumentNumber ] = useState("")
-    const [ kycStatus , setKycStatus ] = useState("")
-    const [ earnings , setEarnings ] = useState(0)
-    const [ cashWon , setCashWon ] = useState(0)
-    const [ battlePlayed , setBattlePlayed ] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setIsLoading(true);
+      if (!phone) return;
+      try {
+        const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params: { phoneNumber: phone } });
+        if (response.data) {
+          const { phoneNumber, name, email, userId, kycDetails, totalUserReferalEarning, gameWon, cashWon, gameLost } = response.data[0];
+          setName(name);
+          setEmail(email);
+          setPhone(phoneNumber);
+          setUserId(userId);
+          setKycStatus(kycDetails.status);
+          setEarnings(totalUserReferalEarning);
+          setCashWon(cashWon);
+          setBattlePlayed(gameWon + gameLost);
+        }
+      } catch (err) { console.error(err); }
+      finally { setIsLoading(false); }
+    };
+    fetchProfile();
+  }, [phone]);
 
-  
-    // Get phoneNumber from location state or fallback
-    
+  const updateProfile = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/update-Profile`, { phoneNumber: phone, name, email });
+      if (response.data.success) toast.success("Profile Updated!");
+    } catch (err) { console.error(err); }
+    finally { setIsLoading(false); setEditClicked(false); }
+  };
+
+  const handleLogOut = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+      if (response.data.success) {
+        setUserId(""); setName(""); setPhone(""); setPhoneNumber(""); setLogin(false);
+        navigate("/");
+      }
+    } catch (err) { console.error(err); }
+    finally { setIsLoading(false); }
+  };
+
+  if (isLoading) return (
+    <div className="flex items-center justify-center h-screen w-full bg-[#0b0b0d]">
+      <div className="h-16 w-16 border-4 border-t-purple-500 border-purple-500/20 rounded-full animate-spin"></div>
+    </div>
+  );
+
+  return (
+    <div className="bg-[#0b0b0d] min-h-screen w-full max-w-md mx-auto pt-16 pb-24 px-5 text-gray-100 relative">
+      
+      {/* --- EDIT PROFILE MODAL --- */}
+      {editClicked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+          <div className="bg-[#1a1a1f] w-full rounded-3xl p-6 border border-white/10 animate-slide-up">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-black text-lg">EDIT PROFILE</h3>
+              <X className="cursor-pointer text-gray-500" onClick={() => setEditClicked(false)} />
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Username</label>
+                <input type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none focus:border-purple-500" value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase ml-1">Email Address</label>
+                <input type="email" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none focus:border-purple-500" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <button className="w-full bg-purple-600 py-3 rounded-xl font-black text-sm uppercase shadow-lg shadow-purple-500/20 mt-4" onClick={updateProfile}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- KYC MODAL --- */}
+      {kycClicked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6 overflow-y-auto">
+          <div className="bg-[#1a1a1f] w-full rounded-3xl p-6 border border-white/10 my-10">
+            <h3 className="font-black text-lg mb-6">IDENTITY VERIFICATION</h3>
+            <div className="space-y-4">
+               <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#25252b] p-3 rounded-2xl border border-dashed border-white/10 text-center">
+                    <Camera size={20} className="mx-auto text-gray-500 mb-1" />
+                    <p className="text-[8px] uppercase font-bold text-gray-400">Front View</p>
+                    <input type="file" className="hidden" id="front" onChange={(e) => setSelectedFile(e.target.files![0])} />
+                    <label htmlFor="front" className="text-[10px] text-purple-400 font-bold block mt-1 cursor-pointer truncate">{selectedFile ? selectedFile.name : "Upload"}</label>
+                  </div>
+                  <div className="bg-[#25252b] p-3 rounded-2xl border border-dashed border-white/10 text-center">
+                    <Camera size={20} className="mx-auto text-gray-500 mb-1" />
+                    <p className="text-[8px] uppercase font-bold text-gray-400">Back View</p>
+                    <input type="file" className="hidden" id="back" onChange={(e) => setSelectedFile2(e.target.files![0])} />
+                    <label htmlFor="back" className="text-[10px] text-purple-400 font-bold block mt-1 cursor-pointer truncate">{selectedFile2 ? selectedFile2.name : "Upload"}</label>
+                  </div>
+               </div>
+               <input placeholder="Full Name (As per Aadhar)" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setname(e.target.value)} />
+               <input placeholder="DOB (DD/MM/YYYY)" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setDOB(e.target.value)} />
+               <input placeholder="State" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setState(e.target.value)} />
+               <input placeholder="Aadhar Number" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setDocumentNumber(e.target.value)} />
+               
+               <div className="flex gap-2 pt-4">
+                 <button className="flex-1 bg-gray-800 py-3 rounded-xl font-bold text-sm" onClick={() => setKycClicked(false)}>Cancel</button>
+                 <button className="flex-1 bg-green-600 py-3 rounded-xl font-bold text-sm" onClick={() => { setKycClicked(false); toast.info("Uploading Documents..."); }}>Submit</button>
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MAIN PROFILE HEADER --- */}
+      <div className="bg-gradient-to-br from-[#1a1a1f] to-[#121217] rounded-[2rem] p-6 border border-white/5 shadow-2xl mb-8 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 p-4">
+          <button onClick={() => setEditClicked(true)} className="bg-white/5 p-2 rounded-xl hover:bg-white/10 transition-colors">
+            <Edit3 size={18} className="text-purple-400" />
+          </button>
+        </div>
         
-  
-    useEffect(() => {
-      const fetchProfile = async () => {
-        setIsLoading(true);
-        if (!phone) {
-          console.log("Phone number (Profile): "+ phone);
-          return;
-        }
-  
-        try {
-          const response = await axios.get(
-            `${API_URL}/api/auth/findProfile`,
-             { params :{ phoneNumber : phone }} 
-          );
-  
-          if (response.data) {
-            const {phoneNumber, name, email, userId, kycDetails, totalUserReferalEarning, gameWon, cashWon, gameLost } = response.data[0];
-            setName(name );
-            setEmail(email );
-            setPhone(phoneNumber);
-            setName(name);
-            setUserId(userId);
-            setKycStatus(kycDetails.status);
-            setEarnings(totalUserReferalEarning);
-            setCashWon(cashWon);
-            setBattlePlayed(gameWon + gameLost);
-            console.log("Profile fetched successfully.");
-          } else {
-            console.warn("Failed to fetch profile.");
-          }
-        } catch (err) {
-          console.error("Error fetching profile:", err);
-        }
-        finally{
-          setIsLoading(false);
-        }
-      };
-  
-      fetchProfile();
-    }, []);
-  
-    const updateProfile = async () => {
-      setIsLoading(true);
-      if (!name || !phone || !email) {
-        console.error("All fields are required:", { name, phone, email });
-        return;
-      }
-  
-      try {
-        const response = await axios.post(
-          `${API_URL}/api/auth/update-Profile`,
-          { phoneNumber : phone , name, email }
-        );
-  
-        if (response.data.success) {
-          console.log("Profile updated successfully.");
-        } else {
-          console.warn("Failed to update profile.");
-        }
-      } catch (err) {
-        console.error("Error updating profile:", err);
-      }
-    };
-
-    const uploadScreenshot = async () => {
-      if (!selectedFile ||  !selectedFile2 ||  !userId) {
-        alert("Please select a file to upload.");
-        return;
-      }
-      if (!Name ||  !DOB ||  !state  ||  !documentNumber) {
-        alert("Please Enter all the details first");
-        return;
-      }
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-      formData.append("image2", selectedFile2);
-      formData.append("userId", userId);
-      formData.append("Name", Name);
-      formData.append("DOB", DOB);
-      formData.append("state", state);
-      formData.append("documentNumber", documentNumber);
-
-      console.log("Form data:", selectedFile, userId);
-      setIsLoading(true);
-      try {
-          await axios.post(`${API_URL}/api/auth/kyc`, formData);
-
-      } catch (err) {
-        console.error("Error uploading screenshot:", err);
-      }
-      finally{
-        setIsLoading(false);
-      }
-    };
-
-    const handleLogOut = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
-    
-        if (response.data.success) {
-          toast.success("Logged out successfully!", { position: "top-right" });
-    
-          // Clear user state
-          setUserId("");
-          setName("");
-          setPhone("");
-          setPhoneNumber("");
-          setLogin(false);
-    
-          // Redirect to login page
-          navigate("/");
-        } else {
-          toast.error("Logout failed. Please try again.", { position: "top-right" });
-        }
-      } catch (err) {
-        console.error("Logout Error:", err);
-        toast.error("Something went wrong. Try again!", { position: "top-right" });
-      }
-      finally{
-        setIsLoading(false);
-      }
-    };
-  
-    if(isLoading){
-      return (
-        <div className="flex items-center h-screen w-full ">
-        <div className="bg-gray-200 mx-10 bg-opacity-100 shadow-xl p-10 rounded-md flex flex-col gap-4">
-               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-             </div>
-        </div>
-      )
-    }
-    
-
-    return ( 
-    <div className="">
-        <div className="flex flex-col left-0 inset-y-0 pt-12">
-      <div className="bg-gray-200 max-w-sm relative  min-h-screen">
-        {editClicked && <div className="absolute bg-gray-300 rounded-lg top-60 left-16 w-60 z-40 p-4 ">
-            <div className="flex justify-end font-bold " onClick={()=>{
-                setEditClicked(false);
-            }}>X</div>
-            <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs">Enter the username:</div>
-            <input type="text" className="rounded-md p-1" value={name} onChange={(e)=>{setName(e.target.value)}}/>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs">Enter the email:</div>
-            <input type="text" className="rounded-md p-1" value={email}  onChange={(e)=>{setEmail(e.target.value)}}/>
-                </div>
-                <button className="bg-green-500 text-center p-1 mt-3 rounded-md text-white" 
-                onClick={()=>{
-                    setEditClicked(false)
-                    updateProfile();
-                }}>Save</button>
+        <div className="flex items-center gap-5">
+          <div className="relative">
+            <div className="h-20 w-20 rounded-3xl bg-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(147,51,234,0.3)]">
+              <User size={40} className="text-white" />
             </div>
-            </div>}
-             {/*********** *Kyc upload **************/}
-             { kycClicked && <div className="absolute top-20 left-3 z-30  bg-gray-400 p-8 rounded-lg">
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-col gap-1">
-                    <div className="font-bold text-xs">Front View :</div>
-                  <input disabled={isLoading}  type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
-                    if(e.target.files)
-                    setSelectedFile(e.target.files[0])
-                }} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="font-bold text-xs">Back View :</div>
-                  <input disabled={isLoading}   type="file" id="fileInput" className=" text-center shadow-md  rounded-lg px-2 py-2  w-52 border border-black bg-white  text-sm " onChange={(e)=>{
-                    if(e.target.files)
-                    setSelectedFile2(e.target.files[0])
-                }} />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3 pt-2">
-                <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs">Enter the Name :</div>
-            <input disabled={isLoading}  type="text" className="rounded-md p-1"  onChange={(e)=>{setname(e.target.value)}}/>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs"> Date of Birth :</div>
-            <input disabled={isLoading}  type="text" className="rounded-md p-1"   onChange={(e)=>{setDOB(e.target.value)}}/>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs"> State :</div>
-            <input disabled={isLoading}  type="text" className="rounded-md p-1"   onChange={(e)=>{setState(e.target.value)}}/>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div className="font-bold text-xs"> Aadhar Number :</div>
-            <input disabled={isLoading}  type="text" className="rounded-md p-1"   onChange={(e)=>{setDocumentNumber(e.target.value)}}/>
-                </div>
-                </div>
-               
-                <button disabled={isLoading}  className="bg-green-400 text-white text-center mt-6 mx-8 p-2 rounded-lg " onClick={()=>{
-                  uploadScreenshot();
-                  setKycClicked(false);
-                }}>Done</button>
-                <button disabled={isLoading}  className="bg-gray-500 text-white text-center mt-2 mx-16 p-2 rounded-lg " onClick={()=>{
-                  setKycClicked(false);
-                }}>back</button>
-                </div>}
-            <div className="m-5 bg-gray-600 rounded-xl flex flex-col hover:bg-gray-700 ">
-                <div className="flex">
-                <img src="../../profile.png" alt=""  className="h-32  p-3"/>
-                <div className="text-white text-xl w-32 font-serif mx-6 my-10" >{name}</div>
-                <div onClick={()=>{
-                   setEditClicked(true);
-                }}>
-                  
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" className="size-6 mt-11 ">
-  <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-</svg>
-                </div>
-
-                </div>
-                <div className="grid grid-cols-10 p-1 m-1">
-                    <div className="col-start-2 flex gap-1">
-                    <img src="../../call-icon.png" alt="" className="h-5 pt-1 "/>
-                    <div className="text-white font-semibold text-sm">{phone}</div>
-                    </div>
-                    <div className="text-white font-semibold col-start-6 text-sm  ">{email}</div>
-                </div>
-            </div>
-            <div className="flex justify-around m-4">
-                <div className="bg-gray-100 h-16 w-40 rounded-md relative z-3 hover:bg-gray-400  font-bold" onClick={()=>{
-                  navigate('/wallet')
-                }}>
-                    <img src="../../wallet.png" alt="" className="size-7 absolute top-0 left-16 mt-2" />
-                    <div className="absolute top-8 left-10 mt-1">My Wallet</div>
-                </div>
-                { kycStatus === "pending" &&<div className="bg-red-500  rounded-md h-16 w-40 flex justify-center " onClick={()=>{
-                      setKycClicked(true);
-                    }}>
-                    <div className="absolute text-center py-4  font-bold text-white" >Kyc pending</div>
-                </div>}
-                { kycStatus === "verified" &&<div className="bg-gray-100  rounded-md h-16 w-40 relative hover:bg-gray-700 ">
-                    <img src="../../kyc.png" alt=""  className="size-7 absolute top-0 left-16 mt-2 " />
-                    <div className="absolute top-8 left-6 mt-1 font-bold" >Kyc completed</div>
-                </div>}
-
-               
-            </div>
-                <div className="flex justify-around m-8">
-                    <div className="">
-                        <div className="relative bg-gray-100 h-32 w-20 rounded-md flex flex-col gap-4 hover:bg-green-500">
-                          <div className="flex justify-center p-4">
-                        <img src="../../cash.png" alt="" className="size-8 "/>
-                          </div>
-                        <div className="font-bold text-black  px-4 ">{cashWon}</div>
-                        </div>
-                        <div className="font-thin text-xs text-center p-2">cash won</div>
-                    </div>
-                    <div>
-                    <div className="bg-gray-100 h-32 w-20 rounded-md  flex flex-col gap-4 hover:bg-green-500">
-                      <div className="flex justify-center p-4">
-                        <img src="../../battle.png" alt="" className="size-8"/>
-                      </div>
-                        <div className="font-bold text-black  text-center top-20">{battlePlayed}</div>
-                    </div>
-                    <div className="font-thin text-xs text-center p-2">Battle Played</div>
-                    </div>
-                    <div>
-                    <div className="bg-gray-100 h-32 w-20 rounded-md  flex flex-col gap-4 hover:bg-green-500">
-                      <div className="flex justify-center p-4">
-                        <img src="../../referal.png" alt="" className="size-8 "/>
-                      </div>
-                        <div className="font-bold text-black text-center">{earnings}</div>
-                    </div>
-                    <div className="font-thin text-xs text-center py-2">Referal Earnings</div>
-                    </div>
-                </div>
-                <div className="mt-16 ">
-                <div className="absolute w-80 bg-gray-300 text-black rounded-xl p-2 m-8 border border-black text-center hover:cursor-pointer hover:bg-green-500 hover:text-white" onClick={()=>{
-                    handleLogOut();
-                }}>Log out</div>
-                </div>
-                
+            <div className="absolute -bottom-2 -right-2 bg-green-500 h-6 w-6 rounded-full border-4 border-[#1a1a1f]" title="Online"></div>
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-xl font-black truncate tracking-tight">{name}</h2>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest flex items-center gap-1 mt-1">
+              <ShieldCheck size={12} className="text-purple-500" /> ID: {userId.slice(-6).toUpperCase()}
+            </p>
+          </div>
         </div>
 
+        <div className="grid grid-cols-2 gap-4 mt-8 border-t border-white/5 pt-6">
+          <div className="flex items-center gap-2">
+            <Phone size={14} className="text-gray-500" />
+            <span className="text-[11px] font-bold text-gray-300">{phone}</span>
+          </div>
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Mail size={14} className="text-gray-500" />
+            <span className="text-[11px] font-bold text-gray-300 truncate">{email}</span>
+          </div>
         </div>
       </div>
-       
-    )
-}
+
+      {/* --- QUICK ACTIONS --- */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div onClick={() => navigate('/wallet')} className="bg-[#1a1a1f] p-4 rounded-3xl border border-white/5 flex items-center justify-between group cursor-pointer hover:border-blue-500/30 transition-all active:scale-95">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-500/10 p-2 rounded-xl text-blue-500"><Wallet size={20} /></div>
+            <span className="text-xs font-black uppercase">Wallet</span>
+          </div>
+        </div>
+
+        {kycStatus === "verified" ? (
+          <div className="bg-green-500/10 p-4 rounded-3xl border border-green-500/20 flex items-center justify-center gap-2">
+            <ShieldCheck size={20} className="text-green-500" />
+            <span className="text-[10px] font-black text-green-500 uppercase">Verified</span>
+          </div>
+        ) : (
+          <div onClick={() => setKycClicked(true)} className="bg-red-500/10 p-4 rounded-3xl border border-red-500/20 flex items-center justify-center gap-2 cursor-pointer animate-pulse active:scale-95">
+            <ShieldAlert size={20} className="text-red-500" />
+            <span className="text-[10px] font-black text-red-500 uppercase">KYC Needed</span>
+          </div>
+        )}
+      </div>
+
+      {/* --- STATS GRID --- */}
+      <div className="grid grid-cols-3 gap-3 mb-10">
+        <div className="bg-[#1a1a1f] p-4 rounded-[1.5rem] border border-white/5 text-center">
+          <Trophy size={20} className="text-yellow-500 mx-auto mb-3" />
+          <h4 className="text-lg font-black italic">₹{cashWon}</h4>
+          <p className="text-[8px] text-gray-500 uppercase font-black mt-1">Cash Won</p>
+        </div>
+        <div className="bg-[#1a1a1f] p-4 rounded-[1.5rem] border border-white/5 text-center">
+          <Sword size={20} className="text-blue-500 mx-auto mb-3" />
+          <h4 className="text-lg font-black italic">{battlePlayed}</h4>
+          <p className="text-[8px] text-gray-500 uppercase font-black mt-1">Battles</p>
+        </div>
+        <div className="bg-[#1a1a1f] p-4 rounded-[1.5rem] border border-white/5 text-center">
+          <Users size={20} className="text-emerald-500 mx-auto mb-3" />
+          <h4 className="text-lg font-black italic">₹{earnings}</h4>
+          <p className="text-[8px] text-gray-500 uppercase font-black mt-1">Referral</p>
+        </div>
+      </div>
+
+      {/* --- LOGOUT BUTTON --- */}
+      <button 
+        onClick={handleLogOut}
+        className="w-full bg-gradient-to-r from-red-600/10 to-red-600/20 border border-red-600/20 text-red-500 py-4 rounded-3xl font-black text-sm uppercase flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white transition-all duration-300 mb-10"
+      >
+        <LogOut size={18} /> Logout Account
+      </button>
+
+    </div>
+  );
+};

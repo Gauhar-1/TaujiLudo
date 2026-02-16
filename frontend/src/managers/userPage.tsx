@@ -1,5 +1,9 @@
+import { useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { useUserContext } from "../hooks/UserContext";
+
+// User Components
 import { Header } from "../components/header";
-import { Route, Routes} from "react-router-dom";
 import { Footer } from "../components/footer";
 import { HomePage } from "../components/homePage";
 import { ProfilePage } from "../components/profilePage";
@@ -14,11 +18,15 @@ import { SupportPage } from "../components/supportPage";
 import { BattlePage } from "../components/battlePage";
 import { RulesPgage } from "../components/rulesPage";
 import { GameHistory } from "../components/GameHistory";
+import { WinCashPage } from "../components/winCashPage";
+import { ReferPage } from "../components/referPage";
+import { Notifications } from "../components/notification";
+import { RedeemEarnings } from "../components/redeemEarning";
+
+// Admin Components
 import { AdminPage } from "./adminPage";
 import { DashBoard } from "../adminComponents/dashBoard";
 import { AllPlayers } from "../adminComponents/allPlayers";
-import { WinCashPage } from "../components/winCashPage";
-import { useUserContext } from "../hooks/UserContext";
 import { TransactionHistory } from "../adminComponents/transaction";
 import { BlockedPlayer } from "../adminComponents/blockedPlayers";
 import { PendingBattle } from "../adminComponents/pendingBattle";
@@ -35,124 +43,93 @@ import { MoneyRecharge } from "../adminComponents/moneyRecharge";
 import { PendingKyc } from "../adminComponents/pendingKyc";
 import { KycVerification } from "../adminComponents/kycVerify";
 import { VerifiedKyc } from "../adminComponents/verifiedKyc";
-import { ReferPage } from "../components/referPage";
 import { PaymentSettings } from "../adminComponents/paymentSettings";
 import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
-import { Notifications } from "../components/notification";
-import { RedeemEarnings } from "../components/redeemEarning";
-import { useEffect } from "react";
-// import { ErrorPage } from "../components/errorPage";
-// import axios from "axios";
-// import { API_URL } from "../utils/url";
 
+export const UserPage = () => {
+  const { adminClicked } = useUserContext();
+  const location = useLocation();
 
-export const UserPage = ()=>{
+  // Update Page Title and Favicon
+  useEffect(() => {
+    document.title = "TaujiLudo | Play & Win";
+    const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+    if (favicon) favicon.href = "logo.png";
+  }, []);
 
-      // const { login  } = useUserContext();
-      // const navigate = useNavigate();
-
-      const { adminClicked } = useUserContext();
-
-      // useEffect(()=>{
-      //   if(login === true){
-      //     navigate('/winCash')
-      //   }
-      // },[login])
-
-      // const [isServerUp, setIsServerUp] = useState(false);
-
-      // useEffect(() => {
-
-      //   const checkServerHealth = async () => {
-      //     if(isServerUp){
-      //       return console.log("Server is up");
-      //     }
-      //     try { 
-      //       const response = await axios.get(`${API_URL}/api/auth/health`);
-           
-      //       const { status } = response.data;
-
-      //       if (!status) throw new Error("Server down");
-      //       setIsServerUp(true);
-      //     } catch (error) {
-      //       console.log("Error: "+ error);
-      //       setIsServerUp(false);
-      //     } 
-      //   };
-    
-      //   // Check every 5 seconds
-      //   const interval = setInterval(checkServerHealth, 5000);
-      //   checkServerHealth(); // Check immediately on load
-    
-      //   return () => clearInterval(interval);
-      // }, []);
-
-      useEffect(() => {
-        document.title = "taujiLudo"; // Change tab title
-      
-        const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
-        if (favicon) {
-          favicon.href = "logo.png"; // Replace with your favicon path
-        }
-      
-      }, []);
-      
-
-  // If server is down, show the error page
-  // if (!isServerUp) {
-  //   return <ErrorPage />;
-  // }
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
-    <div className="flex justify-center">
-      {!adminClicked && <Header />}
-    <div>
-      <Routes>
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/wallet" element={<WalletPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/deposit" element={<DepositPage />} />
-        <Route path="/withdraw" element={<WithdrawPage />} />
-        <Route path="/withdrawToBank" element={<WithdrawToBank />} />
-        <Route path="/withdrawToUPI" element={<WithdrawToUPI />} />
-        <Route path="/support" element={<SupportPage />} />
-        <Route path="/battle" element={<BattlePage />} />
-        <Route path="/rules" element={<RulesPgage />} />
-        <Route path="/refer" element={<ReferPage />} />
-        <Route path="/gameHistory" element={<GameHistory />} />
-        <Route path="/winCash" element={<WinCashPage />} />
-        <Route path="/notification" element={<Notifications />} />
-        <Route path="/referalEarning" element={<RedeemEarnings />} />
-        <Route path="/admin" element={<AdminPage />}>
-          <Route index element={<DashBoard />} />
-          <Route path="allPlayers" element={<AllPlayers />} />
-          <Route path="allPlayers/transaction" element={<TransactionHistory />} />
-          <Route path="blocked" element={<BlockedPlayer />} />
-          <Route path="pendingBattle" element={<PendingBattle />} />
-          <Route path="runningBattle" element={<RunningBattle />} />
-          <Route path="completeBattle" element={<CompleteBattle />} />
-          <Route path="disputeBattle" element={<DisputeBattle />} />
-          <Route path="viewResult" element={<BattleResult />} />
-          <Route path="disputeResult" element={<DisputeResult />} />
-          <Route path="allPayments" element={<AllPayments />} />
-          <Route path="reqPayments" element={<ReqPayments />} />
-          <Route path="paymentReq" element={<PaymentRequest />} />
-          <Route path="rechargeUser" element={<RechargeUser />} />
-          <Route path="addMoney" element={<MoneyRecharge />} />
-          <Route path="pendingKyc" element={<PendingKyc />} />
-          <Route path="verifiedKyc" element={<VerifiedKyc />} />
-          <Route path="pendingKyc/kycView" element={<KycVerification />} />
-          <Route path="paymentSettings" element={<PaymentSettings />} />
-          <Route path="adminSettings" element={<AdminSettings />} />
-          <Route path="adminNotification" element={<AdminNotification />} />
-        </Route>
-      </Routes>
-    </div>
-      {!adminClicked && <Footer />}
+    <div className="min-h-screen bg-[#0b0b0d] flex justify-center selection:bg-purple-500/30">
+      <div className="w-full max-w-md bg-[#0f0f12] shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col relative min-h-screen">
+        
+        {!adminClicked && location.pathname !== "/" && <Header />}
+
+        {/* Content Area */}
+        <main className={`flex-1 flex flex-col ${!adminClicked && location.pathname !== "/" ? "pt-8 pb-20" : ""}`}>
+          <Routes>
+            {/* User Routes */}
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/winCash" element={<WinCashPage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/deposit" element={<DepositPage />} />
+            <Route path="/withdraw" element={<WithdrawPage />} />
+            <Route path="/withdrawToBank" element={<WithdrawToBank />} />
+            <Route path="/withdrawToUPI" element={<WithdrawToUPI />} />
+            <Route path="/support" element={<SupportPage />} />
+            <Route path="/battle" element={<BattlePage />} />
+            <Route path="/rules" element={<RulesPgage />} />
+            <Route path="/refer" element={<ReferPage />} />
+            <Route path="/gameHistory" element={<GameHistory />} />
+            <Route path="/notification" element={<Notifications />} />
+            <Route path="/referalEarning" element={<RedeemEarnings />} />
+
+            {/* Admin Routes (Nested) */}
+            <Route path="/admin" element={<AdminPage />}>
+              {/* <index element={<DashBoard />} /> */}
+              <Route index element={<DashBoard />} />
+              <Route path="allPlayers" element={<AllPlayers />} />
+              <Route path="allPlayers/transaction" element={<TransactionHistory />} />
+              <Route path="blocked" element={<BlockedPlayer />} />
+              <Route path="pendingBattle" element={<PendingBattle />} />
+              <Route path="runningBattle" element={<RunningBattle />} />
+              <Route path="completeBattle" element={<CompleteBattle />} />
+              <Route path="disputeBattle" element={<DisputeBattle />} />
+              <Route path="viewResult" element={<BattleResult />} />
+              <Route path="disputeResult" element={<DisputeResult />} />
+              <Route path="allPayments" element={<AllPayments />} />
+              <Route path="reqPayments" element={<ReqPayments />} />
+              <Route path="paymentReq" element={<PaymentRequest />} />
+              <Route path="rechargeUser" element={<RechargeUser />} />
+              <Route path="addMoney" element={<MoneyRecharge />} />
+              <Route path="pendingKyc" element={<PendingKyc />} />
+              <Route path="verifiedKyc" element={<VerifiedKyc />} />
+              <Route path="pendingKyc/kycView" element={<KycVerification />} />
+              <Route path="paymentSettings" element={<PaymentSettings />} />
+              <Route path="adminSettings" element={<AdminSettings />} />
+              <Route path="adminNotification" element={<AdminNotification />} />
+            </Route>
+          </Routes>
+        </main>
+
+        {/* Conditional Footer: Hidden in Admin or Login modes */}
+        {!adminClicked && location.pathname !== "/" && <Footer />}
+      </div>
+
+      {/* Background Ambience (Desktop only decorative elements) */}
+      <div className="hidden lg:block fixed top-1/2 left-10 -translate-y-1/2 opacity-20 select-none">
+        <h1 className="text-8xl font-black text-white/5 rotate-90 tracking-tighter">ARENA</h1>
+      </div>
+      <div className="hidden lg:block fixed top-1/2 right-10 -translate-y-1/2 opacity-20 select-none">
+        <h1 className="text-8xl font-black text-white/5 -rotate-90 tracking-tighter">WINNER</h1>
+      </div>
     </div>
   );
-    
-}
+};

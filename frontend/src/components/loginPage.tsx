@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import {  useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
+import { Phone, ShieldCheck, Timer, ArrowRight, Smartphone } from "lucide-react";
 
 export const LoginPage = () => {
   const [sendOtp, setSendOtp] = useState(false);
@@ -13,60 +14,38 @@ export const LoginPage = () => {
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
-  const { setUserId , phone, setPhone, setName, setLogin, login , setPhoneNumber, tempotp , settempotp } = useUserContext();
+  const { setUserId, phone, setPhone, setName, setLogin, login, setPhoneNumber, tempotp, settempotp } = useUserContext();
 
-  // Validate phone number (basic validation)
   const isPhoneNumberValid = (phone: string) => /^(\+91)?[6-9]\d{9}$/.test(phone);
-
-  // Validate OTP (assuming 6-digit OTP)
   const isOtpValid = (otp: string) => /^\d{6}$/.test(otp);
 
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
 
-    const location = useLocation();
-    const [isLoading, setIsLoading] = useState(false);
-  
-  
-    useEffect(() => {
-      const checkAuth = async () => {
-        if (!login) {
-          console.log("No auth cookie found, skipping auth check.");
-          return;
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (!login) return;
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+        if (response.data.success) {
+          const userData = response.data.user;
+          setUserId(userData.userId);
+          setName(userData.name);
+          setPhoneNumber(userData.phoneNumber);
+          setPhone(userData.phoneNumber);
+          setLogin(true);
+          navigate("/winCash");
         }
-  
-        try {
-          setIsLoading(true);
-          const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
-  
-          if (response.data.success) {
-            const userData = response.data.user;
-            setUserId(userData.userId);
-            setName(userData.name);
-            setPhoneNumber(userData.phoneNumber);
-            setPhone(userData.phoneNumber);
-            setLogin(true);
-            // Navigate only if coming from the login page
-              navigate("/winCash");
-          }
-        } catch (error) {
-          console.error("Authentication failed:", error);
-          setLogin(false);
-
-          // Prevent infinite redirects
-          if (location.pathname === "/") {
-              navigate("/");
-            }
-        }
-        finally{
-          setIsLoading(false);
-        }
-      };
-  
-      checkAuth();
-  
-      // Cleanup function to avoid unnecessary re-renders
-      return () => {};
-    }, [location.pathname]); // ✅ Dependency added
-    
+      } catch (error) {
+        setLogin(false);
+        if (location.pathname === "/") navigate("/");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkAuth();
+  }, [location.pathname]);
 
   useEffect(() => {
     const refCode = searchParams.get("ref");
@@ -81,7 +60,7 @@ export const LoginPage = () => {
           if (prev <= 1) {
             clearInterval(timer);
             setCanResend(true);
-            return 30; // Reset timeout for next cycle
+            return 30;
           }
           return prev - 1;
         });
@@ -90,175 +69,162 @@ export const LoginPage = () => {
     return () => clearInterval(timer);
   }, [canResend, sendOtp]);
 
-
-  // Send OTP handler
   const handleSendOtp = async () => {
     if (!isPhoneNumberValid(phone)) {
-      console.log("phoneNumber: " + phone);
-      toast.error("Please enter a valid 10-digit phone number.");
+      toast.error("Enter a valid 10-digit number.");
       return;
     }
-
     try {
-      const response = await axios.post(`${API_URL}/api/auth/send-otp`, {
-        phoneNumber : phone,
-      });
-
+      const response = await axios.post(`${API_URL}/api/auth/send-otp`, { phoneNumber: phone });
       if (response.data.success) {
-        toast.success("OTP sent successfully!");
+        toast.success("OTP sent!");
         settempotp(response.data.otp);
         setSendOtp(true);
-         setResendTimeout(30); // Reset Timer
-        setCanResend(true);
-      } else {
-        toast.error(response.data.message, {
-          autoClose: 1000, // 3 seconds
-          position: "top-right",
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        setResendTimeout(30);
+        setCanResend(false); // Should be false initially to start the timer
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to send OTP. Please try again.", {
-        autoClose: 1000, // 3 seconds
-        position: "top-right",
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error("Failed to send OTP.");
     }
   };
 
-  // Verify OTP handler
   const handleVerifyOtp = async () => {
     if (!isOtpValid(otp)) {
-      toast.error("Please enter a valid 6-digit OTP.");
+      toast.error("Enter 6-digit OTP.");
       return;
     }
-
     try {
       setIsLoading(true);
       const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
-        phoneNumber : phone,
+        phoneNumber: phone,
         otp,
         ref: referralCode
-      },
-      { withCredentials: true } 
-    );
+      }, { withCredentials: true });
 
       if (response.data.success) {
-        toast.success("OTP verified successfully!", {
-          autoClose: 1000, // 3 seconds
-          position: "top-right",
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        toast.success("Verified!");
         setUserId(response.data.userId);
         setName(response.data.name);
         setLogin(true);
         setPhone(phone);
         navigate("/winCash");
-      } else {
-        toast.error(response.data.message || "Invalid OTP.", {
-          autoClose: 1000, // 3 seconds
-          position: "top-right",
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Error verifying OTP. Please try again.", {
-        autoClose: 1000, // 3 seconds
-        position: "top-right",
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    }
-    finally{
-      setIsLoading(false)
+      toast.error("Invalid OTP.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-gray-200 flex justify-center pt-16 max-w-sm min-h-screen">
-      <div className="relative w-full flex flex-col  max-w-sm p-6">
-        <div className="py-4 px-2">
-        <img src="../../logo.png" alt="" />
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h1 className="text-3xl font-serif text-center mb-2">Login Here!</h1>
+    <div className="bg-[#0b0b0d] flex flex-col items-center justify-center min-h-screen w-full font-sans text-gray-100 p-6 overflow-hidden relative">
+      
+      {/* Background Decorative Circles */}
+      <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-purple-600/20 rounded-full blur-[100px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-blue-600/20 rounded-full blur-[100px]" />
 
-          {/* Phone Number Input */}
-          <div className="mb-4">
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-              Phone Number
-            </label>
-            <div className="flex mt-1">
-              <span className="bg-gray-200 border border-r-0 border-gray-300 text-gray-600 px-3 py-2 rounded-l-md">
-                +91
-              </span>
-              <input
-                id="phone"
-                type="tel"
-                className="bg-white border border-gray-300 text-gray-700 p-2 w-full rounded-r-md focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your phone number"
-                onChange={(e) => setPhone(e.target.value)}
-                
-              />
-            </div>
+      <div className="z-10 w-full max-w-sm">
+        {/* Logo Section */}
+        <div className="flex justify-center mb-10 animate-fade-in">
+          <img src="../../logo.png" alt="Logo" className="h-16 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]" />
+        </div>
+
+        {/* Login Card */}
+        <div className="bg-[#16161a] border border-white/10 rounded-3xl p-8 shadow-2xl backdrop-blur-sm relative overflow-hidden">
+          
+          <div className="relative z-10">
+            <h1 className="text-2xl font-black mb-2 text-white tracking-tight">
+              {sendOtp ? "Verify Account" : "Welcome Back"}
+            </h1>
+            <p className="text-gray-400 text-sm mb-8 font-medium">
+              {sendOtp ? `Enter code sent to +91 ${phone}` : "Login to start winning cash today"}
+            </p>
+
+            {/* Phone Input */}
+            {!sendOtp ? (
+              <div className="space-y-2 mb-6 animate-slide-up">
+                <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">Phone Number</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400 group-focus-within:text-purple-500 transition-colors">
+                    <Smartphone size={18} />
+                  </div>
+                  <span className="absolute inset-y-0 left-10 flex items-center text-gray-400 font-bold border-r border-white/10 pr-3 my-3">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    className="w-full bg-[#1f1f25] border border-white/5 group-hover:border-white/20 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none rounded-2xl py-4 pl-24 pr-4 text-white font-bold transition-all placeholder:text-gray-600"
+                    placeholder="98765 43210"
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+              </div>
+            ) : (
+              /* OTP Input */
+              <div className="space-y-2 mb-6 animate-slide-up">
+                <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">6-Digit OTP</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400 group-focus-within:text-purple-500 transition-colors">
+                    <ShieldCheck size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    className="w-full bg-[#1f1f25] border border-white/5 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none rounded-2xl py-4 pl-12 pr-4 text-white font-bold tracking-[0.5em] transition-all"
+                    placeholder="••••••"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                  />
+                </div>
+                {tempotp && (
+                  <div className="bg-purple-500/10 border border-purple-500/20 p-3 rounded-xl mt-4">
+                    <p className="text-[10px] text-purple-300 uppercase font-black text-center mb-1">Testing Mode OTP</p>
+                    <p className="text-center font-mono text-lg text-purple-400 font-bold tracking-widest">{tempotp}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Action Button */}
+            <button
+              disabled={isLoading}
+              onClick={() => (!sendOtp ? handleSendOtp() : handleVerifyOtp())}
+              className={`w-full relative overflow-hidden group py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg
+                ${!sendOtp 
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-purple-500/20" 
+                  : !canResend 
+                    ? "bg-gray-800 text-gray-500 cursor-not-allowed" 
+                    : "bg-gradient-to-r from-green-500 to-emerald-600 text-black shadow-green-500/20"
+                }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                {isLoading ? (
+                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    {!sendOtp ? "Get Secure OTP" : !canResend ? `Resend in ${resendTimeout}s` : "Verify & Play"}
+                    <ArrowRight size={18} />
+                  </>
+                )}
+              </div>
+            </button>
+            
+            <p className="text-[10px] text-center text-gray-500 mt-6 font-medium">
+                By logging in, you agree to our <span className="underline">Terms of Service</span> and <span className="underline">Privacy Policy</span>.
+            </p>
           </div>
-
-          {/* OTP Input (conditionally rendered) */}
-          {sendOtp && (
-            <div className="mb-4">
-              <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
-                OTP
-              </label>
-              <input
-                id="otp"
-                type="text"
-                className="bg-white border border-gray-300 text-gray-700 p-2 w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter the OTP"
-                onChange={(e) => setOtp(e.target.value)}
-                value={otp}
-              />
-              <div> Otp Service is down. Please use this to login in: {tempotp}</div>
-            </div>
-          )}
-
-          {/* Action Button */}
-          <button
-        className="bg-purple-600 text-white w-full py-2 rounded-md text-center hover:bg-indigo-700"
-        onClick={() => {
-          if (!sendOtp) {
-            handleSendOtp();
-          } else if (canResend) {
-            handleVerifyOtp();
-          }
-        }}
-      >
-        {!sendOtp
-          ? "Send OTP"
-          : !canResend
-          ? `Resend in ${resendTimeout}s`
-          : "Verify OTP"}
-      </button>
         </div>
-        {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
-               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-             </div>}
       </div>
+
+      {/* Full Screen Loading Overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0b0b0d]/80 backdrop-blur-md">
+          <div className="relative">
+            <div className="h-20 w-20 rounded-full border-t-2 border-purple-500 animate-spin" />
+            <ShieldCheck className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-purple-400" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

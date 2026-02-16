@@ -1,93 +1,177 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
+import { ArrowLeft, Send, IndianRupee, Wallet, AlertCircle, CheckCircle2, Zap } from "lucide-react";
+import { toast } from "react-toastify";
 
-export const  WithdrawToUPI = ()=>{
-
+export const WithdrawToUPI = () => {
     const [token, setToken] = useState(0);
     const [upiId, setUpiId] = useState("");
     const [message, setMessage] = useState("");
     const [balanceLess, setBalanceLess] = useState(false);
-    const { userId , amount, phone, setAmount } = useUserContext();
+    const { userId, amount, phone, setAmount } = useUserContext();
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleWithdraw = async () => {
+        if (!upiId) return toast.error("Please enter a valid UPI ID");
+        if (token < 150) return toast.error("Minimum withdrawal is ₹150");
 
         try {
             setIsLoading(true);
-          const response = await axios.post(`${API_URL}/api/auth/withdraw`, {
+            const response = await axios.post(`${API_URL}/api/auth/withdraw`, {
                 userId,
-                phoneNumber : phone,
-                amount : token,
-                wallet : amount - token,
+                phoneNumber: phone,
+                amount: token,
+                wallet: amount - token,
                 paymentMethod: 'upi',
-                destinationDetails : upiId
-            }  );
+                destinationDetails: upiId
+            });
 
-            const { success , message } = response.data;
-            if(success === false){
+            const { success, message } = response.data;
+            if (success === false) {
                 setMessage(message);
                 setBalanceLess(true);
                 return;
             }
-            setAmount(amount - token)
-            console.log('Withdrawal request submitted.');
+            setAmount(amount - token);
+            toast.success("Withdrawal Request Submitted!");
             navigate('/wallet');
         } catch (err: any) {
-            if (err.response) {
-                console.log("Error Response:", err.response.data);
-                setMessage(err.response.data.message);
-                setBalanceLess(true);
-            } else {
-                console.log("Error in withdrawal:", err);
-            }
-        }
-        finally{
+            setMessage(err.response?.data?.message || "Something went wrong");
+            setBalanceLess(true);
+        } finally {
             setIsLoading(false);
         }
-        
     };
-  
-    const navigate = useNavigate();
+
     return (
-        <div className="bg-gray-200 min-h-screen max-w-sm ">
-            <div className="pt-16">
-                <div className="rounded-md bg-gray-300 my-6 mx-8 ">
-                <div className="p-4 w-80 text-center font-serif text-2xl">Withdrawal To UPI</div>
-                 <div className="px-6 py-2 flex flex-col gap-2">
-                    <div className="text-sm font-semibold text-slate-500">Your Linked UPI ID</div>
-                    <input type="text" disabled={isLoading} className="rounded-md border border-gray-950 p-1" onChange={(e)=>{
-                        setUpiId(e.target.value);
-                    }}/>
-                 </div>
-                 <div className="px-6 py-2 flex flex-col gap-2">
-                    <div className="text-sm font-semibold text-slate-500">Amount to Withdraw:</div>
-                    <input type="text" disabled={isLoading} className="rounded-md border border-gray-950 p-1"  onChange={(e)=>{
-                        const newValue = parseInt(e.target.value);
-                        setToken(newValue);
-                    }}/>
-                 </div>
-                 <div className="p-2 flex justify-center">
-                 <button disabled={isLoading} className=" bg-green-500 h-10 w-64 text-white rounded-md text-center pt-2 mb-2" onClick={handleWithdraw}>Withdraw</button >
-                 </div>
-                 <div className="flex justify-center">
-                 <button disabled={isLoading} className="bg-blue-700 w-28 text-white text-center rounded-md p-1 mb-8" onClick={()=>{
-                    navigate('/withdraw')
-                 }}>back</button >
-                 </div>
+        <div className="bg-[#0b0b0d] min-h-screen w-full max-w-md mx-auto relative font-sans text-gray-100 overflow-hidden">
+            
+            {/* Background Glow */}
+            <div className="absolute top-[-5%] left-[-10%] w-64 h-64 bg-violet-600/10 rounded-full blur-[100px]" />
+            <div className="absolute bottom-[10%] right-[-10%] w-64 h-64 bg-green-600/10 rounded-full blur-[100px]" />
+
+            {/* Header */}
+            <div className="relative z-10 px-6 pt-12 flex items-center gap-4 mb-8">
+                <button 
+                    onClick={() => navigate(-1)}
+                    className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white transition-colors"
+                >
+                    <ArrowLeft size={20} />
+                </button>
+                <h1 className="text-xl font-black italic tracking-tight uppercase">UPI Payout</h1>
+            </div>
+
+            <div className="relative z-10 px-6 space-y-6">
+                
+                {/* Balance Info Card */}
+                <div className="bg-[#16161a] border border-white/5 p-4 rounded-2xl flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-emerald-500/10 p-2 rounded-lg text-emerald-500">
+                            <Wallet size={18} />
+                        </div>
+                        <span className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Available for payout</span>
+                    </div>
+                    <span className="text-lg font-black text-white italic">₹{amount}</span>
+                </div>
+
+                {/* Main Form Card */}
+                <div className="bg-[#16161a] border border-white/10 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+                    <div className="relative z-10 space-y-6">
+                        
+                        {/* UPI ID Input */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-500 uppercase ml-1 tracking-widest flex items-center gap-1">
+                                <Send size={12} /> Enter UPI ID
+                            </label>
+                            <input 
+                                type="text" 
+                                disabled={isLoading} 
+                                placeholder="example@upi"
+                                className="w-full bg-[#1f1f25] border border-white/5 focus:border-violet-500 outline-none rounded-2xl py-4 px-5 text-white font-bold transition-all placeholder:text-gray-700"
+                                onChange={(e) => setUpiId(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Amount Input */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-500 uppercase ml-1 tracking-widest flex items-center gap-1">
+                                <IndianRupee size={12} /> Amount to Withdraw
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-xl font-black text-violet-500 italic">₹</span>
+                                <input 
+                                    type="number" 
+                                    disabled={isLoading} 
+                                    placeholder="0"
+                                    className="w-full bg-[#1f1f25] border border-white/5 focus:border-violet-500 outline-none rounded-2xl py-4 pl-12 pr-5 text-2xl font-black text-white transition-all placeholder:text-gray-700"
+                                    onChange={(e) => setToken(parseInt(e.target.value) || 0)}
+                                />
+                            </div>
+                            <div className="flex justify-between items-center px-1">
+                                <span className="text-[9px] text-gray-600 font-bold uppercase">Min: ₹150</span>
+                                <span className="text-[9px] text-gray-600 font-bold uppercase">Processing: 0%</span>
+                            </div>
+                        </div>
+
+                        {/* Withdraw Button */}
+                        <button 
+                            disabled={isLoading || token < 150}
+                            onClick={handleWithdraw}
+                            className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-gray-800 disabled:text-gray-600 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-white transition-all active:scale-95 shadow-[0_10px_20px_rgba(139,92,246,0.2)] flex items-center justify-center gap-2"
+                        >
+                            {isLoading ? (
+                                <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <>Confirm Payout <Zap size={16} fill="currentColor" /></>
+                            )}
+                        </button>
+                    </div>
+                    
+                    {/* Decorative Background Icon */}
+                    <Send className="absolute -right-10 -bottom-10 text-white/5 rotate-12" size={180} />
+                </div>
+
+                {/* Safety Instruction */}
+                <div className="bg-white/5 p-4 rounded-2xl border border-white/5 flex gap-3">
+                    <AlertCircle size={18} className="text-gray-500 shrink-0" />
+                    <p className="text-[10px] text-gray-500 font-medium leading-relaxed">
+                        Double check your UPI ID before confirming. We are not responsible for transfers made to incorrect IDs. Funds arrive in 5-10 minutes.
+                    </p>
                 </div>
             </div>
-            {  balanceLess &&<div className="absolute top-60 bg-gray-200 mx-10 shadow-xl p-10 rounded-md flex flex-col gap-4">
-                <div className=" border-2 border-gray-500  p-2 font-serif text-lg rounded-md text-purple-700">{message}</div>
-                <div className="bg-blue-500 text-white p-2 text-center rounded-lg" onClick={()=>{
-                    setBalanceLess(false);
-                }}>Ok</div>
-             </div>}
-             {  isLoading &&<div className="absolute left-20 top-60 bg-gray-200 mx-10 bg-opacity-80 shadow-xl p-10 rounded-md flex flex-col gap-4">
-               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-             </div>}
+
+            {/* ERROR MODAL */}
+            {balanceLess && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
+                    <div className="bg-[#1a1a1f] w-full max-w-xs rounded-[2.5rem] p-8 border border-red-500/20 shadow-2xl text-center animate-slide-up">
+                        <div className="bg-red-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <AlertCircle size={32} className="text-red-500" />
+                        </div>
+                        <h3 className="text-lg font-black uppercase mb-2">Insufficient Funds</h3>
+                        <p className="text-xs text-gray-400 leading-relaxed mb-8">{message}</p>
+                        <button 
+                            className="w-full bg-white text-black py-4 rounded-xl font-black text-xs uppercase tracking-widest"
+                            onClick={() => setBalanceLess(false)}
+                        >
+                            Got it
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* FULLSCREEN LOADING */}
+            {isLoading && !balanceLess && (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#0b0b0d]/60 backdrop-blur-sm">
+                    <div className="relative">
+                        <div className="h-20 w-20 rounded-full border-t-2 border-violet-500 animate-spin" />
+                        <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-violet-500 animate-pulse" />
+                    </div>
+                </div>
+            )}
         </div>
-    )
-}
+    );
+};
