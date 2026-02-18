@@ -17,7 +17,7 @@ export const socket = io(`${SOCKET_URL}`, {
 
 export const HomePage = () => {
   const navigate = useNavigate();
-  const { userId, name, battleId } = useUserContext();
+  const { userId, name } = useUserContext();
   const [amount, setAmount] = useState<number>(0);
   const [info, setInfo] = useState("");
   const [isFetching, setIsFetching] = useState<Boolean>(false);

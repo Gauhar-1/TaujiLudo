@@ -2,157 +2,161 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 import axios from "axios";
 import { API_URL } from "./url";
+import { 
+  History, 
+  Eye, 
+  CheckCircle2, 
+  ShieldAlert, 
+  ShieldCheck, 
+  Trash2, 
+  Gavel, 
+  PlusCircle,
+  ExternalLink
+} from "lucide-react";
 
-export const Transaction = (props : any)=>{
-    const navigate = useNavigate();
-    const { setId , setPhoneNumber } =useUserContext();
+/* --- 1. TRANSACTION HISTORY BUTTON --- */
+export const Transaction = (props: any) => {
+  const navigate = useNavigate();
+  const { setId, setPhoneNumber } = useUserContext();
 
-
-
-    return <div className="bg-blue-500 rounded-md w-8 p-1" onClick={()=>{
+  return (
+    <button 
+      className="flex items-center justify-center bg-blue-500/10 hover:bg-blue-500 hover:text-white text-blue-500 border border-blue-500/20 rounded-xl p-2.5 transition-all active:scale-90"
+      onClick={() => {
         setId(props.userId);
         setPhoneNumber(props.phoneNumber);
         navigate('transaction');
-    }}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="size-6">
-  <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" />
-</svg>
-    </div>
-}
-export const KycView = (props : any)=>{
-    const navigate = useNavigate();
-    const {  setPhoneNumber } = useUserContext();
+      }}
+    >
+      <History size={18} strokeWidth={2.5} />
+    </button>
+  );
+};
 
+/* --- 2. KYC VIEW BUTTON --- */
+export const KycView = (props: any) => {
+  const navigate = useNavigate();
+  const { setPhoneNumber } = useUserContext();
 
-
-    return <div className="bg-blue-500 rounded-md w-16 text-center text-white p-2" onClick={()=>{
-        setPhoneNumber(props.phoneNumber)
+  return (
+    <button 
+      className="flex items-center gap-2 bg-amber-500 text-black font-black uppercase text-[10px] tracking-widest px-4 py-2.5 rounded-xl hover:bg-amber-400 transition-all active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+      onClick={() => {
+        setPhoneNumber(props.phoneNumber);
         navigate('/admin/pendingKyc/kycView');
-    }}>View</div>
-}
+      }}
+    >
+      <Eye size={14} /> View KYC
+    </button>
+  );
+};
 
-export const Accept = ()=>{
-    return <div className="bg-green-400 p-1 rounded-md" >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="size-6">
-  <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
-</svg>
+/* --- 3. QUICK ACCEPT/CHECK BUTTON --- */
+export const Accept = () => {
+  return (
+    <button className="flex items-center justify-center bg-emerald-500/10 hover:bg-emerald-500 hover:text-white text-emerald-500 border border-emerald-500/20 rounded-xl p-2.5 transition-all active:scale-90">
+      <CheckCircle2 size={18} strokeWidth={2.5} />
+    </button>
+  );
+};
 
-    </div>
-}
-
-export const Blockplayer = (props : any)=>{
-    const blockPlayer = async()=>{
-        if(!props.userId){
-            console.log("UserId not found", props.userId)
-        }
-        try{
-            const response = await axios.post(`${API_URL}/api/auth/blockPlayer`,{userId: props.userId});
-
-            if(!response.data){
-                console.log("Response not found");
-            }
-        }
-        catch(err){
-         console.log("Error: " + err);
-        }
-    }
-    return <div className="bg-red-500 p-1 rounded-md" onClick={()=>{
-        blockPlayer();
-    }}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="size-6">
-  <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clipRule="evenodd" />
-</svg>
-
-    </div>
-}
-
-export const UnBlock = (props: any)=>{
-    const handleUnBlock = async ()=>{
-
-        try{
-            const response = await axios.post(`${API_URL}/api/auth/unblockPlayer`,{userId: props.userId});
-
-            if(!response.data){
-                return console.log("Response not found", response.data);
-            }
-        }
-        catch(err){
-            console.log("Error: "+ err);
-        }
-    }
-    return (
-        <div className="bg-red-500 p-2 rounded-lg text-white" onClick={handleUnBlock}>UnBlock</div>
-    )
-}
-
-export const DeleteBattle = (props : any)=>{
-    const handleDelete = async ()=>{
-
-        try{
-            const response = await axios.post(`${API_URL}/api/auth/deleteBattle`,{battleId: props.battleId});
-
-            if(!response.data){
-                return console.log("Response not found", response.data);
-            }
-        }
-        catch(err){
-            console.log("Error: "+ err);
-        }
-    }
-    return (
-        <div className="bg-red-500 p-2 rounded-lg text-white" onClick={handleDelete} >Delete</div>
-    )
-}
-
-export const ViewResult = ( props : any)=>{
-
-    const navigate = useNavigate();
-    const { setBattleId } = useUserContext();
-
-    
-    return (
-        <div className="bg-green-300 p-2 rounded-lg font-bold" onClick={()=>{
-        setBattleId(props.battleId);
-       navigate('/admin/viewResult');
-       
-    }}>View</div>
-  )
-}
-export const DisputeResult = ( props : any)=>{
-
-    const navigate = useNavigate();
-    const { setBattleId } = useUserContext();
+/* --- 4. BLOCK PLAYER (ICON) --- */
+export const Blockplayer = (props: any) => {
+  const blockPlayer = async () => {
+    if (!props.userId) return;
+    try {
+      await axios.post(`${API_URL}/api/auth/blockPlayer`, { userId: props.userId });
+    } catch (err) { console.log(err); }
+  };
 
   return (
-    <div className="bg-green-300 p-2 rounded-lg font-bold" onClick={()=>{
-        setBattleId(props.battleId);
-       navigate('/admin/disputeResult');
-       
-    }}>View</div>
-  )
-}
-export const PaymentReq = ( props : any)=>{
+    <button 
+      className="flex items-center justify-center bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/20 rounded-xl p-2.5 transition-all active:scale-90 shadow-lg shadow-red-900/10"
+      onClick={blockPlayer}
+    >
+      <ShieldAlert size={18} strokeWidth={2.5} />
+    </button>
+  );
+};
 
-    const navigate = useNavigate();
-    const { setPaymentId } = useUserContext();
-
-  return (
-    <div className="bg-green-300 p-2 rounded-lg font-bold" onClick={()=>{
-        setPaymentId(props.battleId);
-       navigate('/admin/paymentReq');
-       
-    }}>View</div>
-  )
-}
-
-export const AddMoney = (props : any)=>{
-    const navigate = useNavigate();
-    const profile = props.profile;
+/* --- 5. UNBLOCK PLAYER (TEXT) --- */
+export const UnBlock = (props: any) => {
+  const handleUnBlock = async () => {
+    try {
+      await axios.post(`${API_URL}/api/auth/unblockPlayer`, { userId: props.userId });
+    } catch (err) { console.log(err); }
+  };
 
   return (
-    <div className="bg-green-500 p-2 rounded-lg font-bold text-white" onClick={()=>{
-       navigate('/admin/addMoney', {state : { profile}});
-       
-    }}>Add Money +</div>
-  )
-}
+    <button 
+      className="w-full flex items-center justify-center gap-2 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-black uppercase text-[10px] tracking-widest py-3 rounded-xl hover:bg-emerald-500 hover:text-white transition-all active:scale-95"
+      onClick={handleUnBlock}
+    >
+      <ShieldCheck size={14} /> Restore Player
+    </button>
+  );
+};
+
+/* --- 6. DELETE BATTLE BUTTON --- */
+export const DeleteBattle = (props: any) => {
+  const handleDelete = async () => {
+    try {
+      await axios.post(`${API_URL}/api/auth/deleteBattle`, { battleId: props.battleId });
+    } catch (err) { console.log(err); }
+  };
+
+  return (
+    <button 
+      className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 border border-red-500/20 font-black uppercase text-[10px] tracking-widest py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all active:scale-95"
+      onClick={handleDelete}
+    >
+      <Trash2 size={14} /> Terminate
+    </button>
+  );
+};
+
+/* --- 7. VIEW RESULT/DISPUTE/PAYMENT BUTTONS (Grouped Logic) --- */
+const GenericViewButton = ({ id, path, label, icon, contextSetter }: { id: any; path: string; label: string; icon: any; contextSetter: keyof ReturnType<typeof useUserContext> }) => {
+  const navigate = useNavigate();
+  const context = useUserContext();
+
+  return (
+    <button 
+      className="w-full flex items-center justify-center gap-2 bg-[#1f1f25] text-white border border-white/5 font-black uppercase text-[10px] tracking-widest py-3 rounded-xl hover:border-amber-500/50 transition-all active:scale-95 group"
+      onClick={() => {
+        (context[contextSetter] as any)(id);
+        navigate(path);
+      }}
+    >
+      <div className="group-hover:text-amber-500 transition-colors">{icon}</div>
+      {label}
+    </button>
+  );
+};
+
+export const ViewResult = (props: any) => (
+  <GenericViewButton id={props.battleId} path="/admin/viewResult" label="Details" icon={<Eye size={14} />} contextSetter="setBattleId" />
+);
+
+export const DisputeResult = (props: any) => (
+  <GenericViewButton id={props.battleId} path="/admin/disputeResult" label="Investigate" icon={<Gavel size={14} />} contextSetter="setBattleId" />
+);
+
+export const PaymentReq = (props: any) => (
+  <GenericViewButton id={props.battleId} path="/admin/paymentReq" label="Process" icon={<ExternalLink size={14} />} contextSetter="setPaymentId" />
+);
+
+/* --- 8. ADD MONEY BUTTON --- */
+export const AddMoney = (props: any) => {
+  const navigate = useNavigate();
+  const profile = props.profile;
+
+  return (
+    <button 
+      className="w-full flex items-center justify-center gap-2 bg-emerald-600 text-white font-black uppercase text-[10px] tracking-widest py-3 rounded-xl hover:bg-emerald-500 transition-all active:scale-95 shadow-lg shadow-emerald-900/20"
+      onClick={() => navigate('/admin/addMoney', { state: { profile } })}
+    >
+      <PlusCircle size={14} /> Add Capital
+    </button>
+  );
+};

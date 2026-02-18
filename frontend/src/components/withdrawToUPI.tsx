@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
-import { ArrowLeft, Send, IndianRupee, Wallet, AlertCircle, CheckCircle2, Zap } from "lucide-react";
+import { ArrowLeft, Send, IndianRupee, Wallet, AlertCircle, Zap } from "lucide-react";
 import { toast } from "react-toastify";
 
 export const WithdrawToUPI = () => {

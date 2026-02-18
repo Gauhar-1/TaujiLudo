@@ -2,7 +2,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
-import { Trophy, Sword, Zap, ShieldAlert, History, IndianRupee, Clock } from "lucide-react";
+import { Trophy, Sword, Zap, History, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const GameHistory = () => {

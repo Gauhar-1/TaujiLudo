@@ -1,26 +1,8 @@
-import { ArrowDownward, ArrowUpward} from "@mui/icons-material";
 import React, {  useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "./url";
-
-interface Column {
-  id: "no" | "paymentId"| "userId" | "phoneNumber"  | "amount" | "type" | "status" |"joinedAt" ;
-  label: string;
-  minWidth?: number;
-  align?: "right";
-  format?: (value: number) => string;
-}
-
-const columns: readonly Column[] = [
-  { id: "no", label: "#" },
-  { id: "paymentId", label: "Payment ID", minWidth: 220 },
-  { id: "userId", label: "User ID", minWidth: 220 },
-  { id: "phoneNumber", label: "Mobile No.", minWidth: 220 },
-  { id: "amount", label: "Amount", minWidth: 120,  },
-  { id: "type", label: "Type", minWidth: 120,  },
-  { id: "status", label: "Status", minWidth: 120,  },
-  { id: "joinedAt", label: "Created At", minWidth: 170 },
-];
+import { ArrowDownward, ArrowUpward, Search, FilterList, ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { IndianRupee } from "lucide-react";
 
 interface Data {
   no: number;
@@ -60,7 +42,6 @@ export const StickyTable: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [rows, setRows] = useState<Data[]>([]);
 
   // Fetch battles data
@@ -96,32 +77,14 @@ export const StickyTable: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value.toLowerCase());
+  const getStatusStyle = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === 'success' || s === 'completed') return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+    if (s === 'pending') return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+    return "bg-red-500/10 text-red-500 border-red-500/20";
   };
 
-  const handleSort = (columnId: string) => {
-    const isAsc = sortColumn === columnId && sortOrder === "asc";
-    setSortOrder(isAsc ? "desc" : "asc");
-    setSortColumn(columnId);
-
-    const sortedRows = [...rows].sort((a, b) => {
-      const valueA = a[columnId as keyof Data];
-      const valueB = b[columnId as keyof Data];
-
-      if (typeof valueA === "string" && typeof valueB === "string") {
-        return isAsc ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
-      } else if (typeof valueA === "number" && typeof valueB === "number") {
-        return isAsc ? valueA - valueB : valueB - valueA;
-      } else if (columnId === "joinedAt") {
-        const dateA = new Date(valueA as string);
-        const dateB = new Date(valueB as string);
-        return isAsc ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
-      }
-      return 0;
-    });
-    setRows(sortedRows);
-  };
+  
 
   const filterEachRow = (row: Data) => {
     const query = searchQuery.toLowerCase();
@@ -138,105 +101,123 @@ export const StickyTable: React.FC = () => {
 
   const filteredRows = rows.filter(filterEachRow);
 
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: any) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  return (
-    <div className="w-full overflow-hidden p-4">
-      <div className="flex gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search"
-          className="border p-2 rounded-md w-54"
-          onChange={handleSearch}
-        />
-        <button
-          className="p-2 bg-gray-200 rounded-md"
-          onClick={() => {
-            const columnId = sortColumn || "no";
-            handleSort(columnId);
-          }}
-        >
-          {sortOrder === "asc" ? <ArrowUpward /> : <ArrowDownward />}
-        </button>
-      </div>
-
-      <div className="overflow-y-auto shadow-md relative max-h-[440px]">
-  <div className="flex bg-gray-200 text-center border-b">
-    {columns.map((column) => (
-      <div
-        key={column.id}
-        className={`text-sm font-semibold p-2 flex-1`}
-        style={{
-          minWidth: column.minWidth || 100,
-          textAlign: column.align || "left",
-        }}
-      >
-        {column.label}
-      </div>
-    ))}
-  </div>
-
-  {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-    <div key={row.paymentId} className="flex border-b text-center">
-      {columns.map((column) => {
-        const value = row[column.id as keyof Data];
+ return (
+    <div className="w-full max-w-md mx-auto font-sans">
+      
+      {/* Search & Sort HUD */}
+      <div className="flex flex-col gap-3 mb-6">
+        <div className="relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-500 transition-colors" fontSize="small" />
+          <input
+            type="text"
+            placeholder="Search transactions..."
+            className="w-full bg-[#16161a] border border-white/5 rounded-2xl py-3 pl-10 pr-4 text-sm text-white placeholder:text-gray-600 outline-none focus:border-amber-500/50 focus:ring-4 focus:ring-amber-500/5 transition-all"
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
         
-        return (
-          <div
-            key={column.id}
-            className={`text-sm p-2 flex-1`}
-            style={{
-              minWidth: column.minWidth || 100,
-              textAlign: column.align || "left",
-            }}
+        <div className="flex justify-between items-center px-1">
+          <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
+            {filteredRows.length} Entries Found
+          </p>
+          <button 
+            className="flex items-center gap-1 text-[10px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 active:scale-95 transition-all"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
           >
-            {column.format && typeof value === "number" ? column.format(value) : value}
-          </div>
-        );
-      })}
-    </div>
-  ))}
-</div>
-<div className="mt-4">
-        <div className="flex justify-between items-center">
-          <div className="text-sm">
-            {filteredRows.length} rows
-          </div>
-          <div className="flex gap-4">
-            <select
-              className="border p-2 rounded-md"
-              value={rowsPerPage}
-              onChange={handleChangeRowsPerPage}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={100}>100</option>
-            </select>
-            <button
-              className="border p-2 rounded-md"
-              onClick={() => handleChangePage({}, page - 1)}
-              disabled={page === 0}
-            >
-              Previous
-            </button>
-            <button
-              className="border p-2 rounded-md"
-              onClick={() => handleChangePage({}, page + 1)}
-              disabled={page * rowsPerPage + rowsPerPage >= filteredRows.length}
-            >
-              Next
-            </button>
-          </div>
+            Sort {sortOrder === "asc" ? <ArrowUpward fontSize="inherit" /> : <ArrowDownward fontSize="inherit" />}
+          </button>
         </div>
       </div>
 
+      {/* MOBILE CARD LIST */}
+      <div className="space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1">
+        {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+          <div 
+            key={row.paymentId} 
+            className="bg-[#16161a] border border-white/5 rounded-[1.5rem] p-5 shadow-xl hover:border-white/10 transition-all active:scale-[0.98]"
+          >
+            {/* Row 1: Type & Amount */}
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-xl border ${row.type === 'deposit' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-purple-500/10 text-purple-500 border-purple-500/20'}`}>
+                   <IndianRupee fontSize="small" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest leading-none mb-1">Transaction</p>
+                  <p className="text-sm font-black text-white uppercase tracking-tight">{row.type}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-black italic text-white leading-none">₹{row.amount}</p>
+                <span className={`inline-block mt-1 px-2 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-widest ${getStatusStyle(row.status)}`}>
+                  {row.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Row 2: User Meta */}
+            <div className="grid grid-cols-2 gap-4 py-3 border-t border-white/5 mt-2">
+              <div>
+                <p className="text-[8px] font-black text-gray-600 uppercase tracking-tighter mb-0.5">Mobile Number</p>
+                <p className="text-[11px] font-bold text-gray-300 tracking-wide">{row.phoneNumber}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[8px] font-black text-gray-600 uppercase tracking-tighter mb-0.5">Created At</p>
+                <p className="text-[11px] font-bold text-gray-400 tracking-wide">{row.joinedAt}</p>
+              </div>
+            </div>
+
+            {/* Row 3: ID Footer */}
+            <div className="flex justify-between items-center mt-2 pt-2 border-t border-white/5 opacity-50">
+               <p className="text-[8px] font-mono text-gray-500">ID: {row.paymentId.slice(-12).toUpperCase()}</p>
+               <p className="text-[8px] font-mono text-gray-500">UID: {row.userId.slice(-6).toUpperCase()}</p>
+            </div>
+          </div>
+        ))}
+
+        {filteredRows.length === 0 && (
+          <div className="text-center py-20 opacity-20">
+            <FilterList sx={{ fontSize: 60 }} />
+            <p className="font-black uppercase tracking-[0.3em] mt-4">No Data</p>
+          </div>
+        )}
+      </div>
+
+      {/* MOBILE PAGINATION HUD */}
+      <div className="mt-8 bg-[#1a1a1f] border border-white/10 p-4 rounded-3xl flex items-center justify-between shadow-2xl">
+        <div className="flex items-center gap-2">
+          <select 
+            className="bg-[#0b0b0d] border border-white/5 text-[10px] font-black text-white p-2 rounded-xl outline-none"
+            value={rowsPerPage}
+            onChange={(e) => {setRowsPerPage(+e.target.value); setPage(0);}}
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
+          <span className="text-[10px] font-bold text-gray-600 uppercase">Per Page</span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button 
+            disabled={page === 0}
+            onClick={() => setPage(page - 1)}
+            className="p-2 rounded-xl bg-white/5 text-white disabled:opacity-20 active:scale-90 transition-all"
+          >
+            <ChevronLeft />
+          </button>
+          <span className="text-xs font-black text-amber-500 italic">
+            {page + 1} / {Math.ceil(filteredRows.length / rowsPerPage)}
+          </span>
+          <button 
+            disabled={page * rowsPerPage + rowsPerPage >= filteredRows.length}
+            onClick={() => setPage(page + 1)}
+            className="p-2 rounded-xl bg-white/5 text-white disabled:opacity-20 active:scale-90 transition-all"
+          >
+            <ChevronRight />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

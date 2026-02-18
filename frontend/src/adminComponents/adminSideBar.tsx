@@ -1,172 +1,171 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
+import { 
+  LayoutDashboard, Users, Sword, ShieldCheck, 
+  CreditCard, Bell, Settings, LogOut, ChevronDown, 
+  UserX, Clock, Trophy, AlertTriangle, BadgeIndianRupee,
+  Zap, ArrowRight
+} from "lucide-react";
 
-export const AdminSideBar = ( props : any)=>{
-    const navigate = useNavigate();
-    const [ playerButton , setPlayerButton ] = useState(false);
-    const [ battleButton , setBattleButton ] = useState(false);
-    const [ kycButton , setKycButton ] = useState(false);
-    const [ paymentsButton , setPaymentsButton ] = useState(false);
-    const { setAdminClicked } = useUserContext()
+export const AdminSideBar = (props: any) => {
+  const navigate = useNavigate();
+  const { setAdminClicked } = useUserContext();
 
-    return (
-        <div className="bg-gray-200  shadow-lg fixed min-h-screen min-w-64  z-50 flex flex-col ">
-          <div className="flex justify-between">
-            <div className="pt-2">
-            <img src="/logo.png" alt="" className="h-12"/>
-            </div>
-            <div className="p-4 font-bold text-lg" onClick={()=>{
-            props.setSidebarClicked(false);
-          }}>
-            X
-          </div>
-            </div>
-          <div className=" pl-2 flex flex-col ">
-            <div className="">
-              <div className="flex gap-4 p-3   rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/admin');
-                props.setSidebarClicked(false);
-              }}>
-                <img src="../../user.png" alt=""  className="size-6"/>
-                <div className="font-mono">DashBoard</div>
-              </div>
-              <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                // props.setSidebarClicked(false);
-                playerButton ? setPlayerButton(false) : setPlayerButton(true);
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
-</svg>
+  const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
+    players: false,
+    battle: false,
+    kyc: false,
+    payments: false,
+  });
 
-                <div className="font-mono">Players</div>
-              </div>
-              { playerButton && <div className="bg-white mx-6 my-2 rounded-md p-4 flex flex-col gap-1">
-                 <div className="text-gray-500 pb-1 text-sm">Players:</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate('allPlayers');
-                 }}>All Players</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate('blocked');
-                 }}>Blocked Players</div>
-                </div>}
-              <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                // props.setSidebarClicked(false);
-                battleButton ? setBattleButton(false) : setBattleButton(true);
-              }}>
-                <img src="../../wallet.png" alt=""  className="size-6"/>
-                <div className="font-mono">Battle</div>
-              </div>
-              { battleButton && <div className="bg-white mx-6 my-2 rounded-md p-4 flex flex-col gap-1">
-                 <div className="text-gray-400 pb-1 text-xs font-bold">ALL BATTLE SHOW:</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("pendingBattle");
-                 }}>New Battle</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("runningBattle");
-                 }}>Running battle</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("completeBattle");
-                 }}>Battle Result</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("disputeBattle");
-                 }}>Battle Dispute</div>
-                </div>}
-              <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                // props.setSidebarClicked(false);
-                kycButton ? setKycButton(false) : setKycButton(true)
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0" />
-</svg>
+  const toggleMenu = (menu: string) => {
+    setOpenMenus(prev => ({ ...prev, [menu]: !prev[menu] }));
+  };
 
-                <div className="font-mono">KYC</div>
-              </div>
-              { kycButton && <div className="bg-white mx-6 my-2 rounded-md p-4 flex flex-col gap-1">
-                 <div className="text-gray-400 pb-1 text-xs font-bold">ALL BATTLE SHOW:</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("pendingKyc");
-                 }}>Pending KYC</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("verifiedKyc");
-                 }}>Approved KYC</div>
-                </div>}
-              <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                // props.setSidebarClicked(false);
-                paymentsButton ? setPaymentsButton(false) : setPaymentsButton(true)
-              }}>
-                <img src="../../order-history.png" alt=""  className="size-6"/>
-                <div className="font-mono">Payments</div>
-              </div>
-              { paymentsButton && <div className="bg-white mx-6 my-2 rounded-md p-4 flex flex-col gap-1">
-                 <div className="text-gray-400 pb-1 text-xs font-bold">ALL PAYMENTS:</div>
-                 <div className="text-sm" onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("allPayments");
-                 }}>Payment Recieved</div>
-                 <div className="text-sm"  onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("rechargeUser");
-                 }}>Recharge to User</div>
-                 <div className="text-sm"  onClick={()=>{
-                  props.setSidebarClicked(false);
-                  navigate("paymentSettings");
-                 }}>Payment Settings</div>
-                </div>}
-              <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                props.setSidebarClicked(false);
-                navigate("reqPayments");
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-</svg>
+  const navTo = (path: string) => {
+    navigate(path);
+    props.setSidebarClicked(false);
+  };
 
-                <div className="font-mono ">Payment Request</div>
-              </div>
-              <div className="flex gap-4 p-3  rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate("adminSettings");
-                props.setSidebarClicked(false);
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" >
-  <path strokeLinecap="round" strokeLinejoin="round"  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-</svg>
-
-                <div className="font-mono">Admin Settings</div>
-              </div>
-            
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('adminNotification');
-                props.setSidebarClicked(false);
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-</svg>
-
-                <div className="font-mono">Notifications</div>
-              </div>
-              <div className="flex gap-4 p-3 rounded-lg hover:bg-gray-400" onClick={()=>{
-                navigate('/profile');
-                props.setSidebarClicked(false);
-                setAdminClicked(false);
-              }}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-</svg>
-
-                <div className="font-mono">Log Out</div>
-              </div>
-            </div>
-          </div>
+  return (
+    /* The container sits inside the header's centered flex column */
+    <div className="w-full flex flex-col items-center animate-slide-down">
+      
+      {/* Main Sidebar Module */}
+      <div className="w-full bg-[#1c1c21]/95 backdrop-blur-2xl border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-[2.5rem] flex flex-col overflow-hidden max-h-[75vh]">
+        
+        {/* Navigation Content */}
+        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-1">
           
+          <AdminNavItem 
+            icon={<LayoutDashboard size={18} />} 
+            label="Dashboard Overview" 
+            onClick={() => navTo('/admin')} 
+          />
 
-          </div>
-    )
-}
+          <div className="h-px bg-white/5 mx-4 my-2" />
+
+          {/* USER SECTION */}
+          <CollapsibleMenu 
+            icon={<Users size={18} />} 
+            label="User Management" 
+            isOpen={openMenus.players} 
+            onClick={() => toggleMenu('players')}
+          >
+            <SubNavItem label="All Players" onClick={() => navTo('allPlayers')} />
+            <SubNavItem icon={<UserX size={14} />} label="Blocked" onClick={() => navTo('blocked')} />
+          </CollapsibleMenu>
+
+          {/* BATTLE SECTION */}
+          <CollapsibleMenu 
+            icon={<Sword size={18} />} 
+            label="Battle Ops" 
+            isOpen={openMenus.battle} 
+            onClick={() => toggleMenu('battle')}
+          >
+            <SubNavItem icon={<Clock size={14} />} label="New Battle" onClick={() => navTo('pendingBattle')} />
+            <SubNavItem icon={<Zap size={14} />} label="Running" onClick={() => navTo('runningBattle')} />
+            <SubNavItem icon={<Trophy size={14} />} label="Results" onClick={() => navTo('completeBattle')} />
+            <SubNavItem icon={<AlertTriangle size={14} />} label="Disputes" onClick={() => navTo('disputeBattle')} />
+          </CollapsibleMenu>
+
+          {/* KYC SECTION */}
+          <CollapsibleMenu 
+            icon={<ShieldCheck size={18} />} 
+            label="Verification" 
+            isOpen={openMenus.kyc} 
+            onClick={() => toggleMenu('kyc')}
+          >
+            <SubNavItem label="Pending KYC" onClick={() => navTo('pendingKyc')} />
+            <SubNavItem label="Approved" onClick={() => navTo('verifiedKyc')} />
+          </CollapsibleMenu>
+
+          {/* PAYMENTS SECTION */}
+          <CollapsibleMenu 
+            icon={<BadgeIndianRupee size={18} />} 
+            label="Finance Hub" 
+            isOpen={openMenus.payments} 
+            onClick={() => toggleMenu('payments')}
+          >
+            <SubNavItem label="Receipts" onClick={() => navTo('allPayments')} />
+            <SubNavItem label="Manual Recharge" onClick={() => navTo('rechargeUser')} />
+            <SubNavItem label="Gateways" onClick={() => navTo('paymentSettings')} />
+          </CollapsibleMenu>
+
+          <div className="h-px bg-white/5 mx-4 my-2" />
+
+          <AdminNavItem 
+            icon={<CreditCard size={18} />} 
+            label="Payout Requests" 
+            onClick={() => navTo('reqPayments')} 
+          />
+          
+          <AdminNavItem 
+            icon={<Settings size={18} />} 
+            label="Global Settings" 
+            onClick={() => navTo('adminSettings')} 
+          />
+
+          <AdminNavItem 
+            icon={<Bell size={18} />} 
+            label="Push Center" 
+            onClick={() => navTo('adminNotification')} 
+          />
+        </div>
+
+        {/* Footer: Context Switch */}
+        <div className="p-3 bg-white/5 border-t border-white/5">
+          <button 
+            onClick={() => { setAdminClicked(false); navigate('/profile'); }}
+            className="w-full flex items-center justify-between p-4 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <LogOut size={18} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Terminate Admin Mode</span>
+            </div>
+            <ArrowRight size={14} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Modernized Sub-components ---
+
+const AdminNavItem = ({ icon, label, onClick }: any) => (
+  <button 
+    onClick={onClick}
+    className="w-full flex items-center gap-4 p-4 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all group active:scale-95"
+  >
+    <div className="text-gray-500 group-hover:text-amber-500 transition-colors">{icon}</div>
+    <span className="text-[11px] font-black uppercase tracking-widest">{label}</span>
+  </button>
+);
+
+const CollapsibleMenu = ({ icon, label, isOpen, onClick, children }: any) => (
+  <div className="flex flex-col">
+    <button 
+      onClick={onClick}
+      className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${isOpen ? 'bg-amber-500/10 text-amber-500' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+    >
+      <div className="flex items-center gap-4">
+        <div className={isOpen ? 'text-amber-500' : 'text-gray-500'}>{icon}</div>
+        <span className="text-[11px] font-black uppercase tracking-widest">{label}</span>
+      </div>
+      <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+    </button>
+    {isOpen && <div className="px-2 pb-2 space-y-1 animate-fade-in">{children}</div>}
+  </div>
+);
+
+const SubNavItem = ({ icon, label, onClick }: any) => (
+  <button 
+    onClick={onClick}
+    className="w-full flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest pl-10"
+  >
+    {icon || <div className="w-1.5 h-1.5 rounded-full bg-amber-500/40" />}
+    {label}
+  </button>
+);

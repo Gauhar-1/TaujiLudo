@@ -1,61 +1,107 @@
-// import { formatDistanceToNowStrict } from "date-fns";
 import { formatDistanceToNowStrict } from "date-fns";
 import { API_URL } from "./url";
 import axios from "axios";
+import { 
+  Bell, 
+  ArrowUpCircle, 
+  ArrowDownCircle, 
+  IndianRupee,
+  CheckCircle2
+} from "lucide-react";
 
-export const NotifyCard = (props : any)=>{
+export const NotifyCard = (props: any) => {
+  const { notification } = props;
 
-    const handleRead = async()=>{
-        
-        const id = props.notification._id;
-        if(!id){
-            return console.log("notification id not found!");
-        }
+  const handleRead = async () => {
+    const id = notification._id;
+    if (!id) return console.log("notification id not found!");
 
-        const response = await axios.post(`${API_URL}/api/auth/markRead`, { id });
-
-        if(!response.data){
-            return console.log("response not found");
-        }
-
+    try {
+      const response = await axios.post(`${API_URL}/api/auth/markRead`, { id });
+      if (!response.data) return console.log("response not found");
+      // Ideally, trigger a state refresh in parent here
+    } catch (err) {
+      console.error("Failed to mark as read", err);
     }
+  };
 
-    return (
-        <div className="p-4">
-           { <div className=" border border-black bg-gray-400 rounded-lg flex justify-between p-3">
-            <div className="flex">
-            <div>
-                    <img src="/profile.png" alt="" className="h-10"/>
-                </div>
-                <div className="px-4 font-serif text-sm  ">
-                    <div className="flex gap-2">
-                    <div className="text-white">A Player</div>
-                    {/* {props.notifications.type <div className="text-green-300 pt-1">has joined!!</div>} */}
-                    <div className={` ${props.notification.type === "deposit" ? "text-green-400": "text-red-500"} `}>has {props.notification.type === "deposit" ? "deposited": "withdrawed"}!!</div>
-                    </div>
-                    <div className="flex gap-1">
-                        <img src="/money.png" alt="" className="h-5"/>
-                        <div className={`text-sm ${props.notification.type === "deposit" ? "text-green-400": "text-red-500"} `}>{props.notification.type === "deposit" ? "(+)": "(-)"}</div>
-                        <div className="text-sm font-mono">{props.notification.amount}</div>
-                    </div>
-                </div>
+  const isDeposit = notification.type === "deposit";
+  const isRead = notification.markAsRead;
+
+  return (
+    <div className="px-4 mb-3 group">
+      <div 
+        className={`relative transition-all duration-300 rounded-2xl border p-4 shadow-xl 
+        ${isRead 
+          ? "bg-[#16161a]/60 border-white/5 opacity-60" 
+          : "bg-[#16161a] border-amber-500/20 ring-1 ring-amber-500/5"}`}
+      >
+        
+        {/* Unread Indicator Dot */}
+        {!isRead && (
+          <div className="absolute top-4 right-4 flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+          </div>
+        )}
+
+        <div className="flex justify-between items-start">
+          <div className="flex gap-4">
+            
+            {/* Semantic Icon Avatar */}
+            <div className={`h-12 w-12 rounded-xl flex items-center justify-center border shrink-0
+              ${isDeposit 
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" 
+                : "bg-rose-500/10 border-rose-500/20 text-rose-500"}`}
+            >
+              {isDeposit ? <ArrowUpCircle size={24} /> : <ArrowDownCircle size={24} />}
             </div>
-                <div className="flex  flex-col justify-between">
-                    <div className="flex justify-center " onClick={()=>{
-                        handleRead();
-                    }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill={`${props.notification.
-markAsRead ? "gray" : "yellow"}`} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6" >
-  <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-</svg>
 
-                    </div>
-                    <div className="flex justify-end">
-                    <div className="text-xs">{formatDistanceToNowStrict(new Date(props.notification.createdAt), { addSuffix: true })}</div>
-                    </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-white uppercase tracking-tight">
+                  Player Activity
+                </span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase
+                  ${isDeposit ? "bg-emerald-500/20 text-emerald-500" : "bg-rose-500/20 text-rose-500"}`}
+                >
+                  {notification.type}
+                </span>
+              </div>
 
-                </div>
-            </div>}
+              <p className="text-sm text-gray-400 mt-1">
+                <span className="font-bold text-gray-200">A Player</span> has 
+                {isDeposit ? " initiated a deposit" : " requested a withdrawal"}.
+              </p>
+
+              <div className="flex items-center gap-1.5 mt-2 bg-white/5 w-fit px-2 py-1 rounded-lg border border-white/5">
+                <IndianRupee size={12} className={isDeposit ? "text-emerald-500" : "text-rose-500"} />
+                <span className="text-xs font-black italic text-white">
+                  {isDeposit ? "+" : "-"}{notification.amount}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end justify-between h-20 shrink-0">
+            {/* Mark as Read Toggle */}
+            <button 
+              onClick={handleRead}
+              className={`p-2 rounded-xl transition-all active:scale-90 
+                ${isRead 
+                  ? "text-gray-600 cursor-default" 
+                  : "bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-black"}`}
+              title={isRead ? "Already read" : "Mark as read"}
+            >
+              {isRead ? <CheckCircle2 size={18} /> : <Bell size={18} />}
+            </button>
+
+            <div className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">
+              {formatDistanceToNowStrict(new Date(notification.createdAt), { addSuffix: true })}
+            </div>
+          </div>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};

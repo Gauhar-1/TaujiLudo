@@ -30,7 +30,7 @@ export const WithdrawToBank = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post(`${API_URL}/api/auth/withdraw`, {
+      await axios.post(`${API_URL}/api/auth/withdraw`, {
         userId,
         phoneNumber: phone,
         amount: token,

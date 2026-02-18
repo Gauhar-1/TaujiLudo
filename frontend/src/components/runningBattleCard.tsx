@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
-import { Sword, Trophy, Zap, Eye, IndianRupee } from "lucide-react";
+import { Sword, Zap, Eye } from "lucide-react";
 
 interface Battle {
   _id: string;

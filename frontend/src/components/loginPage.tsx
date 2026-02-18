@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
-import { Phone, ShieldCheck, Timer, ArrowRight, Smartphone } from "lucide-react";
+import { ShieldCheck, ArrowRight, Smartphone, RefreshCw, ChevronLeft } from "lucide-react";
 
 export const LoginPage = () => {
   const [sendOtp, setSendOtp] = useState(false);
@@ -22,6 +22,7 @@ export const LoginPage = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
 
+  // Auth persistence check
   useEffect(() => {
     const checkAuth = async () => {
       if (!login) return;
@@ -39,19 +40,19 @@ export const LoginPage = () => {
         }
       } catch (error) {
         setLogin(false);
-        if (location.pathname === "/") navigate("/");
       } finally {
         setIsLoading(false);
       }
     };
     checkAuth();
-  }, [location.pathname]);
+  }, [location.pathname, login, navigate, setName, setPhone, setPhoneNumber, setUserId, setLogin]);
 
   useEffect(() => {
     const refCode = searchParams.get("ref");
     if (refCode) setReferralCode(refCode);
   }, [searchParams]);
 
+  // Timer Logic
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (!canResend && sendOtp) {
@@ -60,7 +61,7 @@ export const LoginPage = () => {
           if (prev <= 1) {
             clearInterval(timer);
             setCanResend(true);
-            return 30;
+            return 0;
           }
           return prev - 1;
         });
@@ -75,16 +76,19 @@ export const LoginPage = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const response = await axios.post(`${API_URL}/api/auth/send-otp`, { phoneNumber: phone });
       if (response.data.success) {
         toast.success("OTP sent!");
         settempotp(response.data.otp);
         setSendOtp(true);
         setResendTimeout(30);
-        setCanResend(false); // Should be false initially to start the timer
+        setCanResend(false);
       }
     } catch (error) {
       toast.error("Failed to send OTP.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,112 +123,115 @@ export const LoginPage = () => {
   return (
     <div className="bg-[#0b0b0d] flex flex-col items-center justify-center min-h-screen w-full font-sans text-gray-100 p-6 overflow-hidden relative">
       
-      {/* Background Decorative Circles */}
-      <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-purple-600/20 rounded-full blur-[100px]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-blue-600/20 rounded-full blur-[100px]" />
+      {/* Background Orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-purple-600/10 rounded-full blur-[100px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-blue-600/10 rounded-full blur-[100px]" />
 
       <div className="z-10 w-full max-w-sm">
-        {/* Logo Section */}
-        <div className="flex justify-center mb-10 animate-fade-in">
-          <img src="../../logo.png" alt="Logo" className="h-16 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]" />
+        <div className="flex justify-center mb-10">
+          <img src="../../logo.png" alt="Logo" className="h-14 object-contain" />
         </div>
 
-        {/* Login Card */}
-        <div className="bg-[#16161a] border border-white/10 rounded-3xl p-8 shadow-2xl backdrop-blur-sm relative overflow-hidden">
+        <div className="bg-[#16161a] border border-white/10 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
           
           <div className="relative z-10">
-            <h1 className="text-2xl font-black mb-2 text-white tracking-tight">
-              {sendOtp ? "Verify Account" : "Welcome Back"}
-            </h1>
-            <p className="text-gray-400 text-sm mb-8 font-medium">
-              {sendOtp ? `Enter code sent to +91 ${phone}` : "Login to start winning cash today"}
-            </p>
-
-            {/* Phone Input */}
-            {!sendOtp ? (
-              <div className="space-y-2 mb-6 animate-slide-up">
-                <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">Phone Number</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400 group-focus-within:text-purple-500 transition-colors">
-                    <Smartphone size={18} />
-                  </div>
-                  <span className="absolute inset-y-0 left-10 flex items-center text-gray-400 font-bold border-r border-white/10 pr-3 my-3">
-                    +91
-                  </span>
-                  <input
-                    type="tel"
-                    className="w-full bg-[#1f1f25] border border-white/5 group-hover:border-white/20 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none rounded-2xl py-4 pl-24 pr-4 text-white font-bold transition-all placeholder:text-gray-600"
-                    placeholder="98765 43210"
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-              </div>
-            ) : (
-              /* OTP Input */
-              <div className="space-y-2 mb-6 animate-slide-up">
-                <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">6-Digit OTP</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400 group-focus-within:text-purple-500 transition-colors">
-                    <ShieldCheck size={18} />
-                  </div>
-                  <input
-                    type="text"
-                    maxLength={6}
-                    className="w-full bg-[#1f1f25] border border-white/5 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none rounded-2xl py-4 pl-12 pr-4 text-white font-bold tracking-[0.5em] transition-all"
-                    placeholder="••••••"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                  />
-                </div>
-                {tempotp && (
-                  <div className="bg-purple-500/10 border border-purple-500/20 p-3 rounded-xl mt-4">
-                    <p className="text-[10px] text-purple-300 uppercase font-black text-center mb-1">Testing Mode OTP</p>
-                    <p className="text-center font-mono text-lg text-purple-400 font-bold tracking-widest">{tempotp}</p>
-                  </div>
-                )}
-              </div>
+            {sendOtp && (
+                <button 
+                    onClick={() => setSendOtp(false)} 
+                    className="flex items-center gap-1 text-gray-500 text-xs font-bold mb-4 hover:text-purple-400 transition-colors"
+                >
+                    <ChevronLeft size={14} /> Edit Number
+                </button>
             )}
 
-            {/* Action Button */}
-            <button
-              disabled={isLoading}
-              onClick={() => (!sendOtp ? handleSendOtp() : handleVerifyOtp())}
-              className={`w-full relative overflow-hidden group py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-lg
-                ${!sendOtp 
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-purple-500/20" 
-                  : !canResend 
-                    ? "bg-gray-800 text-gray-500 cursor-not-allowed" 
-                    : "bg-gradient-to-r from-green-500 to-emerald-600 text-black shadow-green-500/20"
-                }`}
-            >
-              <div className="flex items-center justify-center gap-2">
-                {isLoading ? (
-                  <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
-                    {!sendOtp ? "Get Secure OTP" : !canResend ? `Resend in ${resendTimeout}s` : "Verify & Play"}
-                    <ArrowRight size={18} />
-                  </>
-                )}
-              </div>
-            </button>
-            
-            <p className="text-[10px] text-center text-gray-500 mt-6 font-medium">
-                By logging in, you agree to our <span className="underline">Terms of Service</span> and <span className="underline">Privacy Policy</span>.
+            <h1 className="text-2xl font-black mb-2 text-white">
+              {sendOtp ? "Verification" : "Welcome"}
+            </h1>
+            <p className="text-gray-400 text-sm mb-8">
+              {sendOtp ? `Sent to +91 ${phone}` : "Enter your number to play"}
             </p>
+
+            {!sendOtp ? (
+              /* --- PHONE VIEW --- */
+              <div className="space-y-6 animate-fade-in">
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Phone Number</label>
+                    <div className="relative">
+                        <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                        <span className="absolute left-11 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm border-r border-white/10 pr-2">
+                            +91
+                        </span>
+                        <input
+                            type="tel"
+                            maxLength={10}
+                            className="w-full bg-[#0b0b0d] border border-white/5 focus:border-purple-500 rounded-2xl py-4 pl-20 pr-4 text-white font-bold transition-all"
+                            placeholder="00000 00000"
+                            onChange={(e) => setPhone(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <button
+                    disabled={isLoading}
+                    onClick={handleSendOtp}
+                    className="w-full bg-purple-600 hover:bg-purple-500 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-purple-500/20"
+                >
+                    Get OTP <ArrowRight size={16} />
+                </button>
+              </div>
+            ) : (
+              /* --- OTP VIEW --- */
+              <div className="space-y-6 animate-fade-in">
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1">Security Code</label>
+                    <div className="relative">
+                        <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                        <input
+                            type="text"
+                            maxLength={6}
+                            className="w-full bg-[#0b0b0d] border border-white/5 focus:border-green-500 rounded-2xl py-4 pl-12 pr-4 text-white font-bold tracking-[0.6em] transition-all"
+                            placeholder="••••••"
+                            onChange={(e) => setOtp(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                {/* VERIFY BUTTON */}
+                <button
+                    disabled={isLoading}
+                    onClick={handleVerifyOtp}
+                    className="w-full bg-green-500 hover:bg-green-400 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-black transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl shadow-green-500/20"
+                >
+                    {isLoading ? "Verifying..." : "Verify & Play"} <ArrowRight size={16} />
+                </button>
+
+                {/* SEPARATE RESEND BUTTON */}
+                <div className="flex flex-col items-center gap-3 pt-2">
+                    <button
+                        disabled={!canResend || isLoading}
+                        onClick={handleSendOtp}
+                        className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all
+                            ${canResend 
+                                ? "text-purple-400 hover:text-purple-300" 
+                                : "text-gray-600 cursor-not-allowed"}`}
+                    >
+                        <RefreshCw size={12} className={!canResend ? "" : "animate-spin-slow"} />
+                        {canResend ? "Resend OTP Now" : `Resend in ${resendTimeout}s`}
+                    </button>
+                </div>
+              </div>
+            )}
+            
+            {/* Testing Hint */}
+            {sendOtp && tempotp && (
+              <div className="mt-6 p-3 bg-white/5 border border-white/10 rounded-xl text-center">
+                <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Dev Mode OTP</p>
+                <p className="font-mono text-purple-400 font-bold tracking-tighter">{tempotp}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Full Screen Loading Overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0b0b0d]/80 backdrop-blur-md">
-          <div className="relative">
-            <div className="h-20 w-20 rounded-full border-t-2 border-purple-500 animate-spin" />
-            <ShieldCheck className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-purple-400" />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,22 +1,21 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-// Define the structure of the Profile type (Update this as per your needs)
+// --- Types ---
 interface Profile {
   userId?: string;
   name?: string;
   email?: string;
   phoneNumber?: string;
-  [key: string]: any; // Allows additional properties
+  [key: string]: any;
 }
 
-// Define the structure of the UserContext
 interface UserContextType {
   profile: Profile;
   setProfile: (profile: Profile) => void;
   id: string;
   setId: (id: string) => void;
   ludoSet: boolean;
-  setLudoSet: (id: boolean) => void;
+  setLudoSet: (status: boolean) => void;
   userId: string;
   setUserId: (id: string) => void;
   paymentId: string;
@@ -45,144 +44,79 @@ interface UserContextType {
   settempotp: (otp: string) => void;
 }
 
-
-// Helper function to initialize state from sessionStorage
-const getInitialValue = <T,>(key: string, defaultValue: T): T => {
-  const storedValue = sessionStorage.getItem(key);
-  if (storedValue !== null) {
-    try {
-      const parsedValue = JSON.parse(storedValue);
-      if (typeof parsedValue === typeof defaultValue) {
-        return parsedValue as T;
-      }
-    } catch {
-      return defaultValue; // Ignore parsing errors and return the default value
-    }
-  }
-  return defaultValue;
-};
-// Helper function to initialize state from sessionStorage
-// const getInitialValueL = <T,>(key: string, defaultValue: T): T => {
-//   const storedValue = localStorage.getItem(key);
-//   if (storedValue !== null) {
-//     try {
-//       const parsedValue = JSON.parse(storedValue);
-//       if (typeof parsedValue === typeof defaultValue) {
-//         return parsedValue as T;
-//       }
-//     } catch {
-//       return defaultValue; // Ignore parsing errors and return the default value
-//     }
-//   }
-//   return defaultValue;
-// };
-
-// Context creation
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Provider Component
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [userId, setUserId] = useState(() => getInitialValue("userId", ""));
-  const [paymentId, setPaymentId] = useState(() => getInitialValue("paymentId", ""));
-  const [id, setId] = useState(() => getInitialValue("id", ""));
-  const [ludoSet, setLudoSet] = useState(() => getInitialValue("ludoSet", false));
-  const [event, setEvent] = useState(() => getInitialValue("event", ""));
-  const [details, setDetails] = useState(() => getInitialValue("details", ""));
-  const [phoneNumber, setPhoneNumber] = useState(() => getInitialValue("phoneNumber", ""));
-  const [phone, setPhone] = useState(() => getInitialValue("phone", ""));
-  const [name, setName] = useState(() => getInitialValue("name", ""));
-  const [battleId, setBattleId] = useState(() => getInitialValue("battleId", ""));
-  const [login, setLogin] = useState(() => getInitialValue("login", false));
-  const [adminClicked, setAdminClicked] = useState(() => getInitialValue("adminClicked", false));
-  const [opponentFound, setOpponentFound] = useState(() => getInitialValue("opponentFound", false));
-  const [amount, setAmount] = useState(() => getInitialValue("amount", 0));
-  const [profile, setProfile] = useState<Profile>(() => getInitialValue("profile", {}));
-  const [tempotp, settempotp] = useState(() => getInitialValue("otp", ""));
+/**
+ * Custom Hook: useStorageState
+ * Automatically syncs React state with localStorage or sessionStorage.
+ */
+function useStorageState<T>(key: string, defaultValue: T, storage: Storage = sessionStorage) {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const storedValue = storage.getItem(key);
+      if (storedValue !== null) {
+        return JSON.parse(storedValue);
+      }
+    } catch (error) {
+      console.error(`Error parsing storage for key "${key}":`, error);
+    }
+    return defaultValue;
+  });
 
-  // Update sessionStorage when state changes
   useEffect(() => {
-    const updateSessionStorage = (key: string, value: any) => {
-      sessionStorage.setItem(key, JSON.stringify(value));
-    };
-    const updateLocalStorage = (key: string, value: any) => {
-      localStorage.setItem(key, JSON.stringify(value));
-    };
+    storage.setItem(key, JSON.stringify(state));
+  }, [key, state, storage]);
 
-    updateSessionStorage("userId", userId);
-    updateSessionStorage("phoneNumber", phoneNumber);
-    updateSessionStorage("phone", phone);
-    updateSessionStorage("name", name);
-    updateSessionStorage("battleId", battleId);
-    updateLocalStorage("login", login);
-    updateSessionStorage("opponentFound", opponentFound);
-    updateSessionStorage("amount", amount);
-    updateSessionStorage("id", id);
-    updateSessionStorage("paymentId", paymentId);
-    updateSessionStorage("adminClicked", adminClicked);
-    updateSessionStorage("details", details);
-    updateSessionStorage("event", event);
-    updateSessionStorage("profile", profile);
-    updateSessionStorage("ludoSet", ludoSet);
-    updateSessionStorage("otp", tempotp);
-  }, [
-    userId,
-    phoneNumber,
-    phone,
-    name,
-    battleId,
-    login,
-    opponentFound,
-    amount,
-    id,
-    paymentId,
-    adminClicked,
-    details,
-    event,
-    profile,
-    ludoSet,
-    tempotp
-  ]);
+  return [state, setState] as const;
+}
 
-  // Context value
+// --- Provider Component ---
+export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // 1. Auth & Critical Info (Use localStorage to stay logged in on reload)
+  const [login, setLogin] = useStorageState<boolean>("login", false, localStorage);
+  const [profile, setProfile] = useStorageState<Profile>("profile", {}, localStorage);
+  const [userId, setUserId] = useStorageState<string>("userId", "");
+  const [name, setName] = useStorageState<string>("name", "");
+  const [phoneNumber, setPhoneNumber] = useStorageState<string>("phoneNumber", "");
+
+  // 2. Session/Game Info (Use sessionStorage - clears when tab closes)
+  const [id, setId] = useStorageState<string>("id", "");
+  const [paymentId, setPaymentId] = useStorageState<string>("paymentId", "");
+  const [ludoSet, setLudoSet] = useStorageState<boolean>("ludoSet", false);
+  const [event, setEvent] = useStorageState<string>("event", "");
+  const [details, setDetails] = useStorageState<string>("details", "");
+  const [phone, setPhone] = useStorageState<string>("phone", "");
+  const [battleId, setBattleId] = useStorageState<string>("battleId", "");
+  const [adminClicked, setAdminClicked] = useStorageState<boolean>("adminClicked", false);
+  const [opponentFound, setOpponentFound] = useStorageState<boolean>("opponentFound", false);
+  const [amount, setAmount] = useStorageState<number>("amount", 0);
+  const [tempotp, settempotp] = useStorageState<string>("otp", "");
+
   const contextValue: UserContextType = {
-    id,
-    setId,
-    userId,
-    setUserId,
-    phoneNumber,
-    setPhoneNumber,
-    phone,
-    setPhone,
-    name,
-    setName,
-    battleId,
-    setBattleId,
-    login,
-    setLogin,
-    opponentFound,
-    setOpponentFound,
-    amount,
-    setAmount,
-    paymentId,
-    setPaymentId,
-    profile,
-    setProfile,
-    adminClicked,
-    setAdminClicked,
-    event,
-    setEvent,
-    details,
-    setDetails,
-    ludoSet,
-    setLudoSet,
-    tempotp,
-    settempotp
+    profile, setProfile,
+    id, setId,
+    ludoSet, setLudoSet,
+    userId, setUserId,
+    paymentId, setPaymentId,
+    battleId, setBattleId,
+    name, setName,
+    phoneNumber, setPhoneNumber,
+    phone, setPhone,
+    login, setLogin,
+    opponentFound, setOpponentFound,
+    adminClicked, setAdminClicked,
+    amount, setAmount,
+    event, setEvent,
+    details, setDetails,
+    tempotp, settempotp,
   };
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 };
 
-// Custom hook to use the UserContext
+/**
+ * Custom hook to use the UserContext
+ */
 export const useUserContext = (): UserContextType => {
   const context = useContext(UserContext);
   if (!context) {

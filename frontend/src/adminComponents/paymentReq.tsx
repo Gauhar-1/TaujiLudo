@@ -1,199 +1,192 @@
-import { useEffect, useState } from "react"
-import { API_URL } from "../utils/url"
-import axios from "axios"
-import { useUserContext } from "../hooks/UserContext"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { API_URL } from "../utils/url";
+import axios from "axios";
+import { useUserContext } from "../hooks/UserContext";
+import { useNavigate } from "react-router-dom";
+import {  
+  User, 
+  Calendar, 
+  IndianRupee, 
+  CheckCircle2, 
+  XCircle,
+  ArrowLeft,
+  Banknote,
+  Smartphone,
+  Send,
+  X,
+  Image as ImageIcon
+} from "lucide-react";
 
-export const PaymentRequest = ()=>{
-
+export const PaymentRequest = () => {
     const { paymentId, setId, id } = useUserContext();
-    const [ battle, setBattle ] = useState({
-        _id : "",
-        amount: 0,
-        winner: "",
-        filename: "",
-        path: "",
-        player1Name : "",
-        player2Name : "",
-        userId: "",
-        date: "",
-        type: "",
-        details :"",
-        paymentMethod: "",
-
-    });
-    const [ rejectClicked, setRejectClicked ] = useState(false);
-    const [ viewClicked, setViewClicked ] = useState(false);
-    const [ reason, setReason ] = useState("");
-    const [ bank , setBank ] = useState({
-        name : "",
-        IFSC : "",
-        accountNumber : ""
-    });
+    const [battle, setBattle] = useState<any>(null);
+    const [rejectClicked, setRejectClicked] = useState(false);
+    const [viewClicked, setViewClicked] = useState(false);
+    const [reason, setReason] = useState("");
     const navigate = useNavigate();
 
-    useEffect(()=>{
-        const handle = async()=>{
-            try{
-                const response = await axios.get(`${API_URL}/api/auth/findTransaction` , { params : { paymentId }});
+    useEffect(() => {
+        const fetchTransaction = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/api/auth/findTransaction`, { params: { paymentId } });
+                setBattle(response.data);
+                setId(response.data.userId);
+            } catch (err) { console.error("Error:", err); }
+        };
+        fetchTransaction();
+    }, [paymentId, setId]);
 
-            if(!response.data){
-                return console.log("Response: "+ response.data);
-            }
+    const handleVerdict = async (action: 'verify' | 'reject') => {
+        try {
+            const sanitizedId = battle._id.toString().replace(/:/g, "");
+            const endpoint = action === 'verify' ? 'verify-payment' : 'reject-payment';
+            const payload = action === 'verify' 
+                ? { transactionId: sanitizedId, userId: id } 
+                : { transactionId: sanitizedId, reason, userId: id };
 
-            setBattle(response.data);
-            console.log("Filename: " + battle.filename);
+            await axios.post(`${API_URL}/api/auth/${endpoint}`, payload);
+            navigate('/admin/reqPayments');
+        } catch (err) { console.error("Verdict Error:", err); }
+    };
 
-            typeof battle.details === "string" ? setBank(response.data.details) : "";
-            setId(response.data.userId);
-            console.log("Battle : " + battle);
-        }
-            catch(err){
-                 console.log("Error: " + err);
-            }
-        }
+    if (!battle) return <div className="min-h-screen bg-[#0b0b0d] flex items-center justify-center text-amber-500 font-black animate-pulse">Loading Transaction...</div>;
 
-        handle();
-    },[paymentId]);
+    const isDeposit = battle.type === "deposit";
+    const date = new Date(battle.date).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-    const handleVerify = async()=>{
-        try{
-            if(battle._id){
-                console.log("Battle Id", battle._id);
-            }
-
-            const sanitizedTransactionId = battle._id.toString().replace(/:/g, "");
-
-            console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
-    
-
-            const response = await axios.post(`${API_URL}/api/auth/verify-payment`,{transactionId: sanitizedTransactionId, userId : id})
-
-            if(response.data){
-                console.log("Response: "+response.data);
-            }
-
-            navigate('/admin/reqPayments')
-        }
-        catch(err){
-            console.log("Error: "+ err);
-        }
-    }
-    const handleReject = async()=>{
-        try{
-            if(battle._id){
-                console.log("Battle Id", battle._id);
-            }
-
-            const sanitizedTransactionId = battle._id.toString().replace(/:/g, "");
-
-            console.log(`Sanitized Transaction ID: ${sanitizedTransactionId}`);
-    
-
-            const response = await axios.post(`${API_URL}/api/auth/reject-payment`,{transactionId: sanitizedTransactionId, reason , userId : id})
-
-            if(response.data){
-                console.log("Response: "+response.data);
-            }
-
-            navigate('/admin/reqPayments')
-        }
-        catch(err){
-            console.log("Error: "+ err);
-        }
-    }
-
-    const date = new Date(battle.date).toLocaleString();
-
-    
     return (
-        <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-4 px-4">
-                    <div className="text-3xl font-serif">Paymnet Request</div>
-                    <div className="bg-white  rounded-md shadow-md pb-4">
-                        <div className="bg-gray-100 rounded-t-md">
-                            <div className=" font-semibold my-4 py-3 px-4 text-blue-700 border-b-2">Pending</div>
+        <div className="bg-[#0b0b0d] min-h-screen w-full max-w-md mx-auto pt-24 px-4 pb-20 font-sans text-gray-100">
+            
+            {/* 1. HEADER HUD */}
+            <div className="flex items-center gap-4 mb-8">
+                <button onClick={() => navigate(-1)} className="p-3 bg-white/5 rounded-2xl text-gray-400 active:scale-90 transition-all border border-white/5">
+                    <ArrowLeft size={20} />
+                </button>
+                <div>
+                    <h1 className="text-2xl font-black italic tracking-tight uppercase text-white leading-none">Authorization</h1>
+                    <p className={`text-[10px] font-bold uppercase tracking-[0.2em] mt-1 ${isDeposit ? 'text-blue-500' : 'text-rose-500'}`}>
+                        {battle.type} request
+                    </p>
+                </div>
+            </div>
+
+            {/* 2. TRANSACTION SUMMARY CARD */}
+            <div className="bg-[#16161a] border border-white/5 rounded-[2.5rem] p-6 mb-6 shadow-2xl relative overflow-hidden">
+                <div className="flex justify-between items-start mb-6">
+                    <div className="flex gap-4">
+                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center border ${isDeposit ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' : 'bg-rose-500/10 border-rose-500/20 text-rose-500'}`}>
+                            <IndianRupee size={24} />
                         </div>
-                        <div className="p-4">
-                            <div className="py-2 font-bold text-gray-500">Payment Details</div>
-                            <div className="flex">
-                                <div className="p-2 w-24 border">Payment ID</div>
-                                <div className="p-2 w-60 border">{paymentId}</div>
-                            </div>
-                            <div className="flex">
-                                <div className="p-2 w-24 border">User ID</div>
-                                <div className="p-2 w-60 border">{battle.userId}</div>
-                            </div>
-                            <div className="flex">
-                                <div className="p-2 w-24 border">Type</div>
-                                <div className="p-2 w-60 border">{battle.type}</div>
-                            </div>
-                            <div className="flex">
-                                <div className="p-2 w-24 border">Amount</div>
-                                <div className="p-2 w-60 border">{battle.amount}</div>
-                            </div>
-                            <div className="flex">
-                                <div className="p-2 w-24 border">Date</div>
-                                <div className="p-2 w-60 border">{date}</div>
-                            </div>
-                           
+                        <div>
+                            <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Amount</p>
+                            <h2 className="text-2xl font-black text-white italic leading-none">₹{battle.amount}</h2>
                         </div>
-                        
-                        <div className="p-4">
-                        <div className="py-2 font-bold text-gray-500">{`${battle.
-paymentMethod === "bank" ? "Bank" : "Upi" } Details`}</div>
-                        { typeof battle.details === "string" ? <div className="flex">
-                                <div className="p-2 w-28 border">UTR No.</div>
-                                <div className="p-2 w-60 border">{typeof battle.details === "string" ? battle.details : "" }</div>
-                            </div> : ""}
-                        { typeof battle.details !== "string" ? <div className="flex">
-                                <div className="p-2 w-28 border">Name</div>
-                                <div className="p-2 w-60 border">{typeof battle.details !== "string" ? bank.name : "" }</div>
-                            </div> : ""}
-                        { typeof battle.details !== "string" ? <div className="flex">
-                                <div className="p-2 w-28 border">IFSC</div>
-                                <div className="p-2 w-60 border">{typeof battle.details !== "string" ?bank.IFSC : "" }</div>
-                            </div> : ""}
-                        { typeof battle.details !== "string" ? <div className="flex">
-                                <div className="p-2 w-28 border">Account Number</div>
-                                <div className="p-2 w-60 border">{typeof battle.details !== "string" ? bank.accountNumber : "" }</div>
-                            </div> : ""}
-                        {battle.type === "deposit" ? <div className="flex">
-                                <div className="p-2 w-28 border">ScreenShot</div>
-                                <div className="p-2 w-60 border">
-                                    <div className="bg-green-300 w-11 p-1 rounded-md" onClick={()=>{
-                                        if(viewClicked){
-                                            setViewClicked(false);
-                                        }
-                                        else{
-                                            setViewClicked(true);
-                                        }
-                                    }}>{ viewClicked ? "back" : "view"}</div>
-                                </div>
-                            </div> : ""}
-                           {!rejectClicked && <div className="flex text-center">
-                                <div className="p-2 w-1/2 border bg-green-400 rounded-lg m-2" onClick={handleVerify}>Approve</div>
-                                <div className="p-2 w-1/2 border bg-red-400 rounded-lg m-2" onClick={()=>{
-                                    setRejectClicked(true);
-                                }}>Reject</div>
-                            </div>}
-                        </div>
-                        { viewClicked && <div className="bg-gray-400 p-6 mx-6  rounded-lg">
-                            <img src={`${API_URL}/uploads/${battle.filename}`} alt="" className="rounded-lg" />
-                        </div> }
                     </div>
-                    {rejectClicked && <div className="bg-gray-400 p-10 absolute w-80 m-6">
-                        <textarea
-        className="w-full border border-gray-300 p-2 rounded resize-none break-words whitespace-normal"
-        rows={4}
-        placeholder="Type your text here..." onChange={(e)=>{
-            setReason(e.target.value)
-        }}
-      ></textarea>
-                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={handleReject}>sent</div>
-                            <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
-                                setRejectClicked(false);
-                            }}>cancel</div>
-                        </div>}
-                 </div>
-    )
-}
+                    <div className="text-right">
+                        <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest block mb-1">Status</span>
+                        <span className="bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded border border-amber-500/20 text-[8px] font-black uppercase tracking-widest">Pending</span>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                    <div className="space-y-1">
+                        <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest flex items-center gap-1"><User size={10}/> User ID</p>
+                        <p className="text-xs font-mono font-bold text-gray-300">#{battle.userId.slice(-10)}</p>
+                    </div>
+                    <div className="space-y-1 text-right">
+                        <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest flex items-center justify-end gap-1"><Calendar size={10}/> Date</p>
+                        <p className="text-xs font-bold text-gray-300">{date.split(',')[0]}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* 3. SETTLEMENT DETAILS BENTO */}
+            <div className="bg-[#16161a] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl mb-6">
+                <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        {battle.paymentMethod === 'bank' ? <Banknote size={16} className="text-amber-500" /> : <Smartphone size={16} className="text-amber-500" />}
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+                            {battle.paymentMethod === 'bank' ? 'Bank Settlement' : 'UPI Transfer'}
+                        </h3>
+                    </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                    {typeof battle.details === "string" ? (
+                        <div className="space-y-2">
+                            <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Reference / UTR No.</p>
+                            <div className="p-4 bg-[#0b0b0d] rounded-2xl border border-white/5 text-center">
+                                <span className="text-sm font-mono font-black text-amber-500 tracking-widest uppercase">{battle.details}</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-3">
+                            {[
+                                { label: 'Account Holder', val: battle.details.name },
+                                { label: 'IFSC Code', val: battle.details.IFSC },
+                                { label: 'Account Number', val: battle.details.accountNumber },
+                            ].map((item, i) => (
+                                <div key={i} className="flex justify-between items-center p-3 bg-white/[0.02] rounded-xl border border-white/5">
+                                    <span className="text-[9px] font-black text-gray-600 uppercase">{item.label}</span>
+                                    <span className="text-xs font-mono font-black text-gray-300">{item.val}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {isDeposit && (
+                        <button 
+                            onClick={() => setViewClicked(!viewClicked)}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-blue-600/10 text-blue-500 border border-blue-500/20 font-black uppercase text-[10px] tracking-widest active:scale-95 transition-all"
+                        >
+                            <ImageIcon size={14} /> {viewClicked ? "Hide Proof" : "View Receipt"}
+                        </button>
+                    )}
+                </div>
+
+                {viewClicked && isDeposit && (
+                    <div className="p-4 bg-[#0b0b0d] animate-fade-in">
+                        <img src={`${API_URL}/uploads/${battle.filename}`} alt="Proof" className="w-full rounded-2xl shadow-2xl border border-white/10" />
+                    </div>
+                )}
+            </div>
+
+            {/* 4. ACTIONS */}
+            {!rejectClicked ? (
+                <div className="grid grid-cols-2 gap-4">
+                    <button 
+                        onClick={() => handleVerdict('verify')}
+                        className="py-4 bg-emerald-500 rounded-3xl font-black uppercase text-xs tracking-widest text-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 active:scale-95 transition-all"
+                    >
+                        <CheckCircle2 size={18} /> Approve
+                    </button>
+                    <button 
+                        onClick={() => setRejectClicked(true)}
+                        className="py-4 bg-[#16161a] border border-red-500/30 text-red-500 rounded-3xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-all"
+                    >
+                        <XCircle size={18} /> Reject
+                    </button>
+                </div>
+            ) : (
+                <div className="bg-[#16161a] border border-red-500/30 rounded-[2.5rem] p-6 animate-slide-up">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xs font-black text-red-500 uppercase italic">Rejection Reason</h3>
+                        <button onClick={() => setRejectClicked(false)}><X size={16} className="text-gray-600"/></button>
+                    </div>
+                    <textarea
+                        className="w-full bg-[#0b0b0d] border border-white/5 rounded-2xl p-4 text-sm text-white focus:border-red-500 outline-none resize-none mb-4"
+                        rows={3}
+                        placeholder="e.g. Invalid UTR number, Amount mismatch..."
+                        onChange={(e) => setReason(e.target.value)}
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                        <button onClick={() => setRejectClicked(false)} className="py-3 bg-white/5 rounded-xl font-black uppercase text-[10px] text-gray-400">Cancel</button>
+                        <button onClick={() => handleVerdict('reject')} className="py-3 bg-red-600 rounded-xl font-black uppercase text-[10px] text-white flex items-center justify-center gap-2">
+                            <Send size={14}/> Submit
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};

@@ -1,25 +1,8 @@
-import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "./url";
+import { Search, Sword, Zap, Clock, IndianRupee, ChevronLeft, ChevronRight, History, Filter } from "lucide-react";
 
-interface Column {
-  id: "no" | "battleId" | "player1Name" | "player2Name" | "amount" | "status" | "joinedAt";
-  label: string;
-  minWidth?: number;
-  align?: "right";
-  format?: (value: number) => string;
-}
-
-const columns: readonly Column[] = [
-  { id: "no", label: "#" },
-  { id: "battleId", label: "Battle ID", minWidth: 220 },
-  { id: "player1Name", label: "Player1", minWidth: 170 },
-  { id: "player2Name", label: "Player2", minWidth: 170 },
-  { id: "amount", label: "Amount", minWidth: 120,  },
-  { id: "status", label: "Status", minWidth: 170 },
-  { id: "joinedAt", label: "Joined At", minWidth: 170 },
-];
 
 interface Data {
   no: number;
@@ -48,7 +31,6 @@ export const StickyTable: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [rows, setRows] = useState<Data[]>([]);
 
   // Fetch battles data
@@ -83,32 +65,7 @@ export const StickyTable: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value.toLowerCase());
-  };
 
-  const handleSort = (columnId: string) => {
-    const isAsc = sortColumn === columnId && sortOrder === "asc";
-    setSortOrder(isAsc ? "desc" : "asc");
-    setSortColumn(columnId);
-
-    const sortedRows = [...rows].sort((a, b) => {
-      const valueA = a[columnId as keyof Data];
-      const valueB = b[columnId as keyof Data];
-
-      if (typeof valueA === "string" && typeof valueB === "string") {
-        return isAsc ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
-      } else if (typeof valueA === "number" && typeof valueB === "number") {
-        return isAsc ? valueA - valueB : valueB - valueA;
-      } else if (columnId === "joinedAt") {
-        const dateA = new Date(valueA as string);
-        const dateB = new Date(valueB as string);
-        return isAsc ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
-      }
-      return 0;
-    });
-    setRows(sortedRows);
-  };
 
   const filterEachRow = (row: Data) => {
     const query = searchQuery.toLowerCase();
@@ -122,11 +79,13 @@ export const StickyTable: React.FC = () => {
     );
   };
 
-  const filteredRows = rows.filter(filterEachRow);
-
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
+  const getStatusStyle = (status: string) => {
+    if (status === "in-progress") return "text-amber-500 bg-amber-500/10 border-amber-500/20";
+    if (status === "pending") return "text-red-500 bg-red-500/10 border-red-500/20";
+    return "text-blue-500 bg-blue-500/10 border-blue-500/20";
   };
+
+  const filteredRows = rows.filter(filterEachRow);
 
   const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(+event.target.value);
@@ -134,100 +93,136 @@ export const StickyTable: React.FC = () => {
   };
 
   return (
-    <div className="w-full overflow-hidden p-4">
-      <div className="flex gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search"
-          className="border p-2 rounded-md w-54"
-          onChange={handleSearch}
-        />
-        <button
-          className="p-2 bg-gray-200 rounded-md"
-          onClick={() => {
-            const columnId = sortColumn || "no";
-            handleSort(columnId);
-          }}
-        >
-          {sortOrder === "asc" ? <ArrowUpward /> : <ArrowDownward />}
-        </button>
-      </div>
-
-      <div className="overflow-y-auto shadow-md relative max-h-[440px]">
-  <div className="flex bg-gray-200 text-center  shadow-md  border-b">
-    {columns.map((column) => (
-      <div
-        key={column.id}
-        className={`text-sm font-semibold p-2 flex-1`}
-        style={{
-          minWidth: column.minWidth || 100,
-          textAlign: column.align || "left",
-        }}
-      >
-        {column.label}
-      </div>
-    ))}
-  </div>
-
-  {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-    <div key={row.battleId} className="flex border-b text-center">
-      {columns.map((column) => {
-        const value = row[column.id as keyof Data];
-        const isStatus = column.id === "status";
-        const statusClass =
-          isStatus && value === "pending"
-            ? "text-red-500 font-bold"
-            : isStatus && value === "in-progress"
-            ? "text-yellow-500 font-bold"
-            : "";
-
-        return (
-          <div
-            key={column.id}
-            className={`text-sm p-2 flex-1 ${statusClass}`}
-            style={{
-              minWidth: column.minWidth || 100,
-              textAlign: column.align || "left",
-            }}
-          >
-            {column.format && typeof value === "number" ? column.format(value) : value}
-          </div>
-        );
-      })}
-    </div>
-  ))}
-</div>
-<div className="mt-4">
-        <div className="flex justify-between items-center">
-          <div className="text-sm">
-            {filteredRows.length} rows
-          </div>
-          <div className="flex gap-4">
-            <select
-              className="border p-2 rounded-md"
-              value={rowsPerPage}
-              onChange={handleChangeRowsPerPage}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={100}>100</option>
-            </select>
-            <button
-              className="border p-2 rounded-md"
-              onClick={() => handleChangePage({}, page - 1)}
-              disabled={page === 0}
-            >
-              Previous
-            </button>
-            <button
-              className="border p-2 rounded-md"
-              onClick={() => handleChangePage({}, page + 1)}
-              disabled={page * rowsPerPage + rowsPerPage >= filteredRows.length}
-            >
-              Next
-            </button>
-          </div>
+    <div className="w-full max-w-md mx-auto font-sans bg-[#0b0b0d] min-h-[60vh] pb-10">
+      
+      {/* SEARCH & FILTER HUD */}
+      <div className="p-4 space-y-4">
+        <div className="relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-500 transition-colors" size={16} />
+          <input
+            type="text"
+            placeholder="Search active battles..."
+            className="w-full bg-[#16161a] border border-white/5 rounded-2xl py-3 pl-10 pr-4 text-sm text-white placeholder:text-gray-600 outline-none focus:border-amber-500/50 transition-all shadow-inner"
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
+        
+        <div className="flex justify-between items-center px-1">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+              {filteredRows.length} Matches Live
+            </p>
+          </div>
+          <button 
+             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+             className="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-1 bg-amber-500/5 px-3 py-1 rounded-lg border border-amber-500/10"
+          >
+            Sort Time
+          </button>
+        </div>
+      </div>
+
+      {/* CARD LIST VIEW */}
+      <div className="px-4 space-y-4 overflow-y-auto max-h-[500px] custom-scrollbar">
+        {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+          <div key={row.battleId} className="bg-[#16161a] border border-white/5 rounded-[2rem] p-5 shadow-2xl relative overflow-hidden group">
+            
+            {/* Top Row: Meta Info */}
+            <div className="flex justify-between items-center mb-6">
+                <div className={`px-3 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest ${getStatusStyle(row.status)}`}>
+                    {row.status}
+                </div>
+                <div className="flex items-center gap-1.5 text-gray-600">
+                    <Clock size={10} />
+                    <span className="text-[9px] font-bold uppercase tracking-tighter">{row.joinedAt.split(',')[1]}</span>
+                </div>
+            </div>
+
+            {/* Main Action: Player vs Player */}
+            <div className="flex justify-between items-center relative z-10">
+                <div className="flex flex-col items-center gap-2 w-28">
+                    <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-lg shadow-blue-900/10">
+                        <Zap size={18} className="text-blue-500" />
+                    </div>
+                    <span className="text-[10px] font-black text-white uppercase truncate text-center w-full tracking-tight">{row.player1Name}</span>
+                </div>
+
+                <div className="flex flex-col items-center">
+                    <div className="bg-[#1f1f25] p-2.5 rounded-full border border-white/10 shadow-inner group-hover:scale-110 transition-transform">
+                        <Sword size={16} className="text-red-500" />
+                    </div>
+                    <span className="text-[8px] font-black text-gray-700 uppercase mt-1 tracking-[0.2em]">Vs</span>
+                </div>
+
+                <div className="flex flex-col items-center gap-2 w-28">
+                    <div className="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 shadow-lg shadow-purple-900/10">
+                        <Zap size={18} className="text-purple-500" />
+                    </div>
+                    <span className="text-[10px] font-black text-white uppercase truncate text-center w-full tracking-tight">{row.player2Name}</span>
+                </div>
+            </div>
+
+            {/* Entry Amount Card */}
+            <div className="mt-6 pt-4 border-t border-white/5 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <div className="bg-emerald-500/10 p-1.5 rounded-lg">
+                        <IndianRupee size={12} className="text-emerald-500" />
+                    </div>
+                    <div>
+                        <p className="text-[7px] font-black text-gray-600 uppercase leading-none">Entry Stake</p>
+                        <p className="text-xs font-black text-white italic">₹{row.amount}</p>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <p className="text-[8px] font-black text-gray-700 uppercase">Battle ID</p>
+                    <p className="text-[9px] font-mono text-gray-500 uppercase tracking-tighter italic">#{row.battleId.slice(-8)}</p>
+                </div>
+            </div>
+
+            {/* Background Accent */}
+            <History className="absolute -right-4 -bottom-4 text-white/[0.02] -rotate-12" size={80} />
+          </div>
+        ))}
+
+        {filteredRows.length === 0 && (
+          <div className="text-center py-20 opacity-20">
+             <Filter size={48} className="mx-auto" />
+             <p className="font-black uppercase tracking-widest mt-2">No matches found</p>
+          </div>
+        )}
+      </div>
+
+      {/* PAGINATION HUD */}
+      <div className="mt-8 px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 bg-[#16161a] p-1.5 rounded-xl border border-white/5">
+             <select 
+                className="bg-transparent text-[10px] font-black text-amber-500 p-1 outline-none"
+                value={rowsPerPage}
+                onChange={handleChangeRowsPerPage}
+             >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+             </select>
+          </div>
+          
+          <div className="flex items-center gap-4">
+             <button 
+                disabled={page === 0}
+                onClick={() => setPage(page - 1)}
+                className="p-2 bg-white/5 rounded-xl text-gray-400 disabled:opacity-10 active:scale-90 transition-all"
+             >
+                <ChevronLeft size={20} />
+             </button>
+             <span className="text-xs font-black text-white italic">{page + 1}</span>
+             <button 
+                disabled={page * rowsPerPage + rowsPerPage >= filteredRows.length}
+                onClick={() => setPage(page + 1)}
+                className="p-2 bg-white/5 rounded-xl text-gray-400 disabled:opacity-10 active:scale-90 transition-all"
+             >
+                <ChevronRight size={20} />
+             </button>
+          </div>
       </div>
     </div>
   );

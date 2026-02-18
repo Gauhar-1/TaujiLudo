@@ -1,210 +1,191 @@
-import { useEffect, useState } from "react"
-import axios from "axios"
-import { useUserContext } from "../hooks/UserContext"
-import { API_URL } from "../utils/url"
-import { useNavigate } from "react-router-dom"
-// import { useLocation } from "react-router-dom"
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useUserContext } from "../hooks/UserContext";
+import { API_URL } from "../utils/url";
+import { useNavigate } from "react-router-dom";
+import { 
+  ShieldCheck, User, Mail, Phone, Calendar, 
+  MapPin, Hash, Image as ImageIcon, CheckCircle2, 
+  XCircle, Send, X, AlertCircle 
+} from "lucide-react";
 
-export const KycVerification = ()=>{
-    const [ username, setUserName ] = useState("");
-    const [ email, setEmail ] = useState("");
-    const [ kycDetails, setKycDetails ] = useState({
-        Name: "",
-        DOB: "",
-        state: "",
-        documentName: "",
-        documentNumber: "",
-        status: "",
-        frontView: "",
-        backView: "",
+export const KycVerification = () => {
+    const [username, setUserName] = useState("");
+    const [email, setEmail] = useState("");
+    const [kycDetails, setKycDetails] = useState<any>({
+        Name: "", DOB: "", state: "", documentName: "",
+        documentNumber: "", status: "", frontView: "", backView: ""
     });
-    const [ rejectClicked, setRejectClicked ] = useState(false);
-    const [ frontViewClicked, setFrontViewClicked ] = useState(false);
-    const [ backViewClicked, setBackViewClicked ] = useState(false);
-    const [ reason, setReason ] = useState("");
+    const [rejectClicked, setRejectClicked] = useState(false);
+    const [frontViewClicked, setFrontViewClicked] = useState(false);
+    const [backViewClicked, setBackViewClicked] = useState(false);
+    const [reason, setReason] = useState("");
 
     const { phoneNumber, userId, setUserId } = useUserContext();
-
     const navigate = useNavigate();
-    // const navigate = useLocation();
-    
-    useEffect(()=>{
-        const handle = async()=>{
-            if(phoneNumber){
-                console.log("UserId: " + phoneNumber);
-            }
-            try{const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { phoneNumber }});
 
-            if(!response.data){
-                 return console.log("response not found" , response.data);
-            }
-            console.log(response.data)
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params: { phoneNumber } });
+                const { name, email, kycDetails, userId } = response.data[0];
+                setKycDetails(kycDetails);
+                setUserName(name);
+                setEmail(email || "N/A");
+                setUserId(userId);
+            } catch (err) { console.error("Error fetching profile:", err); }
+        };
+        fetchProfile();
+    }, [phoneNumber, setUserId]);
 
-            const { name ,  email, kycDetails, filename, path, userId } = response.data[0];
-
-
-            setKycDetails(kycDetails);
-            setUserName(name);
-            setEmail(email  || "N/A");
-            setUserId(userId)
-            kycDetails.filename = filename;
-            kycDetails.path = path;
-            console.log("profile fetched successfully");
-            }
-            catch(err){
-                console.log("Error: " + err);
-            }
-        }
-        handle();
-    },[]);
-    
-
-    const handleVerify = async()=>{
-        try{
-            if(userId){
-                console.log("Battle Id", userId);
-            }
-
-            const response = await axios.post(`${API_URL}/api/auth/verify-kyc`,{userId})
-
-            if(!response.data){
-                console.log("Response: "+response.data);
-            }
-
-        }
-        catch(err){
-            console.log("Error: "+ err);
-        }
-    }
-    const handleReject = async()=>{
-        try{
-            if(userId){
-                console.log("User Id",userId);
-            }
-
-            const response = await axios.post(`${API_URL}/api/auth/reject-kyc`,{userId, reason})
-
-            if(response.data){
-                console.log("Response: "+response.data);
-            }
-
-        }
-        catch(err){
-            console.log("Error: "+ err);
-        }
-    }
+    const handleAction = async (action: 'verify' | 'reject') => {
+        try {
+            const endpoint = action === 'verify' ? 'verify-kyc' : 'reject-kyc';
+            const payload = action === 'verify' ? { userId } : { userId, reason };
+            await axios.post(`${API_URL}/api/auth/${endpoint}`, payload);
+            navigate('/admin/pendingKyc');
+        } catch (err) { console.error(`Error during ${action}:`, err); }
+    };
 
     return (
-        <div className="max-w-sm bg-gray-200 min-h-screen pb-4 pt-4 px-4">
-                   <div className="text-3xl font-serif pb-4">Kyc Verification</div>
-                   <div className="bg-white  rounded-md shadow-md pb-4">
-                    <div className="bg-gray-300 flex justify-center gap-2 p-6">
-                        <div className="">
-                            <img src="/Avatar.png" alt="" className="size-24"/>
-                        </div>
-                        <div className="flex flex-col gap-1 p-2" >
-                            <div className="font-bold text-lg">{username}</div>
-                            <div>{phoneNumber}</div>
-                            <div>{email}</div>
+        <div className="bg-[#0b0b0d] min-h-screen w-full max-w-md mx-auto pt-24 px-4 pb-20 font-sans text-gray-100">
+            
+            {/* 1. HEADER HUD */}
+            <div className="flex justify-between items-center mb-8 px-2">
+                <div>
+                    <h1 className="text-2xl font-black italic tracking-tight uppercase text-white leading-none">Verifier</h1>
+                    <p className="text-[10px] font-bold text-amber-500 uppercase tracking-[0.2em] mt-1 flex items-center gap-1">
+                        <ShieldCheck size={10} /> Identity Validation
+                    </p>
+                </div>
+                <div className="flex gap-2">
+                    {kycDetails.status === "pending" && (
+                        <button 
+                            onClick={() => handleAction('verify')}
+                            className="bg-emerald-500 text-black p-2.5 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-90 transition-all"
+                        >
+                            <CheckCircle2 size={20} />
+                        </button>
+                    )}
+                    <button 
+                        onClick={() => setRejectClicked(true)}
+                        className="bg-red-500 text-white p-2.5 rounded-xl shadow-lg shadow-red-500/20 active:scale-90 transition-all"
+                    >
+                        <XCircle size={20} />
+                    </button>
+                </div>
+            </div>
+
+            {/* 2. PLAYER PROFILE CARD */}
+            <div className="bg-[#16161a] border border-white/5 rounded-[2.5rem] p-6 mb-6 shadow-2xl relative overflow-hidden">
+                <div className="flex gap-5 relative z-10">
+                    <div className="h-20 w-20 rounded-3xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-xl">
+                        <User size={40} className="text-amber-500" />
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <h2 className="text-xl font-black text-white uppercase tracking-tight leading-none mb-2">{username}</h2>
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <Phone size={12} className="text-amber-500/50" />
+                                <span className="text-xs font-bold tracking-widest">{phoneNumber}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-600">
+                                <Mail size={12} />
+                                <span className="text-[10px] font-medium">{email}</span>
+                            </div>
                         </div>
                     </div>
-                       <div className="bg-gray-300  flex justify-between mt-2">
-                           <div className=" font-semibold  py-3 px-4 text-blue-600 border-b-2">KYC Status
-                           </div>
-                           <div className="flex gap-2 py-3 px-4">
-                           {kycDetails.status === "pending" && <div className="bg-green-400 text-white py-1 px-2 rounded-md" onClick={handleVerify}>Approve</div>}
-                            <div className="bg-red-500 text-white py-1 px-2 rounded-md" onClick={()=>{
-                                setRejectClicked(true);
-                            }}> Reject</div>
-                           </div>
-                       </div>
+                </div>
+                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                    <ShieldCheck size={100} />
+                </div>
+            </div>
 
-                       <div className="bg-blue-700 shadow-md font-semibold  py-3 px-4 text-gray-300 border-b-2">KYC Document Detail
-                       </div>
-                       <div className="p-4">
-                       <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2">Doucument No.</div>
-                        <div className="border border-gray-400 w-40 p-2">{kycDetails.documentNumber}</div>
-                       </div>
-                       <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2"> Name</div>
-                        <div className="border border-gray-400 w-40 p-2">{kycDetails.Name}</div>
-                       </div>
-                       <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2">DOB</div>
-                        <div className="border border-gray-400 w-40 p-2">{kycDetails.DOB}</div>
-                       </div>
-                       <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2">State</div>
-                        <div className="border border-gray-400 w-40 p-2">{kycDetails.state}</div>
-                       </div>
-                       <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2">Front Side</div>
+            {/* 3. DOCUMENT DETAILS BENTO */}
+            <div className="bg-[#16161a] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center gap-2">
+                    <Hash size={16} className="text-amber-500" />
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Document Data</h3>
+                </div>
 
-                        <div className="border border-gray-400 w-40 p-2 flex justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6" onClick={()=>{
-                           if(!frontViewClicked){
-                            setFrontViewClicked(true)
-                        }
-                        else{
-                            setFrontViewClicked(false);
-                        }
-                        }}>
-  <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clipRule="evenodd" />
-</svg>
+                <div className="p-4 space-y-3">
+                    {[
+                        { label: 'Document Number', val: kycDetails.documentNumber, icon: <Hash size={14} /> },
+                        { label: 'Legal Name', val: kycDetails.Name, icon: <User size={14} /> },
+                        { label: 'Date of Birth', val: kycDetails.DOB, icon: <Calendar size={14} /> },
+                        { label: 'Residential State', val: kycDetails.state, icon: <MapPin size={14} /> },
+                    ].map((item, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 bg-white/[0.02] rounded-2xl border border-white/5">
+                            <div className="flex items-center gap-3 text-gray-500">
+                                {item.icon}
+                                <span className="text-[10px] font-black uppercase tracking-wider">{item.label}</span>
+                            </div>
+                            <span className="text-xs font-bold text-white tracking-tight">{item.val}</span>
                         </div>
-                       
-                       </div >
-                       { frontViewClicked && <div className="bg-gray-400 p-6 mx-6 my-4  rounded-lg">
-                            <img src={`${API_URL}/uploads/${kycDetails.frontView}`} alt="" className="rounded-lg" />
-                        </div> }
-                       <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2">Back Side</div>
+                    ))}
 
-                        <div className="border border-gray-400 w-40 p-2 flex justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6" onClick={()=>{
-                            if(!backViewClicked){
-                                setBackViewClicked(true)
-                            }
-                            else{
-                                setBackViewClicked(false);
-                            }
-                        }}>
-  <path fillRule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clipRule="evenodd" />
-</svg>
+                    {/* Image Toggles */}
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+                        {[
+                            { label: 'Front View', state: frontViewClicked, setter: setFrontViewClicked, img: kycDetails.frontView },
+                            { label: 'Back View', state: backViewClicked, setter: setBackViewClicked, img: kycDetails.backView }
+                        ].map((view, i) => (
+                            <div key={i} className="space-y-3">
+                                <button 
+                                    onClick={() => view.setter(!view.state)}
+                                    className={`w-full py-3 rounded-2xl border font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95
+                                    ${view.state ? 'bg-amber-500 border-amber-400 text-black' : 'bg-white/5 border-white/10 text-gray-400'}`}
+                                >
+                                    <ImageIcon size={14} /> {view.state ? 'Hide' : view.label}
+                                </button>
+                                {view.state && (
+                                    <div className="p-2 bg-[#0b0b0d] rounded-2xl border border-white/10 animate-fade-in">
+                                        <img 
+                                            src={`${API_URL}/uploads/${view.img}`} 
+                                            alt={view.label} 
+                                            className="w-full rounded-xl shadow-2xl" 
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* 4. REJECT MODAL */}
+            {rejectClicked && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+                    <div className="bg-[#16161a] border border-white/10 w-full rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4">
+                            <button onClick={() => setRejectClicked(false)} className="text-gray-500 hover:text-white"><X size={24}/></button>
                         </div>
-                       </div>
-                       { backViewClicked && <div className="bg-gray-400 p-6 mx-6 my-4  rounded-lg">
-                            <img src={`${API_URL}/uploads/${kycDetails.backView}`} alt="" className="rounded-lg" />
-                        </div> }
-                       <div className="flex">
-                        <div className="border border-gray-400 w-40 p-2">Verify Status</div>
-                        <div className="border border-gray-400 w-40 p-2 flex justify-center">
-                            <div className={` ${kycDetails.status === "pending" ?"bg-red-500":"bg-green-500" } py-1 px-4 text-white rounded-md`}>{kycDetails.status === "pending" ?"Pending":"Verified"}</div>
-                        </div>
-                       </div>
-                       </div>
-                       <div className="px-1 pb-10">
-                       </div>
-                       {rejectClicked && <div className="bg-gray-400 p-10 rounded-lg shadow-xl top-60 absolute w-80 m-6">
+                        <h2 className="text-xl font-black uppercase italic text-red-500 mb-2 flex items-center gap-2">
+                            <AlertCircle size={20} /> Reject KYC
+                        </h2>
+                        <p className="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-6 leading-relaxed">
+                            Specify the reason for rejecting {username}'s application.
+                        </p>
                         
                         <textarea
-        className="w-full border border-gray-300 p-2 rounded resize-none break-words whitespace-normal"
-        rows={4}
-        placeholder="Type your text here..." onChange={(e)=>{
-            setReason(e.target.value)
-        }}
-      ></textarea>
-                            <div className="bg-blue-500 text-center p-2 text-white font-bold mt-2 rounded-lg" onClick={()=>{
-                                handleReject();
-                                navigate('/admin/pendingKyc')
-                            }}>sent</div>
-                            <div className="bg-gray-500 text-center p-2 text-white font-bold mt-2 rounded-lg " onClick={()=>{
-                                setRejectClicked(false);
-                            }}>cancel</div>
-                        </div>}
-                   </div>
-                  
+                            className="w-full bg-[#0b0b0d] border border-white/5 rounded-2xl p-4 text-sm text-white focus:border-red-500 transition-all outline-none resize-none mb-6"
+                            rows={4}
+                            placeholder="e.g. Blurry photo, Name mismatch, Expired document..."
+                            onChange={(e) => setReason(e.target.value)}
+                        />
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <button onClick={() => setRejectClicked(false)} className="py-4 bg-white/5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] text-gray-400">Cancel</button>
+                            <button 
+                                onClick={() => handleAction('reject')}
+                                className="py-4 bg-red-600 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] text-white flex items-center justify-center gap-2 shadow-lg shadow-red-900/40"
+                            >
+                                <Send size={14} /> Confirm
+                            </button>
+                        </div>
+                    </div>
                 </div>
-    )
+            )}
+        </div>
+    );
 }
