@@ -17,10 +17,6 @@ export const ProfilePage = () => {
   const [email, setEmail] = useState(() => localStorage.getItem("email") || "");
   const navigate = useNavigate();
   const { name, setName, phone, userId, setPhone, setUserId, setLogin, setPhoneNumber } = useUserContext();
-  const [Name, setname] = useState("");
-  const [DOB, setDOB] = useState("");
-  const [state, setState] = useState("");
-  const [documentNumber, setDocumentNumber] = useState("");
   const [kycStatus, setKycStatus] = useState("");
   const [earnings, setEarnings] = useState(0);
   const [cashWon, setCashWon] = useState(0);
@@ -123,10 +119,10 @@ export const ProfilePage = () => {
                     <label htmlFor="back" className="text-[10px] text-purple-400 font-bold block mt-1 cursor-pointer truncate">{selectedFile2 ? selectedFile2.name : "Upload"}</label>
                   </div>
                </div>
-               <input placeholder="Full Name (As per Aadhar)" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setname(e.target.value)} />
-               <input placeholder="DOB (DD/MM/YYYY)" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setDOB(e.target.value)} />
-               <input placeholder="State" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setState(e.target.value)} />
-               <input placeholder="Aadhar Number" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none" onChange={(e) => setDocumentNumber(e.target.value)} />
+               <input placeholder="Full Name (As per Aadhar)" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none"  />
+               <input placeholder="DOB (DD/MM/YYYY)" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none"  />
+               <input placeholder="State" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none"  />
+               <input placeholder="Aadhar Number" type="text" className="w-full bg-[#25252b] rounded-xl p-3 border border-white/5 outline-none"  />
                
                <div className="flex gap-2 pt-4">
                  <button className="flex-1 bg-gray-800 py-3 rounded-xl font-bold text-sm" onClick={() => setKycClicked(false)}>Cancel</button>

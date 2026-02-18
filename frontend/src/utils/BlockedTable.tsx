@@ -45,8 +45,6 @@ function createData(
 }
 
 export const StickyTable: React.FC = () => {
-  const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [rows, setRows] = useState<Data[]>([]);
 
@@ -133,7 +131,7 @@ export const StickyTable: React.FC = () => {
 
       {/* CARD LIST */}
       <div className="p-4 space-y-4">
-        {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+        {filteredRows.map((row) => (
           <div key={row.userId} className="bg-[#16161a] border-l-4 border-l-red-600 border-y border-r border-white/5 rounded-r-[2rem] rounded-l-lg overflow-hidden shadow-2xl animate-slide-up">
             
             <div className="p-5 flex justify-between items-start">

@@ -4,27 +4,6 @@ import axios from "axios";
 import { Accept, Blockplayer, Transaction } from "./action";
 import { API_URL } from "./url";
 
-interface Column {
-  id: "no" | "userId" | "player1Name" | "mobile" | "wallet" | "referal" | "gameWon" | "gameLost" | "joinedAt" | "action" ;
-  label: string;
-  minWidth?: number;
-  align?: "right";
-  format?: (value: number) => string;
-}
-
-const columns: readonly Column[] = [
-  { id: "no", label: "#" },
-  { id: "userId", label: "User ID", minWidth: 220 },
-  { id: "player1Name", label: "Player1", minWidth: 170 },
-  { id: "mobile", label: "mobile No.", minWidth: 170 },
-  { id: "wallet", label: "Wallet", minWidth: 120,  },
-  { id: "referal", label: "Referal Code", minWidth: 170 },
-  { id: "gameWon", label: "Game Won", minWidth: 170 },
-  { id: "gameLost", label: "Game Lost", minWidth: 170 },
-  { id: "joinedAt", label: "Joined At", minWidth: 170 },
-  { id: "action", label: "Action", minWidth: 170 },
-];
-
 interface Data {
   no: number;
   userId: string;
