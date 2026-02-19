@@ -20,25 +20,32 @@ const express_async_handler_1 = __importDefault(require("express-async-handler")
 const Profile_js_1 = __importDefault(require("../models/Profile.js"));
 const faker_1 = require("@faker-js/faker");
 const crypto_1 = __importDefault(require("crypto"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
 dotenv_1.default.config();
+// 1. Configure the Transporter
+const transporter = nodemailer_1.default.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const phone = req.body.phoneNumber;
-    if (!phone) {
-        res.status(400).json({ success: false, message: 'Phone number is required.' });
+    const email = req.body.email;
+    if (!phone || !email) {
+        res.status(400).json({ success: false, message: 'Phone and Email are required.' });
         return;
     }
     try {
-        // ✅ Check if user exists
         let user = yield User_js_1.default.findOne({ phone });
         if ((user === null || user === void 0 ? void 0 : user.status) === "blocked") {
             res.status(403).json({ success: false, message: "Your account is blocked. Contact support." });
             return;
         }
-        // ✅ Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
         const resendAvailableAt = new Date(Date.now() + 30 * 1000);
-        // ✅ If user exists, update; otherwise, create a new user
         if (user) {
             user.otp = otp;
             user.status = "active";
@@ -55,19 +62,49 @@ exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awa
                 resendAvailableAt
             });
         }
-        // ✅ Send OTP via SMS API
-        // const URL = `https://sms.renflair.in/V1.php?API=${process.env.API_KEY}&PHONE=${phone}&OTP=${otp}`;
-        // await axios.get(URL);
+        // ✅ NEW: Send OTP via Email
+        const mailOptions = {
+            from: `"TaujiLudo" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: `${otp} is your TaujiLudo verification code`, // Adding OTP to subject improves open rates
+            text: `Your TaujiLudo verification code is ${otp}. It expires in 10 minutes.`, // Always include plain-text fallback
+            html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 1px solid #e0e0e0;">
+                <h1 style="margin: 0; color: #333; font-size: 24px;">TaujiLudo</h1>
+            </div>
+            <div style="padding: 30px; color: #444; line-height: 1.6;">
+                <p style="font-size: 16px;">Hello,</p>
+                <p style="font-size: 16px;">Use the verification code below to sign in to your account. This code is valid for <strong>10 minutes</strong>.</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <span style="display: inline-block; background: #0056b3; color: #ffffff; font-size: 32px; font-weight: bold; padding: 12px 25px; border-radius: 6px; letter-spacing: 5px;">
+                        ${otp}
+                    </span>
+                </div>
+
+                <p style="font-size: 14px; color: #777;">If you didn't request this code, you can safely ignore this email.</p>
+            </div>
+            <div style="background-color: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #e0e0e0;">
+                &copy; ${new Date().getFullYear()} TaujiLudo Team. All rights reserved.
+            </div>
+        </div>
+    `
+        };
+        // ✅ Capture the 'info' object from the promise
+        const info = yield transporter.sendMail(mailOptions);
+        // 3. Return a more detailed response to the frontend if you want
         res.status(200).json({
             success: true,
-            message: 'OTP sent successfully',
+            message: 'OTP sent to your email successfully',
+            messageId: info.messageId, // Optional: helpful for debugging
             resendAfter: resendAvailableAt,
-            otp: otp
+            otp: process.env.NODE_ENV === 'development' ? otp : undefined
         });
     }
     catch (error) {
         console.error('❌ Error sending OTP:', error);
-        next(error); // Pass the error to the global error handler
+        next(error);
     }
 }));
 exports.verifyOtp = ((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
