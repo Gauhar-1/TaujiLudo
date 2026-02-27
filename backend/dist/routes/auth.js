@@ -39,6 +39,7 @@ router.get('/battles/disputeBattle', battleManger_1.disputeBattle);
 router.post('/battles/disputeBattle/approve', battleManger_1.determineWinner);
 router.post('/battles/disputeBattle/reject', battleManger_1.rejectDispute);
 router.post('/battles/:id/complete', battleManger_1.completeBattle);
+router.post('/battles/settleBattle', battleManger_1.settleBattlePayout);
 router.post('/battles/inBattle/uploads', multerService_1.upload.single('image'), battleManger_1.uploadScreenShot);
 router.post('/battles/inBattle/canceled', battleManger_1.canceledBattle);
 router.post('/battles/inBattle/lost', battleManger_1.battleLost);

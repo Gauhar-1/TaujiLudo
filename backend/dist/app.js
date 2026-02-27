@@ -37,7 +37,7 @@ app.use((0, cookie_parser_1.default)());
 app.use('/api/auth', auth_1.router);
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "https://tauji-ludo.vercel.app/"], // ✅ Allow requests from your frontend
+        origin: ["http://localhost:5173", "https://tauji-ludo.vercel.app/", "http://localhost:3001"], // ✅ Allow requests from your frontend
         methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
         credentials: true,
     },

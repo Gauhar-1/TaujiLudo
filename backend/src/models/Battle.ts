@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface BattleEvent {
-  event: "opponent_found" | "player_entered" | "opponent_entered" | "opponent_canceled" | "ludoCode_set";
+  event: "opponent_found" | "player_entered" | "opponent_entered" | "opponent_canceled" | "ludoCode_set" | "settled";
   timestamp: Date;
   details?: string; // Optional details
 }
@@ -52,7 +52,7 @@ const BattleSchema: Schema = new Schema({
   // ✅ Event history tracking
   history: [
     {
-      event: { type: String, enum: ["opponent_found", "player_entered", "opponent_entered", "opponent_canceled","ludoCode_set"]},
+      event: { type: String, enum: ["opponent_found", "player_entered", "opponent_entered", "opponent_canceled","ludoCode_set", "settled"]},
       timestamp: { type: Date, default: Date.now },
       details: { type: String },
     },

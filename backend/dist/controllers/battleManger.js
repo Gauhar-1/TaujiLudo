@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rejectDispute = exports.determineWinner = exports.deleteBattle = exports.disputeBattle = exports.runningBattle = exports.completeBattle = exports.canceledBattle = exports.battleLost = exports.uploadScreenShot = exports.inProgressBattle = exports.handleLudoCode = exports.manageRequest = exports.joinBattle = exports.battleHistory = exports.showBattles = exports.pendingBattle = exports.createBattle = void 0;
+exports.settleBattlePayout = exports.rejectDispute = exports.determineWinner = exports.deleteBattle = exports.disputeBattle = exports.runningBattle = exports.completeBattle = exports.canceledBattle = exports.battleLost = exports.uploadScreenShot = exports.inProgressBattle = exports.handleLudoCode = exports.manageRequest = exports.joinBattle = exports.battleHistory = exports.showBattles = exports.pendingBattle = exports.createBattle = void 0;
 const app_1 = require("../app");
 const Battle_1 = __importDefault(require("../models/Battle"));
 const Profile_1 = __importDefault(require("../models/Profile"));
@@ -363,71 +363,72 @@ const uploadScreenShot = (req, res, next) => __awaiter(void 0, void 0, void 0, f
 });
 exports.uploadScreenShot = uploadScreenShot;
 const battleLost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { battleId, userId } = req.body;
+    if (!battleId)
+        return res.status(400).json({ error: "battleId is required" });
+    if (!userId)
+        return res.status(400).json({ error: "UserId is required" });
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
     try {
-        const { battleId, userId } = req.body;
-        if (!battleId)
-            return res.status(400).json({ error: "battleId is required" });
-        if (!userId)
-            return res.status(400).json({ error: "UserId is required" });
-        const battle = yield Battle_1.default.findById(battleId);
-        if (!battle)
-            return res.status(404).json({ error: "Battle not found" });
-        if (!battle.dispute) {
-            battle.dispute = {
-                players: [userId],
-                proofs: [{ player: userId, filename: "", path: "", reason: "", adminReason: "", clicked: "Lost" }],
-                resolved: false,
-                winner: null,
-                timestamp: new Date(),
-            };
+        // 2. Find the Battle in TaujiLudo DB
+        // roomId here refers to the _id or ludoCode used in TaujiLudo
+        const battle = yield Battle_1.default.findById(battleId).session(session);
+        if (!battle) {
+            yield session.abortTransaction();
+            return res.status(404).json({ success: false, message: "Battle not found" });
         }
-        else {
-            // Ensure player doesn't declare lost twice
-            const alreadyLost = battle.dispute.proofs.some(proof => proof.player === userId && proof.clicked === "Lost");
-            if (alreadyLost)
-                return res.status(400).json({ error: "You have already marked yourself as lost" });
-            battle.dispute.players = [...new Set([...battle.dispute.players, userId])]; // Ensure uniqueness
-            battle.dispute.proofs.push({ player: userId, filename: "", path: "", reason: "", adminReason: "", clicked: "Lost" });
+        // 3. Idempotency Check: Prevent double payout
+        if (battle.status === "completed" || battle.winner === "decided") {
+            yield session.abortTransaction();
+            return res.status(200).json({ success: true, message: "Battle already settled" });
         }
-        yield battle.save();
-        // ✅ Check if both players have clicked
-        const player1Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player1);
-        const player2Clicked = battle.dispute.proofs.some(proof => proof.player === battle.player2);
-        // ✅ Update status only after adding proofs
-        if (player1Clicked && player2Clicked) {
-            let status = yield updateBattleStatus(battle);
-            if (status === "completed") {
-                const winnerId = userId === battle.player1 ? battle.player2 : battle.player1;
-                const winnerProfile = yield Profile_1.default.findOne({ userId: winnerId });
-                if (!winnerProfile) {
-                    return res.status(400).json({ error: "Player profile not found" });
-                }
-                winnerProfile.gameWon += 1;
-                yield winnerProfile.save();
-                const loserProfile = yield Profile_1.default.findOne({ userId });
-                if (!loserProfile) {
-                    return res.status(400).json({ error: "Player profile not found" });
-                }
-                loserProfile.gameLost += 1;
-                yield loserProfile.save();
-                // Process referral earnings
-                if (winnerProfile.referredBy) {
-                    const referredByProfile = yield Profile_1.default.findOne({ phoneNumber: winnerProfile.referredBy });
-                    if (referredByProfile) {
-                        const referral = referredByProfile.referrals.find(ref => ref.phoneNumber === winnerProfile.phoneNumber);
-                        if (referral) {
-                            referral.referalEarning += Number(battle.amount * 0.02);
-                            yield referredByProfile.save();
-                        }
-                    }
+        const winnerId = userId === battle.player1.toString() ? battle.player2 : battle.player1;
+        // 4. Update Battle Status
+        battle.status = "completed";
+        battle.winner = winnerId;
+        battle.history.push({
+            event: "settled",
+            timestamp: new Date(),
+            details: `Battle settled. Winner: ${winnerId}`,
+        });
+        yield battle.save({ session });
+        // 5. Calculate Loser ID
+        // 6. Update Winner Profile (Balance + Stats)
+        const winnerProfile = yield Profile_1.default.findOneAndUpdate({ userId: winnerId }, {
+            $inc: {
+                amount: battle.prize,
+                gameWon: 1,
+                cashWon: battle.prize
+            }
+        }, { new: true, session });
+        if (!winnerProfile) {
+            throw new Error("Winner profile not found");
+        }
+        // 7. Update Loser Stats
+        yield Profile_1.default.findOneAndUpdate({ userId: userId }, { $inc: { gameLost: 1 } }, { session });
+        // 8. Handle Referral Earnings (2% commission as per your existing logic)
+        if (winnerProfile.referredBy) {
+            const referedByProfile = yield Profile_1.default.findOne({ phoneNumber: winnerProfile.referredBy }).session(session);
+            if (referedByProfile) {
+                // Find the specific referral record
+                const referral = referedByProfile.referrals.find(ref => ref.phoneNumber === winnerProfile.phoneNumber);
+                if (referral) {
+                    referral.referalEarning += battle.amount * 0.02;
+                    yield referedByProfile.save({ session });
                 }
             }
         }
-        res.json({ message: "Loser assigned successfully", battle });
+        yield session.commitTransaction();
+        session.endSession();
+        console.log(`💰 Battle ${battleId} settled. ${battle.prize} deposited to ${userId}`);
+        return res.status(200).json({ success: true, message: "Payout successful" });
     }
-    catch (err) {
-        console.error("❌ Error in battleLost:", err);
-        next(err);
+    catch (error) {
+        yield session.abortTransaction();
+        session.endSession();
+        console.error("❌ Payout Error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error during payout" });
     }
 });
 exports.battleLost = battleLost;
@@ -621,3 +622,77 @@ const rejectDispute = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.rejectDispute = rejectDispute;
+const settleBattlePayout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { roomId, winnerUserId, secretKey } = req.body;
+    // 1. Security Check: Verify shared secret
+    // Ensure you have GAME_SECRET_KEY in your .env file
+    if (!secretKey || secretKey !== process.env.GAME_SECRET_KEY) {
+        return res.status(401).json({ success: false, message: "Unauthorized: Invalid Secret Key" });
+    }
+    if (!roomId || !winnerUserId) {
+        return res.status(400).json({ success: false, message: "Missing roomId or winnerUserId" });
+    }
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        // 2. Find the Battle in TaujiLudo DB
+        // roomId here refers to the _id or ludoCode used in TaujiLudo
+        const battle = yield Battle_1.default.findById(roomId).session(session);
+        if (!battle) {
+            yield session.abortTransaction();
+            return res.status(404).json({ success: false, message: "Battle not found" });
+        }
+        // 3. Idempotency Check: Prevent double payout
+        if (battle.status === "completed" || battle.winner === "decided") {
+            yield session.abortTransaction();
+            return res.status(200).json({ success: true, message: "Battle already settled" });
+        }
+        // 4. Update Battle Status
+        battle.status = "completed";
+        battle.winner = winnerUserId;
+        battle.history.push({
+            event: "settled",
+            timestamp: new Date(),
+            details: `Battle settled. Winner: ${winnerUserId}`,
+        });
+        yield battle.save({ session });
+        // 5. Calculate Loser ID
+        const loserId = winnerUserId === battle.player1.toString() ? battle.player2 : battle.player1;
+        // 6. Update Winner Profile (Balance + Stats)
+        const winnerProfile = yield Profile_1.default.findOneAndUpdate({ userId: winnerUserId }, {
+            $inc: {
+                amount: battle.prize,
+                gameWon: 1,
+                cashWon: battle.prize
+            }
+        }, { new: true, session });
+        if (!winnerProfile) {
+            throw new Error("Winner profile not found");
+        }
+        // 7. Update Loser Stats
+        yield Profile_1.default.findOneAndUpdate({ userId: loserId }, { $inc: { gameLost: 1 } }, { session });
+        // 8. Handle Referral Earnings (2% commission as per your existing logic)
+        if (winnerProfile.referredBy) {
+            const referedByProfile = yield Profile_1.default.findOne({ phoneNumber: winnerProfile.referredBy }).session(session);
+            if (referedByProfile) {
+                // Find the specific referral record
+                const referral = referedByProfile.referrals.find(ref => ref.phoneNumber === winnerProfile.phoneNumber);
+                if (referral) {
+                    referral.referalEarning += battle.amount * 0.02;
+                    yield referedByProfile.save({ session });
+                }
+            }
+        }
+        yield session.commitTransaction();
+        session.endSession();
+        console.log(`💰 Battle ${roomId} settled. ${battle.prize} deposited to ${winnerUserId}`);
+        return res.status(200).json({ success: true, message: "Payout successful" });
+    }
+    catch (error) {
+        yield session.abortTransaction();
+        session.endSession();
+        console.error("❌ Payout Error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error during payout" });
+    }
+});
+exports.settleBattlePayout = settleBattlePayout;

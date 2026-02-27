@@ -42,7 +42,7 @@ app.use('/api/auth', router);
 
 const io = new Server(server, {
   cors: {
-    origin: [ "http://localhost:5173","https://tauji-ludo.vercel.app/"], // ✅ Allow requests from your frontend
+    origin: [ "http://localhost:5173","https://tauji-ludo.vercel.app/", "http://localhost:3001"], // ✅ Allow requests from your frontend
     methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
     credentials: true,
   },

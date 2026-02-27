@@ -66,7 +66,7 @@ exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awa
         const mailOptions = {
             from: `"TaujiLudo" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: `${otp} is your TaujiLudo verification code`, // Adding OTP to subject improves open rates
+            subject: `TaujiLudo login verification code`, // Adding OTP to subject improves open rates
             text: `Your TaujiLudo verification code is ${otp}. It expires in 10 minutes.`, // Always include plain-text fallback
             html: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
@@ -211,21 +211,18 @@ const logOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         httpOnly: true,
         secure: true, // Secure only in production
         sameSite: "none",
-        expires: new Date(0),
         domain: ".taujiludo.in"
     });
     res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        expires: new Date(0),
         domain: ".taujiludo.in"
     });
     res.clearCookie("sessionId", {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        expires: new Date(0),
         domain: ".taujiludo.in"
     });
     res.setHeader("Cache-Control", "no-store");

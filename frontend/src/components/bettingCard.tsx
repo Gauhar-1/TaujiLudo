@@ -2,13 +2,11 @@ import axios from "axios";
 import { useUserContext } from "../hooks/UserContext";
 import { API_URL } from "../utils/url";
 import { socket } from "./homePage";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Sword, Trophy, Trash2, XCircle, PlayCircle, Clock } from "lucide-react";
 
 export const BettingCard = (props: any) => {
     const { userId, setBattleId, name, amount } = useUserContext();
-    const navigate = useNavigate();
 
     const joinBattle = async () => {
         if (!amount) return console.log("Amount not found");
@@ -25,6 +23,11 @@ export const BettingCard = (props: any) => {
             toast.warn(message);
         }
     };
+    
+    const handlePlayMatch = (battleId : string) => {
+
+window.location.href = `${import.meta.env.VITE_LUDO_SERVICE_URL}/waiting/${battleId}?userId=${userId}&name=${encodeURIComponent(name)}`;
+    }
 
     const deleteBattle = () => {
         socket.emit("deleteBattle", props.battle._id);
@@ -100,7 +103,7 @@ export const BettingCard = (props: any) => {
                                         setBattleId(props.battle._id);
                                         if(hasOpponentFound){
                                             manageRequest("player_entered",`${props.battle.player1Name} joined`);
-                                            navigate('/battle');
+                                            handlePlayMatch(props.battle._id);
                                         }
                                     }}
                                     className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
@@ -126,7 +129,7 @@ export const BettingCard = (props: any) => {
                                         if(hasPlayerEntered){
                                             setBattleId(props.battle._id);
                                             manageRequest("opponent_entered", `${props.battle.player2Name} joined`);
-                                            navigate('/battle');
+                                            handlePlayMatch(props.battle._id);
                                         }
                                     }}
                                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${

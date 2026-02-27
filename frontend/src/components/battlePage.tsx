@@ -148,21 +148,7 @@ const uploadScreenshot = async () => {
 };
 
   
-  const handleLost = async()=>{
-     
-    try{
-      const response = await axios.post(`${API_URL}/api/auth/battles/inBattle/lost`, { 
-         battleId : battle?._id ,
-         userId
-        });
-      if(!response.data){
-        console.log("response not found");
-      }
-    }
-    catch(err){
-      console.log("Error: "+ err);
-    }
-  }
+  
 
   const copyToClipboard = () => {
     if (divRef.current) {
@@ -381,7 +367,7 @@ const uploadScreenshot = async () => {
                         <p className="text-xs text-gray-400 mb-8 leading-relaxed px-4">This action will deduct the entry fee from your wallet. Only confirm if you actually lost.</p>
                         <div className="flex gap-3">
                             <button className="flex-1 bg-gray-800 py-4 rounded-xl font-bold text-xs uppercase" onClick={() => setLosed(false)}>Cancel</button>
-                            <button className="flex-1 bg-red-600 py-4 rounded-xl font-bold text-xs uppercase shadow-lg shadow-red-600/20" onClick={() => { handleLost(); navigate('/home'); }}>Yes, I Lost</button>
+                            
                         </div>
                     </div>
                 </div>
