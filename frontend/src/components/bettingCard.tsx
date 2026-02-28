@@ -26,7 +26,7 @@ export const BettingCard = (props: any) => {
     
     const handlePlayMatch = (battleId : string) => {
 
-window.location.href = `${import.meta.env.VITE_LUDO_SERVICE_URL}/waiting/${battleId}?userId=${userId}&name=${encodeURIComponent(name)}`;
+window.location.href = `${import.meta.env.VITE_LUDO_SERVICE_URL}/waiting/${battleId}?userId=${userId}&name=${encodeURIComponent(name) }`;
     }
 
     const deleteBattle = () => {
