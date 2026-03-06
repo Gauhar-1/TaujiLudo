@@ -13,10 +13,12 @@ dotenv.config();
 
 // 1. Configure the Transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465, // Explicitly force port 465 for SSL
+    secure: true, 
     auth: {
         user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS  
+        pass: process.env.EMAIL_PASS // Note: This MUST be a Google App Password, not your regular password!
     }
 });
 
@@ -120,8 +122,9 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
         }
 
         //@ts-ignore
-        if (!user || user.otp !== otp || new Date() > user.otpExpires) {
+       if (!user || user.otp !== otp || new Date() > user.otpExpires) {
              res.status(400).json({ error: 'Invalid or expired OTP' });
+             return; // Add this line!
         }
 
         let profile = await Profile.findOne({

@@ -46,6 +46,9 @@ import { VerifiedKyc } from "../adminComponents/verifiedKyc";
 import { PaymentSettings } from "../adminComponents/paymentSettings";
 import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
+import LandingPage from "./landingPage";
+
+const CHECK_LOGIN = [ '/', '/login'];
 
 export const UserPage = () => {
   const { adminClicked } = useUserContext();
@@ -67,13 +70,14 @@ export const UserPage = () => {
     <div className="min-h-screen bg-[#0b0b0d] flex justify-center selection:bg-purple-500/30">
       <div className="w-full max-w-md bg-[#0f0f12] shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col relative min-h-screen">
         
-        {!adminClicked && location.pathname !== "/" && <Header />}
+        {!adminClicked && !CHECK_LOGIN.includes(location.pathname) && <Header />}
 
         {/* Content Area */}
-        <main className={`flex-1 flex flex-col ${!adminClicked && location.pathname !== "/" ? "pt-8 pb-20" : ""}`}>
+        <main className={`flex-1 flex flex-col ${!CHECK_LOGIN.includes(location.pathname) ? "pt-8 pb-20" : ""}`}>
           <Routes>
             {/* User Routes */}
-            <Route path="/" element={<LoginPage />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/winCash" element={<WinCashPage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -120,7 +124,7 @@ export const UserPage = () => {
         </main>
 
         {/* Conditional Footer: Hidden in Admin or Login modes */}
-        {!adminClicked && location.pathname !== "/" && <Footer />}
+        {!adminClicked && !CHECK_LOGIN.includes(location.pathname) && <Footer />}
       </div>
 
       {/* Background Ambience (Desktop only decorative elements) */}
