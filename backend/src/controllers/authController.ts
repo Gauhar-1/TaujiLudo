@@ -118,7 +118,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
         const user = await User.findOne({ phone, otp });
 
         if (!user) {
-            return console.log('User not found' );
+            return res.status(404).json({ success: false, message: 'User not found or invalid OTP' });
         }
 
         //@ts-ignore
@@ -147,7 +147,7 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
               name: randomName,
               email: randomEmail,
               phoneNumber : phone,
-              amount: 5,
+              amount: 500,
               imgUrl: "image",
               status: "active",
               cashWon: 0,
@@ -174,88 +174,90 @@ export const verifyOtp  = (async (req: any, res: any, next: any) => {
         }
     }
     
-        // JWT generation logic here
-        const token = jwt.sign(
-            { userId: user._id, phoneNumber: user.phone, name : profile.name },
-            process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in env
-            { expiresIn: "7d" } // Token valid for 7 days
+       const accessToken = jwt.sign(
+            { userId: user._id, phoneNumber: user.phone, name: profile.name },
+            process.env.JWT_ACCESS_SECRET as string, // Add this to your .env
+            { expiresIn: "15m" } // Short-lived!
         );
 
-        res.cookie("token", token, {
+        const refreshToken = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_REFRESH_SECRET as string, // Add this to your .env
+            { expiresIn: "30d" } // Long-lived for Auto-Login
+        );
+
+        res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: true, // Use only in HTTPS
+            secure: true, // Assuming your site is HTTPS
             sameSite: "None",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          });
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            // domain: ".taujiludo.in" // Uncomment if using subdomains, but keep it consistent!
+        });
 
         res.status(200).json({ 
             success: true,
             message: 'OTP verified successfully',
-             token,
+            accessToken,
             userId : user._id,
             name : profile.name
          });
     } catch (error) {
         console.error('Error verifying OTP:', error);
-        next(error)
         res.status(500).json({ error: 'Error verifying OTP' });
     }
 });
 
 export const autoLogin = async (req: any, res: any) => {
+    // Look for the Refresh Token cookie
+    const refreshToken = req.cookies?.refreshToken;
 
-    const token = req.cookies?.token;
-
-    if (!token) {
-        console.log("🛑 No token found, returning 401");
-        return res.status(401).json({ success: false, message: "Not authenticated" });
-    }
-
-    if (!process.env.JWT_SECRET) {
-        console.error("🛑 JWT_SECRET is not defined in environment variables.");
-        return res.status(500).json({ success: false, message: "Internal server error" });
+    if (!refreshToken) {
+        return res.status(401).json({ success: false, message: "No refresh token found, please login." });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload & { userId: string };
+        // Verify the long-lived refresh token
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string) as JwtPayload & { userId: string };
 
         const user = await Profile.findOne({ userId: decoded.userId });
 
         if (!user) {
-            console.log("🛑 User not found, returning 401");
             return res.status(401).json({ success: false, message: "User not found" });
         }
 
-        res.json({ success: true, user });
+        // Issue a brand new Access Token for the session
+        const newAccessToken = jwt.sign(
+            { userId: user.userId, phoneNumber: user.phoneNumber, name: user.name },
+            process.env.JWT_ACCESS_SECRET as string,
+            { expiresIn: "15m" } 
+        );
+
+        res.json({ 
+            success: true, 
+            accessToken: newAccessToken, 
+            user 
+        });
 
     } catch (err) {
-        console.error("🛑 JWT Verification Failed:", err);
-        return res.status(401).json({ success: false, message: "Invalid or expired token" });
+        console.error("🛑 Refresh Token Verification Failed:", err);
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            // domain: ".taujiludo.in" // Must match verifyOtp!
+        });
+        return res.status(401).json({ success: false, message: "Session expired, please login again." });
     }
 };
 
 export const logOut = async (req: any, res: any) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true, // Secure only in production
-        sameSite: "none",
-        domain: ".taujiludo.in"
-    });
-
     res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain: ".taujiludo.in"
-    });
-
-    res.clearCookie("sessionId", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        domain: ".taujiludo.in"
+        // domain: ".taujiludo.in" // Only use this if you used it in verifyOtp
     });
 
     res.setHeader("Cache-Control", "no-store");
-    res.status(200).json({ success: true, message: "Logged out successfully. All cookies cleared." });
+    res.status(200).json({ success: true, message: "Logged out successfully." });
 };

@@ -24,10 +24,12 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 dotenv_1.default.config();
 // 1. Configure the Transporter
 const transporter = nodemailer_1.default.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465, // Explicitly force port 465 for SSL
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        pass: process.env.EMAIL_PASS // Note: This MUST be a Google App Password, not your regular password!
     }
 });
 exports.sendOtp = (0, express_async_handler_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -114,11 +116,12 @@ exports.verifyOtp = ((req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const user = yield User_js_1.default.findOne({ phone, otp });
         if (!user) {
-            return console.log('User not found');
+            return res.status(404).json({ success: false, message: 'User not found or invalid OTP' });
         }
         //@ts-ignore
         if (!user || user.otp !== otp || new Date() > user.otpExpires) {
             res.status(400).json({ error: 'Invalid or expired OTP' });
+            return; // Add this line!
         }
         let profile = yield Profile_js_1.default.findOne({
             userId: user._id
@@ -134,7 +137,7 @@ exports.verifyOtp = ((req, res, next) => __awaiter(void 0, void 0, void 0, funct
                 name: randomName,
                 email: randomEmail,
                 phoneNumber: phone,
-                amount: 5,
+                amount: 500,
                 imgUrl: "image",
                 status: "active",
                 cashWon: 0,
@@ -156,76 +159,74 @@ exports.verifyOtp = ((req, res, next) => __awaiter(void 0, void 0, void 0, funct
                 }
             }
         }
-        // JWT generation logic here
-        const token = jsonwebtoken_1.default.sign({ userId: user._id, phoneNumber: user.phone, name: profile.name }, process.env.JWT_SECRET, // Ensure JWT_SECRET is set in env
-        { expiresIn: "7d" } // Token valid for 7 days
+        const accessToken = jsonwebtoken_1.default.sign({ userId: user._id, phoneNumber: user.phone, name: profile.name }, process.env.JWT_ACCESS_SECRET, // Add this to your .env
+        { expiresIn: "15m" } // Short-lived!
         );
-        res.cookie("token", token, {
+        const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, // Add this to your .env
+        { expiresIn: "30d" } // Long-lived for Auto-Login
+        );
+        res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: true, // Use only in HTTPS
+            secure: true, // Assuming your site is HTTPS
             sameSite: "None",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            // domain: ".taujiludo.in" // Uncomment if using subdomains, but keep it consistent!
         });
         res.status(200).json({
             success: true,
             message: 'OTP verified successfully',
-            token,
+            accessToken,
             userId: user._id,
             name: profile.name
         });
     }
     catch (error) {
         console.error('Error verifying OTP:', error);
-        next(error);
         res.status(500).json({ error: 'Error verifying OTP' });
     }
 }));
 const autoLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.token;
-    if (!token) {
-        console.log("🛑 No token found, returning 401");
-        return res.status(401).json({ success: false, message: "Not authenticated" });
-    }
-    if (!process.env.JWT_SECRET) {
-        console.error("🛑 JWT_SECRET is not defined in environment variables.");
-        return res.status(500).json({ success: false, message: "Internal server error" });
+    // Look for the Refresh Token cookie
+    const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
+    if (!refreshToken) {
+        return res.status(401).json({ success: false, message: "No refresh token found, please login." });
     }
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        // Verify the long-lived refresh token
+        const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const user = yield Profile_js_1.default.findOne({ userId: decoded.userId });
         if (!user) {
-            console.log("🛑 User not found, returning 401");
             return res.status(401).json({ success: false, message: "User not found" });
         }
-        res.json({ success: true, user });
+        // Issue a brand new Access Token for the session
+        const newAccessToken = jsonwebtoken_1.default.sign({ userId: user.userId, phoneNumber: user.phoneNumber, name: user.name }, process.env.JWT_ACCESS_SECRET, { expiresIn: "15m" });
+        res.json({
+            success: true,
+            accessToken: newAccessToken,
+            user
+        });
     }
     catch (err) {
-        console.error("🛑 JWT Verification Failed:", err);
-        return res.status(401).json({ success: false, message: "Invalid or expired token" });
+        console.error("🛑 Refresh Token Verification Failed:", err);
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            // domain: ".taujiludo.in" // Must match verifyOtp!
+        });
+        return res.status(401).json({ success: false, message: "Session expired, please login again." });
     }
 });
 exports.autoLogin = autoLogin;
 const logOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true, // Secure only in production
-        sameSite: "none",
-        domain: ".taujiludo.in"
-    });
     res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain: ".taujiludo.in"
-    });
-    res.clearCookie("sessionId", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        domain: ".taujiludo.in"
+        // domain: ".taujiludo.in" // Only use this if you used it in verifyOtp
     });
     res.setHeader("Cache-Control", "no-store");
-    res.status(200).json({ success: true, message: "Logged out successfully. All cookies cleared." });
+    res.status(200).json({ success: true, message: "Logged out successfully." });
 });
 exports.logOut = logOut;

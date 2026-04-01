@@ -16,7 +16,7 @@ const router = Router();
 
 router.post('/send-otp', sendOtp);
 router.post('/verify-otp', verifyOtp);
-router.get('/me', autoLogin);
+router.get('/autoLogin', autoLogin);
 router.get('/health', health);
 router.post('/logout', logOut);
 router.post('/deposit',upload.single('image'), depositAmount);

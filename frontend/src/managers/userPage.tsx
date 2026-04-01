@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useUserContext } from "../hooks/UserContext";
 
 // User Components
@@ -47,11 +47,37 @@ import { PaymentSettings } from "../adminComponents/paymentSettings";
 import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
 import LandingPage from "./landingPage";
+import { Zap } from "lucide-react";
 
 const CHECK_LOGIN = [ '/', '/login'];
 
+const ProtectedRoute = () => {
+  const { login } = useUserContext();
+  return login ? <Outlet /> : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = () => {
+  const { login } = useUserContext();
+  return login ? <Navigate to="/home" replace /> : <Outlet />;
+};
+
+const AdminRoute = () => {
+  const { login, profile } = useUserContext();
+
+  if (!login) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (profile?.role !== "admin") {
+    console.warn("Unauthorized access attempt to Admin Panel!");
+    return <Navigate to="/home" replace />;
+  }
+
+  return <Outlet />;
+};
+
 export const UserPage = () => {
-  const { adminClicked } = useUserContext();
+  const { adminClicked, isAuthLoading } = useUserContext();
   const location = useLocation();
 
   // Update Page Title and Favicon
@@ -66,6 +92,17 @@ export const UserPage = () => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  if (isAuthLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen w-full bg-[#0b0b0d]">
+        <div className="relative">
+          <div className="h-20 w-20 rounded-full border-t-2 border-b-2 border-red-500 animate-spin"></div>
+          <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-500 animate-pulse" size={24} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0b0b0d] flex justify-center selection:bg-purple-500/30">
       <div className="w-full max-w-md bg-[#0f0f12] shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col relative min-h-screen">
@@ -77,25 +114,33 @@ export const UserPage = () => {
           <Routes>
             {/* User Routes */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/winCash" element={<WinCashPage />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/wallet" element={<WalletPage />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/deposit" element={<DepositPage />} />
-            <Route path="/withdraw" element={<WithdrawPage />} />
-            <Route path="/withdrawToBank" element={<WithdrawToBank />} />
-            <Route path="/withdrawToUPI" element={<WithdrawToUPI />} />
-            <Route path="/support" element={<SupportPage />} />
-            <Route path="/battle" element={<BattlePage />} />
-            <Route path="/rules" element={<RulesPgage />} />
-            <Route path="/refer" element={<ReferPage />} />
-            <Route path="/gameHistory" element={<GameHistory />} />
-            <Route path="/notification" element={<Notifications />} />
-            <Route path="/referalEarning" element={<RedeemEarnings />} />
+
+
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+            </Route>
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/winCash" element={<WinCashPage />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/wallet" element={<WalletPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/deposit" element={<DepositPage />} />
+              <Route path="/withdraw" element={<WithdrawPage />} />
+              <Route path="/withdrawToBank" element={<WithdrawToBank />} />
+              <Route path="/withdrawToUPI" element={<WithdrawToUPI />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/battle" element={<BattlePage />} />
+              <Route path="/rules" element={<RulesPgage />} />
+              <Route path="/refer" element={<ReferPage />} />
+              <Route path="/gameHistory" element={<GameHistory />} />
+              <Route path="/notification" element={<Notifications />} />
+              <Route path="/referalEarning" element={<RedeemEarnings />} />
+            </Route>
 
             {/* Admin Routes (Nested) */}
+            <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminPage />}>
               {/* <index element={<DashBoard />} /> */}
               <Route index element={<DashBoard />} />
@@ -119,6 +164,7 @@ export const UserPage = () => {
               <Route path="paymentSettings" element={<PaymentSettings />} />
               <Route path="adminSettings" element={<AdminSettings />} />
               <Route path="adminNotification" element={<AdminNotification />} />
+            </Route>
             </Route>
           </Routes>
         </main>

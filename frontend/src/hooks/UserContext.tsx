@@ -1,4 +1,8 @@
+import axios from "axios";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+
+// ⚠️ CRITICAL: Tell Axios to send the HttpOnly cookie with requests
+axios.defaults.withCredentials = true;
 
 // --- Types ---
 interface Profile {
@@ -42,6 +46,9 @@ interface UserContextType {
   setDetails: (details: string) => void;
   tempotp: string;
   settempotp: (otp: string) => void;
+  accessToken: string | null;
+  setAccessToken: (token: string | null) => void;
+  isAuthLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -73,6 +80,8 @@ function useStorageState<T>(key: string, defaultValue: T, storage: Storage = ses
 // --- Provider Component ---
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // 1. Auth & Critical Info (Use localStorage to stay logged in on reload)
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [login, setLogin] = useStorageState<boolean>("login", false, localStorage);
   const [profile, setProfile] = useStorageState<Profile>("profile", {}, localStorage);
   const [userId, setUserId] = useStorageState<string>("userId", "");
@@ -92,6 +101,30 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [amount, setAmount] = useStorageState<number>("amount", 0);
   const [tempotp, settempotp] = useStorageState<string>("otp", "");
 
+  // ✅ NEW: The Auto-Login Logic
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        // Replace with your actual backend URL if different
+        const response = await axios.post(`${import.meta.env.VITE_URL_LINK}/api/autoLogin`);
+        
+        if (response.data.success) {
+          setAccessToken(response.data.accessToken);
+          setProfile(response.data.user);
+          setLogin(true); // Ensure they are marked as logged in
+        }
+      } catch (error) {
+        console.log("No valid session found or token expired.");
+        setLogin(false); // Force logout if the token is dead
+        setAccessToken(null);
+      } finally {
+        setIsAuthLoading(false); // Done checking!
+      }
+    };
+
+    checkSession();
+  }, []);
+
   const contextValue: UserContextType = {
     profile, setProfile,
     id, setId,
@@ -109,6 +142,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     event, setEvent,
     details, setDetails,
     tempotp, settempotp,
+    accessToken, setAccessToken,
+    isAuthLoading, 
   };
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
