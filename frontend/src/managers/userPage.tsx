@@ -56,10 +56,7 @@ const ProtectedRoute = () => {
   return login ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
-const PublicRoute = () => {
-  const { login } = useUserContext();
-  return login ? <Navigate to="/winCash" replace /> : <Outlet />;
-};
+
 
 const AdminRoute = () => {
   const { login, profile } = useUserContext();
@@ -116,9 +113,7 @@ export const UserPage = () => {
             <Route path="/" element={<LandingPage />} />
 
 
-            <Route element={<PublicRoute />}>
-              <Route path="/login" element={<LoginPage />} />
-            </Route>
+            <Route path="/login" element={<LoginPage />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/winCash" element={<WinCashPage />} />
