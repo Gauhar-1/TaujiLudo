@@ -114,9 +114,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (response.data.success) {
           setAccessToken(response.data.accessToken);
           setProfile(response.data.user);
-          setUserId(response.data.userId);
-          setName(response.data.name);
-          setPhone(response.data.phoneNumber);
+          setUserId(response.data.user.userId);
+          setName(response.data.user.name);
+          setPhone(response.data.user.phoneNumber);
           setLogin(true);
           navigate("/winCash");
         }
