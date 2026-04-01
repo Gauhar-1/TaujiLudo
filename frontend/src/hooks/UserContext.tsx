@@ -111,12 +111,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (response.data.success) {
           setAccessToken(response.data.accessToken);
           setProfile(response.data.user);
+          setUserId(response.data.userId);
+          setName(response.data.name);
+          setPhone(response.data.phoneNumber);
           setLogin(true); // Ensure they are marked as logged in
         }
       } catch (error) {
         console.log("No valid session found or token expired.");
         setLogin(false); // Force logout if the token is dead
         setAccessToken(null);
+        
       } finally {
         setIsAuthLoading(false); // Done checking!
       }
