@@ -12,14 +12,20 @@ dotenv.config();
 
 
 // 1. Configure the Transporter
+// 1. Configure the Transporter for Cloud Deployment (Updated for Render)
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465, // Explicitly force port 465 for SSL
-    secure: true, 
+    port: 587,          
+    secure: false,      
+    requireTLS: true,   
     auth: {
         user: process.env.EMAIL_USER, 
-        pass: process.env.EMAIL_PASS // Note: This MUST be a Google App Password, not your regular password!
-    }
+        pass: process.env.EMAIL_PASS 
+    },
+    // ✅ NEW: Add timeouts so Render doesn't give up too quickly if Google is slow
+    connectionTimeout: 15000, 
+    greetingTimeout: 15000,
+    socketTimeout: 15000
 });
 
 export const sendOtp: RequestHandler = expressAsyncHandler(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
