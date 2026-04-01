@@ -106,7 +106,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const checkSession = async () => {
       try {
         // Replace with your actual backend URL if different
-        const response = await axios.post(`${import.meta.env.VITE_URL_LINK}/api/autoLogin`);
+        const response = await axios.post(`${import.meta.env.VITE_URL_LINK}/api/auth/autoLogin`);
         
         if (response.data.success) {
           setAccessToken(response.data.accessToken);
