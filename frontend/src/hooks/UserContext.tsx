@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ⚠️ CRITICAL: Tell Axios to send the HttpOnly cookie with requests
 axios.defaults.withCredentials = true;
@@ -79,6 +80,8 @@ function useStorageState<T>(key: string, defaultValue: T, storage: Storage = ses
 
 // --- Provider Component ---
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const navigate = useNavigate();
+
   // 1. Auth & Critical Info (Use localStorage to stay logged in on reload)
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
@@ -114,7 +117,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUserId(response.data.userId);
           setName(response.data.name);
           setPhone(response.data.phoneNumber);
-          setLogin(true); // Ensure they are marked as logged in
+          setLogin(true);
+          navigate("/winCash");
         }
       } catch (error) {
         console.log("No valid session found or token expired.");

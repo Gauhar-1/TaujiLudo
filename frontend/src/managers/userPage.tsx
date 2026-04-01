@@ -58,7 +58,7 @@ const ProtectedRoute = () => {
 
 const PublicRoute = () => {
   const { login } = useUserContext();
-  return login ? <Navigate to="/home" replace /> : <Outlet />;
+  return login ? <Navigate to="/winCash" replace /> : <Outlet />;
 };
 
 const AdminRoute = () => {
@@ -70,7 +70,7 @@ const AdminRoute = () => {
 
   if (profile?.role !== "admin") {
     console.warn("Unauthorized access attempt to Admin Panel!");
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/winCash" replace />;
   }
 
   return <Outlet />;
