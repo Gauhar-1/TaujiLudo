@@ -67,11 +67,7 @@ export const ProfilePage = () => {
     finally { setIsLoading(false); }
   };
 
-<<<<<<< Updated upstream
-  if (isLoading) return (
-=======
   if (isLoading || !userId) return (
->>>>>>> Stashed changes
     <div className="flex items-center justify-center h-screen w-full bg-[#0b0b0d]">
       <div className="h-16 w-16 border-4 border-t-purple-500 border-purple-500/20 rounded-full animate-spin"></div>
     </div>
