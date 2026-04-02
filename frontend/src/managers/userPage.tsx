@@ -59,14 +59,15 @@ const ProtectedRoute = () => {
 
 
 const AdminRoute = () => {
-  const { login, profile } = useUserContext();
+  const { login, phoneNumber, setAdminClicked } = useUserContext();
 
   if (!login) {
     return <Navigate to="/login" replace />;
   }
 
-  if (profile?.role !== "admin") {
+  if (phoneNumber !== import.meta.env.VITE_ADMIN_PHONE) {
     console.warn("Unauthorized access attempt to Admin Panel!");
+    setAdminClicked(false);
     return <Navigate to="/winCash" replace />;
   }
 
