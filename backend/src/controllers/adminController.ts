@@ -3,6 +3,8 @@ import Profile from "../models/Profile";
 import Transaction from "../models/Transaction";
 import User from "../models/User";
 import Battle from "../models/Battle";
+import { createNotification } from "./notifyController";
+import crypto from 'crypto';
 
 export const createAdminDetails = async (req: any, res: any) => {
     try {
@@ -288,4 +290,62 @@ export const onlyAdmins = async(req: any, res:any )=>{
 
 export const health = async(req: any, res: any, next: any)=>{
     res.status(200).send({ status: true });
+}
+
+export const adminDepositAmount = async (req: any, res: any) => {
+    const { userId, wallet, amount, paymentMethod, upiId, phoneNumber } = req.body;
+    
+
+    // Validate userId
+    if (!userId) {
+        return res.status(400).json({ success: false, message: 'Invalid or missing userId.' });
+    }
+
+    // Validate amount and wallet
+    if (isNaN(parseFloat(amount)) || isNaN(parseFloat(wallet))) {
+        return res.status(400).json({ success: false, message: 'Invalid amount or wallet value.' });
+    }
+
+
+    try {
+        // Generate a unique payment reference (e.g., transaction ID or QR code)
+        const paymentReference = crypto.randomBytes(8).toString('hex');
+
+        // Save transaction in the database
+        const transaction = await Transaction.create({
+            userId,
+            phoneNumber,
+            type: 'deposit',
+            amount : parseFloat(amount),
+            wallet: parseFloat(wallet),
+            paymentMethod,
+            paymentReference,
+            status: 'pending',
+            details: upiId,
+            filename: req.file?.filename || null,
+            path: req.file?.path || null
+        })
+
+        await createNotification(
+            userId, 
+            'deposit', 
+            `Your deposit of ${amount} tokens was successful.`,
+             paymentReference,
+             'pending',
+             amount,
+        );
+
+         // Simulate UPI link (replace with QR code generation in production)
+         const upiLink = `upi://pay?pa=${upiId}&pn=BettingGateway&am=${amount}&tn=${paymentReference}`;
+
+         res.status(200).json({
+             success: true,
+             message: 'Deposit initiated. Complete the payment.',
+             upiLink,
+             transaction,
+         });
+     } catch (err : any) {
+         console.error(err);
+         res.status(500).json({ success: false, message: 'Deposit failed', error: err.message });
+     }
 }

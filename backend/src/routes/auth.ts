@@ -10,7 +10,7 @@ import path from 'path';
 import { upload } from '../utils/multerService';
 import { createState } from '../controllers/stateManager';
 import { Socket } from 'socket.io';
-import { createAdminDetails, getAdmin, health, infoSettings, onlyAdmins, QRsettings, supportSettings, UPIsettings } from '../controllers/adminController';
+import { adminDepositAmount, createAdminDetails, getAdmin, health, infoSettings, onlyAdmins, QRsettings, supportSettings, UPIsettings } from '../controllers/adminController';
 
 const router = Router();
 
@@ -20,6 +20,7 @@ router.post('/autoLogin', autoLogin);
 router.get('/health', health);
 router.post('/logout', logOut);
 router.post('/deposit',upload.single('image'), depositAmount);
+router.post('/admin/deposit', adminDepositAmount);
 router.post('/withdraw', withdrawAmount);
 router.post('/verify-payment', verifyPayment);
 router.post('/reject-payment',  rejectPayment);

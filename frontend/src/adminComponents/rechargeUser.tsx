@@ -4,7 +4,7 @@ import { useUserContext } from "../hooks/UserContext";
 import { Search, Wallet, UserSearch, ArrowRight, Zap, Info } from "lucide-react";
 
 export const RechargeUser = () => {
-    const { setPhone } = useUserContext();
+    const { setPhoneNumber } = useUserContext();
     const [searchClicked, setSearchClicked] = useState(false);
 
     return (
@@ -42,7 +42,7 @@ export const RechargeUser = () => {
                             placeholder="Name, Phone, or UserID" 
                             className="w-full bg-[#0b0b0d] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-sm text-white placeholder:text-gray-700 outline-none focus:border-amber-500/50 focus:ring-4 focus:ring-amber-500/5 transition-all"
                             onChange={(e) => {
-                                setPhone(e.target.value);
+                                setPhoneNumber(e.target.value);
                                 if(e.target.value === "") setSearchClicked(false);
                             }}
                         />

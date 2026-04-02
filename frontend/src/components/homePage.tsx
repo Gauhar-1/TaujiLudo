@@ -24,6 +24,7 @@ export const HomePage = () => {
   const [onGoingB, setOnGoingB] = useState([]);
   const [pendingB, setPendingB] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
 
   // ... (Logic remains identical to your provided code) ...
   const getLocalStorageValue = (key: string, defaultValue: any) => {
@@ -94,6 +95,21 @@ export const HomePage = () => {
     fetchOngoing();
     const interval = setInterval(fetchOngoing, 10000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Listen for real-time battle deletions
+  useEffect(() => {
+    const handleBattleDeleted = (data: { battleId: string }) => {
+      setPendingB((prevPending) => 
+        prevPending.filter((battle: any) => battle._id !== data.battleId)
+      );
+    };
+
+    socket.on("battleDeleted", handleBattleDeleted);
+
+    return () => {
+      socket.off("battleDeleted", handleBattleDeleted);
+    };
   }, []);
 
   const createBattle = () => {

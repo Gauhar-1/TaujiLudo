@@ -4,9 +4,11 @@ import { API_URL } from "../utils/url";
 import { socket } from "./homePage";
 import { toast } from "react-toastify";
 import { Sword, Trophy, Trash2, XCircle, PlayCircle, Clock } from "lucide-react";
+import { useState } from "react";
 
 export const BettingCard = (props: any) => {
     const { userId, setBattleId, name, amount } = useUserContext();
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const joinBattle = async () => {
         if (!amount) return console.log("Amount not found");
@@ -29,9 +31,18 @@ export const BettingCard = (props: any) => {
 window.location.href = `${import.meta.env.VITE_LUDO_SERVICE_URL}/waiting/${battleId}?userId=${userId}&name=${encodeURIComponent(name) }`;
     }
 
-    const deleteBattle = () => {
-        socket.emit("deleteBattle", props.battle._id);
-    };
+    const handleDelete = () => {
+    if (isDeleting) return; 
+    
+    setIsDeleting(true); 
+
+    socket.emit("deleteBattle", props.battle._id, (response : any) => {
+      if (response && response.status !== 200) {
+        setIsDeleting(false);
+        console.error("Failed to delete:", response.message);
+      }
+    });
+  };
 
     const manageRequest = async (event: string, details: string) => {
         try {
@@ -116,7 +127,7 @@ window.location.href = `${import.meta.env.VITE_LUDO_SERVICE_URL}/waiting/${battl
                                     {hasOpponentFound ? "Play" : "Wait"}
                                 </button>
                                 <button 
-                                    onClick={deleteBattle}
+                                    onClick={handleDelete}
                                     className="p-2.5 rounded-xl bg-red-600/10 text-red-500 hover:bg-red-600 hover:text-white transition-all"
                                 >
                                     <Trash2 size={16} />

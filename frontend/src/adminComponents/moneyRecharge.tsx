@@ -24,12 +24,13 @@ export const MoneyRecharge = () => {
         
         setLoading(true);
         try {
-            await axios.post(`${API_URL}/api/auth/deposit`, {
+            await axios.post(`${API_URL}/api/auth/admin/deposit`, {
                 userId: profile.userId,
                 amount,
                 wallet: (profile.amount + amount),
-                paymentMethod: 'admin_recharge',
+                paymentMethod: 'admin',
                 upiId: "system_admin",
+                phoneNumber: profile.phoneNumber,
             });
             
             // UI feedback

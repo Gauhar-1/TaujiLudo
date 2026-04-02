@@ -49,14 +49,14 @@ export const StickyTable: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [rows, setRows] = useState<Data[]>([]);
-  const { phone, setProfile } = useUserContext();
+  const { phoneNumber, setProfile } = useUserContext();
   
 
   // Fetch battles data
   useEffect(() => {
     const runningBattle = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { phone }});
+        const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params : { phoneNumber }});
         const fetchedBattles = response.data.map((profile: any, index: number) => {
           const date = new Date(profile.createdAt).toLocaleString();
           setProfile(profile);

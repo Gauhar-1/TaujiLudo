@@ -29,6 +29,8 @@ interface UserContextType {
   setBattleId: (id: string) => void;
   name: string;
   setName: (name: string) => void;
+  phoneNumber: string;
+  setPhoneNumber: (phone: string) => void;
   phone: string;
   setPhone: (phone: string) => void;
   login: boolean;
@@ -87,6 +89,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [profile, setProfile] = useStorageState<Profile>("profile", {}, localStorage);
   const [userId, setUserId] = useStorageState<string>("userId", "");
   const [name, setName] = useStorageState<string>("name", "");
+  const [phoneNumber, setPhoneNumber] = useStorageState<string>("phoneNumber", "");
 
   // 2. Session/Game Info (Use sessionStorage - clears when tab closes)
   const [id, setId] = useStorageState<string>("id", "");
@@ -115,7 +118,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setName(response.data.user.name);
           setPhone(response.data.user.phoneNumber);
           setLogin(true);
-          navigate("/winCash");
+          if (location.pathname === "/login") {
+            navigate("/winCash");
+          }
         }
       } catch (error) {
         console.log("No valid session found or token expired.");
@@ -138,6 +143,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     paymentId, setPaymentId,
     battleId, setBattleId,
     name, setName,
+    phoneNumber, setPhoneNumber,
     phone, setPhone,
     login, setLogin,
     opponentFound, setOpponentFound,

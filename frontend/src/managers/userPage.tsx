@@ -51,6 +51,7 @@ import { Zap } from "lucide-react";
 
 const CHECK_LOGIN = [ '/', '/login'];
 
+
 const ProtectedRoute = () => {
   const { login } = useUserContext();
   return login ? <Outlet /> : <Navigate to="/login" replace />;
@@ -61,11 +62,15 @@ const ProtectedRoute = () => {
 const AdminRoute = () => {
   const { login, phone, setAdminClicked } = useUserContext();
 
+  // 1. Get the phone from Context, or fallback to localStorage if it was wiped by refresh
+  const savedPhone = phone || sessionStorage.getItem("phone"); 
+
   if (!login) {
     return <Navigate to="/login" replace />;
   }
 
-  if (phone !== import.meta.env.VITE_ADMIN_PHONE) {
+  // 2. Add String() just in case of type mismatch, and check against the savedPhone
+  if (savedPhone != import.meta.env.VITE_ADMIN_PHONE) {
     console.warn("Unauthorized access attempt to Admin Panel!");
     setAdminClicked(false);
     return <Navigate to="/winCash" replace />;
@@ -75,9 +80,10 @@ const AdminRoute = () => {
 };
 
 export const UserPage = () => {
-  const { adminClicked, isAuthLoading } = useUserContext();
+  const {  isAuthLoading } = useUserContext();
   const location = useLocation();
 
+  const isAdminRoute = location.pathname.startsWith('/admin');
   // Update Page Title and Favicon
   useEffect(() => {
     document.title = "TaujiLudo | Play & Win";
@@ -105,7 +111,7 @@ export const UserPage = () => {
     <div className="min-h-screen bg-[#0b0b0d] flex justify-center selection:bg-purple-500/30">
       <div className="w-full max-w-md bg-[#0f0f12] shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col relative min-h-screen">
         
-        {!adminClicked && !CHECK_LOGIN.includes(location.pathname) && <Header />}
+        {!isAdminRoute && !CHECK_LOGIN.includes(location.pathname) && <Header />}
 
         {/* Content Area */}
         <main className={`flex-1 flex flex-col ${!CHECK_LOGIN.includes(location.pathname) ? "pt-8 pb-20" : ""}`}>
@@ -166,7 +172,7 @@ export const UserPage = () => {
         </main>
 
         {/* Conditional Footer: Hidden in Admin or Login modes */}
-        {!adminClicked && !CHECK_LOGIN.includes(location.pathname) && <Footer />}
+        {!isAdminRoute && !CHECK_LOGIN.includes(location.pathname) && <Footer />}
       </div>
 
       {/* Background Ambience (Desktop only decorative elements) */}

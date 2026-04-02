@@ -1,15 +1,12 @@
 import Transaction from "../models/Transaction";
 import { Notification } from "../models/Trans-notification";
 import crypto from 'crypto';
-import { randomBytes } from "crypto";
 import { createNotification } from "./notifyController";
 import mongoose from "mongoose";
-import { json } from "body-parser";
-import Admin from "../models/Admin";
 import Profile from "../models/Profile";
 
 export const depositAmount = async (req : any,res : any,next: any) => {
-    const { userId,image,wallet, amount, paymentMethod, upiId, phoneNumber } = req.body;
+    const { userId,wallet, amount, paymentMethod, upiId, phoneNumber } = req.body;
     
 
     // Validate file upload

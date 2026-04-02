@@ -9,7 +9,7 @@ const TransactionSchema: Schema = new Schema({
     type: { type: String, enum: ['deposit', 'withdraw'], required: true },
     amount: { type: Number, required: true },
     wallet: { type: Number },
-    paymentMethod: { type: String, enum: ['upi', 'bank'], required: true },
+    paymentMethod: { type: String, enum: ['upi', 'bank', 'admin'], required: true },
     details: { 
         type: mongoose.Schema.Types.Mixed, // Allows storing any data type, including objects
         required: true 
