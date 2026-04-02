@@ -21,13 +21,13 @@ export const KycVerification = () => {
     const [backViewClicked, setBackViewClicked] = useState(false);
     const [reason, setReason] = useState("");
 
-    const { phoneNumber, userId, setUserId } = useUserContext();
+    const { phone, userId, setUserId } = useUserContext();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params: { phoneNumber } });
+                const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params: { phone } });
                 const { name, email, kycDetails, userId } = response.data[0];
                 setKycDetails(kycDetails);
                 setUserName(name);
@@ -36,7 +36,7 @@ export const KycVerification = () => {
             } catch (err) { console.error("Error fetching profile:", err); }
         };
         fetchProfile();
-    }, [phoneNumber, setUserId]);
+    }, [phone, setUserId]);
 
     const handleAction = async (action: 'verify' | 'reject') => {
         try {
@@ -87,7 +87,7 @@ export const KycVerification = () => {
                         <div className="space-y-1">
                             <div className="flex items-center gap-2 text-gray-500">
                                 <Phone size={12} className="text-amber-500/50" />
-                                <span className="text-xs font-bold tracking-widest">{phoneNumber}</span>
+                                <span className="text-xs font-bold tracking-widest">{phone}</span>
                             </div>
                             <div className="flex items-center gap-2 text-gray-600">
                                 <Mail size={12} />

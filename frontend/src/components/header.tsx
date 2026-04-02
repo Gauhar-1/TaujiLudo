@@ -10,7 +10,7 @@ export const Header = () => {
   const [sidebarClicked, setSidebarClicked] = useState(false);
   const [earnings, setEarnings] = useState(false);
   const navigate = useNavigate();
-  const { login, phone, amount, setAmount, setUserId, setName, setPhone, setPhoneNumber, setLogin } = useUserContext();
+  const { login, phone, amount, setAmount, setUserId, setName, setPhone, setLogin } = useUserContext();
 
   // ... (Auth Logic remains identical) ...
   useEffect(() => {
@@ -25,7 +25,6 @@ export const Header = () => {
           const userData = response.data.user;
           setUserId(userData.userId);
           setName(userData.name);
-          setPhoneNumber(userData.phoneNumber);
           setPhone(userData.phoneNumber);
           setLogin(true);
         }

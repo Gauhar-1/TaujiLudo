@@ -16,7 +16,7 @@ export const ProfilePage = () => {
   const [selectedFile2, setSelectedFile2] = useState<File | null>(null);
   const [email, setEmail] = useState(() => localStorage.getItem("email") || "");
   const navigate = useNavigate();
-  const { name, setName, phone, userId, setPhone, setUserId, setLogin, setPhoneNumber } = useUserContext();
+  const { name, setName, phone, userId, setPhone, setUserId, setLogin } = useUserContext();
   const [kycStatus, setKycStatus] = useState("");
   const [earnings, setEarnings] = useState(0);
   const [cashWon, setCashWon] = useState(0);
@@ -60,7 +60,7 @@ export const ProfilePage = () => {
       setIsLoading(true);
       const response = await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
       if (response.data.success) {
-        setUserId(""); setName(""); setPhone(""); setPhoneNumber(""); setLogin(false);
+        setUserId(""); setName(""); setPhone(""); setLogin(false);
         navigate("/");
       }
     } catch (err) { console.error(err); }

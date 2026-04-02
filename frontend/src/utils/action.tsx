@@ -17,14 +17,14 @@ import {
 /* --- 1. TRANSACTION HISTORY BUTTON --- */
 export const Transaction = (props: any) => {
   const navigate = useNavigate();
-  const { setId, setPhoneNumber } = useUserContext();
+  const { setId, setPhone } = useUserContext();
 
   return (
     <button 
       className="flex items-center justify-center bg-blue-500/10 hover:bg-blue-500 hover:text-white text-blue-500 border border-blue-500/20 rounded-xl p-2.5 transition-all active:scale-90"
       onClick={() => {
         setId(props.userId);
-        setPhoneNumber(props.phoneNumber);
+        setPhone(props.phoneNumber);
         navigate('transaction');
       }}
     >
@@ -36,13 +36,13 @@ export const Transaction = (props: any) => {
 /* --- 2. KYC VIEW BUTTON --- */
 export const KycView = (props: any) => {
   const navigate = useNavigate();
-  const { setPhoneNumber } = useUserContext();
+  const { setPhone } = useUserContext();
 
   return (
     <button 
       className="flex items-center gap-2 bg-amber-500 text-black font-black uppercase text-[10px] tracking-widest px-4 py-2.5 rounded-xl hover:bg-amber-400 transition-all active:scale-95 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
       onClick={() => {
-        setPhoneNumber(props.phoneNumber);
+        setPhone(props.phoneNumber);
         navigate('/admin/pendingKyc/kycView');
       }}
     >

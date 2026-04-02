@@ -18,13 +18,13 @@ import { useNavigate } from "react-router-dom";
 export const TransactionHistory = () => {
     const [username, setUserName] = useState("");
     const [email, setEmail] = useState("");
-    const { userId, phoneNumber } = useUserContext();
+    const { userId, phone } = useUserContext();
     const navigate = useNavigate();
     
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params: { phoneNumber } });
+                const response = await axios.get(`${API_URL}/api/auth/findProfile`, { params: { phone } });
                 if (response.data && response.data.length > 0) {
                     const { name, email } = response.data[0];
                     setUserName(name);
@@ -35,7 +35,7 @@ export const TransactionHistory = () => {
             }
         };
         fetchProfile();
-    }, [phoneNumber, userId]);
+    }, [phone, userId]);
 
     return (
         <div className="bg-[#0b0b0d] min-h-screen w-full max-w-md mx-auto pt-24 px-4 pb-20 font-sans text-gray-100">
@@ -71,7 +71,7 @@ export const TransactionHistory = () => {
                         <div className="space-y-1">
                             <div className="flex items-center gap-2 text-gray-500">
                                 <Phone size={12} className="text-amber-500/50" />
-                                <span className="text-xs font-bold tracking-widest">{phoneNumber}</span>
+                                <span className="text-xs font-bold tracking-widest">{phone}</span>
                             </div>
                             <div className="flex items-center gap-2 text-gray-600">
                                 <Mail size={12} />
