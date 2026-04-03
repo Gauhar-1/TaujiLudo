@@ -184,7 +184,7 @@ interface StoryCardProps {
   content: string;
 }
 
-const StoryCard: React.FC<StoryCardProps> = ({ color, title, headline, content }) => (
+ export const StoryCard: React.FC<StoryCardProps> = ({ color, title, headline, content }) => (
   <div className="story-card w-full md:max-w-md bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl p-6 md:p-8 rounded-2xl md:ml-20">
     <p className={`${color} text-xs font-bold tracking-[0.2em] uppercase mb-2`}>{title}</p>
     <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-4 text-white/90">{headline}</h3>

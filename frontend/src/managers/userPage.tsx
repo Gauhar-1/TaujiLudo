@@ -46,18 +46,15 @@ import { VerifiedKyc } from "../adminComponents/verifiedKyc";
 import { PaymentSettings } from "../adminComponents/paymentSettings";
 import { AdminSettings } from "../adminComponents/adminSettings";
 import { AdminNotification } from "../adminComponents/adminNotification";
-import LandingPage from "./landingPage";
 import { Zap } from "lucide-react";
+import { LandingPage2 } from "./LandingPage2";
 
-const CHECK_LOGIN = [ '/', '/login'];
-
+const CHECK_LOGIN = [ '/', '/login', '/landingPage2'];
 
 const ProtectedRoute = () => {
   const { login } = useUserContext();
   return login ? <Outlet /> : <Navigate to="/login" replace />;
 };
-
-
 
 const AdminRoute = () => {
   const { login, phone, setAdminClicked } = useUserContext();
@@ -80,10 +77,14 @@ const AdminRoute = () => {
 };
 
 export const UserPage = () => {
-  const {  isAuthLoading } = useUserContext();
+  const { isAuthLoading } = useUserContext();
   const location = useLocation();
 
   const isAdminRoute = location.pathname.startsWith('/admin');
+  
+  // Create a variable to check if we are on the landing page
+  const isFullScreenRoute = location.pathname === '/' || location.pathname === '/landingPage2';
+
   // Update Page Title and Favicon
   useEffect(() => {
     document.title = "TaujiLudo | Play & Win";
@@ -108,8 +109,10 @@ export const UserPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0b0d] flex justify-center selection:bg-purple-500/30">
-      <div className="w-full max-w-md bg-[#0f0f12] shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col relative min-h-screen">
+    <div className="min-h-screen bg-[#0b0b0d] flex justify-center selection:bg-purple-500/30 overflow-x-hidden">
+      
+      {/* Conditionally apply max-w-md or w-full based on the route */}
+      <div className={`w-full bg-[#0f0f12] shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col relative min-h-screen ${isFullScreenRoute ? 'max-w-full' : 'max-w-md'}`}>
         
         {!isAdminRoute && !CHECK_LOGIN.includes(location.pathname) && <Header />}
 
@@ -117,8 +120,8 @@ export const UserPage = () => {
         <main className={`flex-1 flex flex-col ${!CHECK_LOGIN.includes(location.pathname) ? "pt-8 pb-20" : ""}`}>
           <Routes>
             {/* User Routes */}
-            <Route path="/" element={<LandingPage />} />
-
+            <Route path="/" element={<LandingPage2 />} />
+            {/* <Route path="/landingPage2" element={<LandingPage2 />} /> */}
 
             <Route path="/login" element={<LoginPage />} />
 
@@ -144,7 +147,6 @@ export const UserPage = () => {
             {/* Admin Routes (Nested) */}
             <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminPage />}>
-              {/* <index element={<DashBoard />} /> */}
               <Route index element={<DashBoard />} />
               <Route path="allPlayers" element={<AllPlayers />} />
               <Route path="allPlayers/transaction" element={<TransactionHistory />} />
@@ -175,13 +177,17 @@ export const UserPage = () => {
         {!isAdminRoute && !CHECK_LOGIN.includes(location.pathname) && <Footer />}
       </div>
 
-      {/* Background Ambience (Desktop only decorative elements) */}
-      <div className="hidden lg:block fixed top-1/2 left-10 -translate-y-1/2 opacity-20 select-none">
-        <h1 className="text-8xl font-black text-white/5 rotate-90 tracking-tighter">ARENA</h1>
-      </div>
-      <div className="hidden lg:block fixed top-1/2 right-10 -translate-y-1/2 opacity-20 select-none">
-        <h1 className="text-8xl font-black text-white/5 -rotate-90 tracking-tighter">WINNER</h1>
-      </div>
+      {/* Background Ambience (Hidden on Full Screen routes so it doesn't block the 3D scene) */}
+      {!isFullScreenRoute && (
+        <>
+          <div className="hidden lg:block fixed top-1/2 left-10 -translate-y-1/2 opacity-20 select-none pointer-events-none">
+            <h1 className="text-8xl font-black text-white/5 rotate-90 tracking-tighter">ARENA</h1>
+          </div>
+          <div className="hidden lg:block fixed top-1/2 right-10 -translate-y-1/2 opacity-20 select-none pointer-events-none">
+            <h1 className="text-8xl font-black text-white/5 -rotate-90 tracking-tighter">WINNER</h1>
+          </div>
+        </>
+      )}
     </div>
   );
 };
