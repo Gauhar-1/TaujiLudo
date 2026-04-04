@@ -61,11 +61,7 @@ socket.on("createBattle", async (battleData, callback) => {
       return callback({ status: 400, message: "Insufficient balance" });
     }
 
-    userProfile.amount -= amount;
-    await userProfile.save();
-
-
-    // ✅ Create a new battle
+    // ✅ Create a new battle FIRST so we have its ID
     const battle = new Battle({
       player1: userId,
       amount,
@@ -77,14 +73,22 @@ socket.on("createBattle", async (battleData, callback) => {
 
     await battle.save();
 
-    // ✅ Update user profile with new battle
-    await Profile.findByIdAndUpdate(
-      userId,
-      {
-        $push: { battles: { battleId: battle._id, timestamp: battle.createdAt, status: "pending" } },
-      },
-      { new: true, upsert: true }
-    );
+    // ✅ UPDATE PROFILE IN MEMORY (Deduct balance AND push battle)
+    userProfile.amount -= amount;
+    
+    // Ensure the battles array exists before pushing (safety check)
+    if (!userProfile.battles) {
+      userProfile.battles = [] as any;
+    }
+    
+    userProfile.battles.push({ 
+      battleId: battle._id, 
+      timestamp: battle.createdAt || new Date(), 
+      status: "pending" 
+    });
+
+    // ✅ Save everything in ONE single database trip
+    await userProfile.save();
 
     console.log("✅ Battle created:", battle._id);
     io.emit("battleCreated", battle);
