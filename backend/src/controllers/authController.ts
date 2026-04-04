@@ -56,7 +56,31 @@ export const sendOtp: RequestHandler = expressAsyncHandler(async (req: Request, 
             to: email,
             subject: 'TaujiLudo login verification code',
             // Example email body:
-            html: `<p>Click here to login: <a href="https://taujiludo.qzz.io/verify?token=${otp}">Login to TaujiLudo</a></p>`
+            html: `
+  <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px; background-color: #FAFAFA;">
+    <div style="text-align: center; padding-bottom: 10px;">
+      <h2 style="color: #111; margin-bottom: 0; text-transform: uppercase; letter-spacing: 1px;">TaujiLudo Security</h2>
+    </div>
+    
+    <div style="background-color: #FFFFFF; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center;">
+      <p style="color: #555; font-size: 16px; margin-top: 0;">Here is your secure verification code to enter the arena:</p>
+      
+      <div style="margin: 30px 0;">
+        <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #000; background-color: #EAB308; padding: 15px 25px; border-radius: 8px; display: inline-block;">
+          ${otp}
+        </span>
+      </div>
+      
+      <p style="color: #777; font-size: 14px;">Please enter this code on the login screen. It will expire shortly.</p>
+      <p style="color: #e3342f; font-size: 12px; font-weight: bold; margin-top: 20px;">Never share this code with anyone.</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <hr style="border: none; border-top: 1px solid #ddd; margin-bottom: 15px;" />
+      <p style="color: #999; font-size: 12px;">If you didn't request this verification code, you can safely ignore this email.</p>
+    </div>
+  </div>
+`
         });
 
         if (error) {
