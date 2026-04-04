@@ -77,6 +77,7 @@ export const LoginPage = () => {
       setIsLoading(true);
       const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
         phoneNumber: phone,
+        email,
         otp,
         ref: searchParams.get("ref")
       }, { withCredentials: true });
