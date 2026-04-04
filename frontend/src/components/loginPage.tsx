@@ -53,7 +53,7 @@ export const LoginPage = () => {
       setIsLoading(true);
       const response = await axios.post(`${API_URL}/api/auth/send-otp`, { 
         phoneNumber: phone,
-        email: email // Sent for Nodemailer
+        email: email
       });
 
       if (response.data.success) {

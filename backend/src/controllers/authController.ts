@@ -35,6 +35,16 @@ export const sendOtp: RequestHandler = expressAsyncHandler(async (req: Request, 
         const resendAvailableAt = new Date(Date.now() + 30 * 1000);
 
         if (user) {
+
+            const profile = await Profile.findOne({ userId: user._id });
+
+            if (profile) {
+                if (profile.email != email) {
+                    res.status(400).json({ success: false, message: 'Invalid email' });
+                    return;
+                }
+            }
+
             user.otp = otp;
             user.status = "active";
             user.otpExpires = otpExpires;
@@ -109,6 +119,7 @@ export const sendOtp: RequestHandler = expressAsyncHandler(async (req: Request, 
 
 export const verifyOtp = (async (req: any, res: any, next: any) => {
     const phone = req.body.phoneNumber;
+    const email = req.body.email;
     const otp = req.body.otp;
     const ref = req.body.ref || "";
     try {
@@ -138,12 +149,11 @@ export const verifyOtp = (async (req: any, res: any, next: any) => {
             const referalLink = `https://taujiludo.in/?ref=${Referal}`;
 
             const randomName = faker.person.firstName(); // Generates a random first name
-            const randomEmail = `${randomName.toLowerCase()}${Math.floor(Math.random() * 1000)}@gmail.com`; // Generates a unique email
 
             profile = await Profile.create({
                 userId: user._id,
                 name: randomName,
-                email: randomEmail,
+                email: email,
                 phoneNumber: phone,
                 amount: 500,
                 imgUrl: "image",
