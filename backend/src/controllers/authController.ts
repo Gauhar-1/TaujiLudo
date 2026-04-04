@@ -52,10 +52,11 @@ export const sendOtp: RequestHandler = expressAsyncHandler(async (req: Request, 
 
         // ✅ NEW: Send via Resend API (HTTPS Port 443 - Not blocked by Render!)
         const { data, error } = await resend.emails.send({
-            from: 'TaujiLudo <onboarding@resend.dev>', // Use your verified domain here later
+            from: 'TaujiLudo <noreply@taujiludo.qzz.io>', // Use your verified domain here later
             to: email,
             subject: 'TaujiLudo login verification code',
-            html: `Your verification code is <strong>${otp}</strong>` // Put your beautiful HTML here
+            // Example email body:
+            html: `<p>Click here to login: <a href="https://taujiludo.qzz.io/verify?token=${otp}">Login to TaujiLudo</a></p>`
         });
 
         if (error) {

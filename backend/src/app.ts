@@ -15,7 +15,7 @@ const server = http.createServer(app);
 // ✅ Connect to Database
 connectDB();
 
-const allowedOrigins = ["http://localhost:5173", "https://tauji-ludo.vercel.app"];
+const allowedOrigins = ["http://localhost:5173", "https://tauji-ludo.vercel.app", "https://taujiludo.qzz.io"];
 
 app.use(
   cors({
@@ -42,7 +42,7 @@ app.use('/api/auth', router);
 
 const io = new Server(server, {
   cors: {
-    origin: [ "http://localhost:5173","https://tauji-ludo.vercel.app/", "http://localhost:3001"], // ✅ Allow requests from your frontend
+    origin: [ "http://localhost:5173","https://tauji-ludo.vercel.app/", "http://localhost:3001", "https://taujiludo.qzz.io"], // ✅ Allow requests from your frontend
     methods: ["GET", "POST"], // ✅ Ensure GET & POST requests work
     credentials: true,
   },
