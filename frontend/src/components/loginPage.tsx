@@ -17,7 +17,7 @@ export const LoginPage = () => {
   const [resendTimeout, setResendTimeout] = useState(0);
   const [canResend, setCanResend] = useState(true);
   
-  const { setUserId, phone, setPhone, setName, setLogin, tempotp, settempotp } = useUserContext();
+  const { setUserId, phone, setPhone, login, setName, setLogin, tempotp, settempotp } = useUserContext();
 
   const isPhoneNumberValid = (num: string) => /^[6-9]\d{9}$/.test(num);
   const isEmailValid = (mail: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail);
@@ -38,6 +38,12 @@ export const LoginPage = () => {
     }
     return () => clearInterval(timer);
   }, [canResend]);
+
+  useEffect(() => {
+    if (login) {
+      navigate("/winCash");
+    }
+  }, [login]);
 
   const handleSendOtp = async () => {
     if (!isPhoneNumberValid(phone)) return toast.error("Invalid 10-digit phone number");
