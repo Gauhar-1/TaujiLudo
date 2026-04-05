@@ -1,79 +1,73 @@
+# TaujiLudo 🎲
 
-# TaujiLudo - A Ludo Wager-Matching Platform
+TaujiLudo is a highly secure, full-stack, real-time multiplayer Ludo and wager-matching platform. Originally built as a freelance project, this platform has been completely re-architected and redesigned from the ground up to meet production-level standards. It features an interactive 3D landing page, a custom-built real-time Ludo arena, a robust financial ecosystem with manual KYC, and a comprehensive admin resolution center.
 
-TaujiLudo is a full-stack platform that allows users to create and join two-player Ludo battles, place wagers, and verify outcomes for matches played on external platforms like Ludo King. It features an integrated wallet, a secure result verification system using screenshot uploads, and a comprehensive admin panel for dispute resolution.
+**Live Demo:** [https://taujiludo.qzz.io](https://taujiludo.qzz.io)
 
-**Live Demo:** [https://tauji-ludo.vercel.app/]
+> **⚠️ Hosting Note:** The backend is currently hosted on Render's free tier. If the platform has been inactive, the initial load may take up to 50 seconds to spin up. Thank you for your patience!
 
-**Note:** The Backend is hosted in Render with a free tier which leds to 50sec of delay on starting after a long period of inactivity. Please Bear 50sec to use it!
+---
 
------
+## 🚀 About the Project
 
-## ⚙️ How It Works
+TaujiLudo is designed to offer a seamless, high-stakes board game experience. Moving away from third-party application dependencies, the platform now features its own state-managed, real-time Ludo arena. It ensures fair play through strict turn timers, handles complex financial transactions (deposits, withdrawals, and referrals), and maintains platform integrity through a rigorous, admin-controlled KYC and dispute resolution system. 
 
-The platform facilitates wagers on external Ludo games through a simple, secure workflow:
-
-1.  **Create or Join a Battle:** A user sets a wager amount and creates a new battle, or joins an existing one.
-2.  **Exchange Room Codes:** Once two players are matched, the app provides a secure space for them to exchange the room code for a game on an external app (like Ludo King).
-3.  **Play Externally:** Players use the code to play their match on the third-party Ludo platform.
-4.  **Verify Winner:** After the game, the winner returns to TaujiLudo and uploads a screenshot of their victory screen as proof.
-5.  **Payout or Dispute:**
-      * If the opponent agrees or doesn't contest, the winner is paid out automatically from the escrowed funds.
-      * If both players upload a winning screenshot, a dispute is automatically created for admin intervention.
-
------
-
-To test the full functionality of the platform, you can use the following pre-configured demo accounts. Both accounts are pre-loaded with tokens to allow for creating and joining battles.
-
-For the best experience, open the website in two different browsers (or an incognito window) to log in as both players simultaneously.
-
-Player One
-Phone Number: 7002926251 (ADMIN ACCESS)
-
-Player Two
-Phone Number: 9784889319 (ADMIN ACCESS)
+---
 
 ## ✨ Key Features
 
-### User-Facing Features
+### 🎮 Immersive Gameplay & Matchmaking
+* **3D Landing Experience:** An engaging, interactive 3D landing page built to provide a premium UI/UX from the first click.
+* **Custom Matchmaking:** Users have full control over their wagers. They can create new challenges with specific bet amounts or browse and join existing live battle requests.
+* **In-App Real-Time Arena:** Players compete directly on the platform in a custom 1v1 classic Ludo environment. 
+* **State-Managed Turn System:** Strict, server-enforced timers keep the game moving. Players have 15 seconds to roll the dice and another 15 seconds to execute a move. Missing the window forfeits the turn.
+* **Admit Defeat & Pause Mechanics:** Players can formally concede a match. If a player disconnects or pauses, the opponent can request admin intervention.
 
-  * **Battle Matchmaking:** Create and join wager-based Ludo battles.
-  * **Secure Code Exchange:** In-app system for players to share external game room codes.
-  * **Screenshot Verification System:** Simple and effective proof-of-win upload functionality.
-  * **Integrated Digital Wallet:**
-      * Securely deposit and withdraw funds.
-      * Funds are held in escrow during a battle.
-      * View detailed transaction history.
-  * **Referral Program:** Invite new users and earn rewards.
+### 💰 Financial Ecosystem
+* **Integrated Escrow Wallet:** Wagers are locked in escrow the moment a match begins and are automatically credited to the victor's wallet upon completion.
+* **Manual Verification System:** To prevent fraud, all deposits are manually verified by admins via payment screenshots before wallet funds are credited.
+* **Secure Withdrawals:** Users can withdraw winnings directly to their Bank Account or UPI after passing KYC.
+* **Automated Referral Engine:** Users earn a 2% commission from the winning matches of anyone they refer, automatically credited to their wallet.
 
-### Admin Panel Features
+### 🛡️ Security & Admin Control
+* **Rigorous KYC Verification:** Withdrawals are locked behind a manual KYC process. Users must upload their Aadhar card, which is securely reviewed and approved by the admin team.
+* **Dispute Resolution Dashboard:** Admins have access to backend game logs. If a game is paused indefinitely or disputed, admins can review the match data, dismiss the game, or manually assign a winner.
+* **256-Bit Encryption Standard:** Secure login and data protection protocols ensure user privacy and financial safety.
 
-  * **Dispute Resolution Dashboard:** A dedicated interface for admins to review conflicting screenshot evidence and manually declare a winner.
-  * **KYC Verification:** Review and approve user identity documents.
-  * **Payment Management:** Approve or reject user deposit and withdrawal requests.
-  * **User Management & Broadcasts:** Oversee all users and send platform-wide announcements.
-
------
+---
 
 ## 💻 Tech Stack
 
-This platform was built using a modern and robust set of technologies:
+This platform leverages a modern, scalable architecture:
 
-  * **Frontend:** **React.js**, **TypeScript**, **Tailwind CSS**
-  * **Backend:** **Node.js**, **Express.js**
-  * **Database:** **MongoDB**
-  * **Real-time Communication:** **Socket.IO / WebSockets** (for matchmaking and notifications)
+* **Frontend:** React.js, TypeScript, Tailwind CSS, Three.js 
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB
+* **Real-Time Communication:** Socket.IO / WebSockets (powers the live Ludo arena, matchmaking, and instant UI updates)
 
------
+---
+
+## ⚙️ User Journey: How It Works
+
+1. **Onboarding:** A user signs up, securely logs in, and uploads their Aadhar card for KYC verification to unlock full platform capabilities.
+2. **Funding the Wallet:** The user initiates a deposit, transfers funds via UPI/Bank, and uploads a screenshot. An admin verifies the screenshot and credits the wallet.
+3. **Entering the Arena:** The user creates a battle request for a specific amount (e.g., ₹50). Another user accepts the challenge.
+4. **The Match:** Both players are routed to a secure waiting room, then deployed into the 3D-styled Ludo board. They play in real-time under strict 15-second turn limits.
+5. **The Payout:** The winner's wallet is instantly credited with the combined wager.
+6. **Withdrawal:** The winner requests a withdrawal to their UPI, which an admin reviews and processes.
+
+---
 
 ## 📜 Copyright and License
 
-© 2025 MD Gohar Khan. All Rights Reserved.
+© 2026 MD Gohar Khan. All Rights Reserved.
 
 The code in this repository is proprietary and may not be used, copied, modified, or distributed without the express written permission of the owner.
 
------
+---
 
 ## 📧 Contact
 
-MD Gohar Khan - [mdg\_ug-22@mech.nits.ac.in](mailto:mdg_ug-22@mech.nits.ac.in)
+**MD Gohar Khan** * **Email:** [mdg_ug-22@mech.nits.ac.in](mailto:mdg_ug-22@mech.nits.ac.in)
+* **LinkedIn:** [MD Gohar Khan](https://www.linkedin.com/in/md-gohar-khan-bb9275321)
+* **GitHub:** [Gauhar-1](https://github.com/Gauhar-1)
